@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第2题 · 线性表插入位置</title>
+<style>:root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--red:#dc2626;--green:#16a34a;--amber:#d97706;--border:#e2e8f0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem}.header .tag{font-size:.75rem;letter-spacing:3px;color:var(--muted)}.header h1{font-size:2rem;font-weight:800;color:var(--blue);margin:8px 0}.header .q-box{display:inline-block;text-align:left;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:1rem 1.5rem;font-size:1.05rem}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2.5rem 0}.section h2{font-size:1.3rem;color:var(--blue);border-left:4px solid var(--blue);padding-left:14px;margin-bottom:1rem}.section h3{font-size:1.05rem;margin:1.3rem 0 .6rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0;box-shadow:0 1px 3px rgba(0,0,0,.03)}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}li::marker{color:var(--blue)}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.demo{display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;font-family:'Cascadia Code',monospace}.demo .slot{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}.demo .slot.elem{background:#dbeafe;border:2px solid var(--blue);color:var(--blue)}.demo .slot.gap{background:transparent;border:2px dashed #94a3b8;color:var(--green);font-size:.7rem}.demo .slot.arrow{background:transparent;color:var(--amber);font-size:1.2rem;border:none}.vs-box{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}.vs-card{padding:1.5rem;border-radius:12px;text-align:center}.vs-card.ins{background:#f0fdf4;border:2px solid var(--green)}.vs-card.del{background:#fef2f2;border:2px solid var(--red)}.vs-card .v{font-size:2rem;font-weight:900}.code-block{background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1.2rem 1.5rem;font-family:'Cascadia Code',monospace;font-size:.85rem;line-height:1.7;overflow-x:auto;margin:1rem 0}.code-block .kw{color:#f87171}.code-block .fn{color:#60a5fa}.code-block .cmt{color:#94a3b8}.code-block .num{color:#fbbf24}</style></head>
+<body><div class="container">
+
+<div class="header"><div class="tag">测试题 · 选择题 · 第2题</div><h1>线性表中插入元素的位置范围</h1>
+<div class="q-box">在长度为 n 的线性表的第 i 个位置插入元素，i 的合法值应为？</div></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">C — 1 ≤ i ≤ n+1</div></div>
+
+<div class="section"><h2>一、通俗理解：排队插队</h2>
+<div class="card">
+<p>你面前有 <strong>5 个人</strong> 在排队：<code>A B C D E</code>。你想插队，<strong>你能站哪些位置？</strong></p>
+<div class="demo">
+  <div class="slot arrow">i=1↓</div><div class="slot elem">A</div>
+  <div class="slot arrow">i=2↓</div><div class="slot elem">B</div>
+  <div class="slot arrow">i=3↓</div><div class="slot elem">C</div>
+  <div class="slot arrow">i=4↓</div><div class="slot elem">D</div>
+  <div class="slot arrow">i=5↓</div><div class="slot elem">E</div>
+  <div class="slot arrow">i=6↓</div>
+</div>
+<p>你可以站在<strong>最前面</strong>（i=1，在A前面），也可以站在<strong>最后面</strong>（i=6，在E后面），还可以站在<strong>任意两人之间</strong>（i=2~5）。</p>
+<p style="font-size:1.1rem;text-align:center;margin-top:1rem"><span class="hl">5 个人 → 6 个"缝隙" → n 个人 → n+1 个位置</span></p></div></div>
+
+<div class="section"><h2>二、插入 vs 删除的区别记忆</h2>
+<div class="card">
+<div class="vs-box">
+  <div class="vs-card ins"><div style="color:var(--green)">📥 插入</div><div class="v" style="color:var(--green)">1 ≤ i ≤ n+1</div><div style="font-size:.85rem;color:var(--muted)">可以追加在末尾 → 多出1个位置</div></div>
+  <div class="vs-card del"><div style="color:var(--red)">📤 删除</div><div class="v" style="color:var(--red)">1 ≤ i ≤ n</div><div style="font-size:.85rem;color:var(--muted)">只能删已有的 → 正好 n 个目标</div></div>
+</div>
+<div class="tip"><strong>💡 生活类比：</strong>插入 = 你排队插队（可以站最前面也可以站最后面）。删除 = 队伍里有人被赶出队伍（只能赶已经在队伍里的人）。</div></div></div>
+
+<div class="section"><h2>三、逐选项分析</h2>
+<div class="card">
+<table style="width:100%;border-collapse:collapse">
+<tr style="border-bottom:1px solid var(--border);background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">A</td><td style="padding:10px"><code>1 ≤ i ≤ n</code></td><td style="padding:10px;color:var(--red)">❌ 缺了 n+1，不能插到末尾</td></tr>
+<tr style="border-bottom:1px solid var(--border);background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">B</td><td style="padding:10px"><code>0 ≤ i ≤ n</code></td><td style="padding:10px;color:var(--red)">❌ 多出 i=0（编号从1开始），又缺 n+1</td></tr>
+<tr style="border-bottom:1px solid var(--border);background:#f0fdf4"><td style="padding:10px;font-weight:700;color:var(--green)">C</td><td style="padding:10px"><code>1 ≤ i ≤ n+1</code></td><td style="padding:10px;color:var(--green)">✅ 完美覆盖所有可插入位置</td></tr>
+<tr style="background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">D</td><td style="padding:10px"><code>1 ≤ i ≤ n-1</code></td><td style="padding:10px;color:var(--red)">❌ 缺得最多</td></tr>
+</table></div></div>
+
+<div class="section"><h2>四、代码验证</h2>
+<div class="card">
+<p>典型的顺序表插入代码中，合法性检查这样写：</p>
+<div class="code-block"><span class="kw">int</span> <span class="fn">ListInsert</span>(SeqList *L, <span class="kw">int</span> i, <span class="kw">int</span> x) {<br>    <span class="kw">if</span> (i &lt; <span class="num">1</span> || i &gt; L-&gt;length + <span class="num">1</span>)  <span class="cmt">// i>n+1 才非法</span><br>        <span class="kw">return</span> <span class="num">0</span>;<br>    <span class="cmt">// ... 后移元素，放入x，length++</span><br>}</div>
+<p style="color:var(--muted);margin-top:.5rem">i>n+1 非法 → 合法的是 i ≤ n+1。代码是最诚实的。</p></div></div>
+
+<div class="tip"><strong>🎯 通俗记忆：</strong>"插比删多一，插入 n+1，删除只有 n。" 只要记住这句话，这题永远不会错。</div>
+
+<div style="text-align:center;color:var(--muted);font-size:.9rem;margin-top:3rem">📖 第2章顺序表的基本操作是编程题的必考内容，插入位置的合法性是基础中的基础。</div>
+
+</div></body></html>

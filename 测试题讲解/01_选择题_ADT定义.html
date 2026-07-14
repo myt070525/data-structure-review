@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第1题 · ADT 抽象数据类型</title>
+<style>:root{--bg:#fefdf7;--card:#fff;--text:#1c1917;--muted:#6b5e4f;--accent:#b45309;--blue:#1e40af;--red:#c41e3a;--green:#166534;--border:#e5ddd0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Georgia','PingFang SC','Microsoft YaHei',serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:17px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:2px solid var(--border)}.header .tag{font-size:.75rem;letter-spacing:3px;color:var(--muted)}.header h1{font-size:2rem;font-weight:700;color:var(--accent);margin:8px 0}.header .q-box{display:inline-block;text-align:left;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:1rem 1.5rem;font-size:1.05rem}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2.5rem 0}.section h2{font-size:1.35rem;color:var(--accent);border-left:4px solid var(--accent);padding-left:14px;margin-bottom:1rem}.section h3{font-size:1.05rem;margin:1.5rem 0 .8rem;color:var(--blue)}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0;box-shadow:0 1px 3px rgba(0,0,0,.03)}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fdf6e8;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em;border:1px solid #e5ddd0}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}li::marker{color:var(--accent)}.hl{background:#fef3c7;border-bottom:2px solid var(--accent);padding:1px 3px;font-weight:600}.layer{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin:1.5rem 0}.lbox{border-radius:14px;padding:1.2rem 1.5rem;text-align:center;flex:1;min-width:140px;font-weight:700}.lbox.data{background:#fef3c7;border:2px solid #f59e0b;color:#92400e}.lbox.rel{background:#dbeafe;border:2px solid #3b82f6;color:#1e40af}.lbox.op{background:#d1fae5;border:2px solid #10b981;color:#065f46}.lbox.store{background:#fce7f3;border:2px dashed #ec4899;color:#9d174d}.vs{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1rem 0}.vsbox{padding:1.3rem;border-radius:10px;text-align:center}.vsbox.logic{background:#eff6ff;border:2px solid var(--blue)}.vsbox.phys{background:#fdf2f8;border:2px dashed #db2777}table{width:100%;border-collapse:collapse;margin:1rem 0}td{padding:10px 14px;border-bottom:1px solid var(--border)}tr.ok td{background:#f0fdf4}tr.no td{background:#fef2f2;color:var(--red)}</style></head>
+<body><div class="container">
+
+<div class="header"><div class="tag">测试题 · 选择题 · 第1题</div><h1>抽象数据类型（ADT）不包括什么？</h1>
+<div class="q-box">抽象数据类型中<strong>不包括</strong>（　）。<br>A、数据对象　B、数据对象的关系　C、操作的集合　D、数据的存储结构</div></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">D — 数据的存储结构</div></div>
+
+<div class="section"><h2>一、通俗理解：ADT 就像一份"说明书"</h2>
+<div class="card">
+<p>想象你去买一个<strong>手机</strong>：</p>
+<ul><li>说明书告诉你：手机能打电话、发短信、拍照——这些是<span class="hl">操作</span></li>
+<li>说明书告诉你：手机有屏幕、按键、摄像头——这些是<span class="hl">数据对象</span></li>
+<li>说明书告诉你：按"电话"按钮进入拨号界面——这是<span class="hl">数据之间的关系</span></li>
+<li>但说明书<strong>不会</strong>告诉你：CPU 用了什么型号、内存颗粒是哪家厂的——这些是<span style="color:var(--red);font-weight:700">存储/实现细节</span></li></ul>
+<p>ADT 只关心"<strong>能做什么</strong>"和"<strong>有什么数据</strong>"，不关心"<strong>怎么存</strong>"。就像你只需要知道手机能打电话，不需要知道手机内部电路长什么样。</p></div></div>
+
+<div class="section"><h2>二、ADT 的三大组成部分</h2>
+<div class="card">
+<div class="layer">
+  <div class="lbox data">📊<br>数据对象<br><small>有哪些数据？</small></div>
+  <div class="lbox rel">🔗<br>数据关系<br><small>数据之间怎样关联？</small></div>
+  <div class="lbox op">⚙️<br>操作集合<br><small>能对数据做什么？</small></div>
+</div>
+<p style="text-align:center;font-size:1.5rem;color:var(--muted)">↓ 再往下走一步 ↓</p>
+<div class="layer"><div class="lbox store">💾<br><strong style="font-size:1.1rem">存储结构 ← 这不属于ADT！</strong><br><small>怎么存在内存里？顺序还是链式？</small></div></div>
+<p style="text-align:center;color:var(--muted);font-size:.9rem">存储结构是"物理层"的事，ADT只管"逻辑层"</p></div></div>
+
+<div class="section"><h2>三、逻辑结构 vs 存储结构（最容易混淆的一对概念）</h2>
+<div class="card">
+<div class="vs">
+  <div class="vsbox logic"><div style="font-size:2rem">🧠</div><h3>逻辑结构</h3><ul style="text-align:left;font-size:.9rem"><li>线性结构（一对一）</li><li>树结构（一对多）</li><li>图结构（多对多）</li><li>集合（没关系）</li></ul><p style="font-size:.8rem;color:var(--muted)">→ 属于 ADT 范畴</p></div>
+  <div class="vsbox phys"><div style="font-size:2rem">💿</div><h3>存储结构</h3><ul style="text-align:left;font-size:.9rem"><li>顺序存储（数组）</li><li>链式存储（指针）</li><li>索引存储</li><li>散列存储（哈希）</li></ul><p style="font-size:.8rem;color:var(--red)">→ 不属于 ADT</p></div>
+</div></div></div>
+
+<div class="section"><h2>四、逐项排查</h2>
+<div class="card">
+<table>
+<tr class="ok"><td style="font-weight:700">A</td><td>数据对象</td><td>✅ ADT三要素之一。必须说明"里面有什么数据"</td></tr>
+<tr class="ok"><td style="font-weight:700">B</td><td>数据对象的关系</td><td>✅ ADT三要素之一。数据之间是线性？树形？图形关系？</td></tr>
+<tr class="ok"><td style="font-weight:700">C</td><td>操作的集合</td><td>✅ ADT三要素之一。插入、删除、查找、修改等</td></tr>
+<tr class="no"><td style="font-weight:700">D</td><td>数据的存储结构</td><td>❌ 这是"怎么实现"的问题，不属于抽象定义范畴</td></tr>
+</table></div></div>
+
+<div class="tip"><strong>🎯 记忆口诀：</strong>"ADT = 对象 + 关系 + 操作"。你只需要知道<strong>有什么、怎么连、能干嘛</strong>，不用管<strong>怎么存</strong>。</div>
+
+<div class="danger"><strong>⚠️ 考试陷阱：</strong>题目问"不包括"，很容易一紧张选反了。看清楚：题目问的是<strong>不</strong>包括！</div>
+
+<div style="text-align:center;color:var(--muted);font-size:.9rem;margin-top:2rem">📖 ADT 是第1章基础概念，虽然简单但每年都有人搞混逻辑结构和存储结构。</div>
+</div></body></html>

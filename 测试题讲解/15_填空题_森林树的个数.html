@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>填空第5题 · 森林中树的个数</title>
+<style>:root{--bg:#f0fdf4;--card:#fff;--text:#14532d;--muted:#15803d;--accent:#166534;--amber:#d97706;--border:#bbf7d0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:16px}.container{max-width:800px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--accent)}.answer{text-align:center;padding:1.5rem;border:3px solid var(--accent);border-radius:10px;background:#dcfce7;margin:1.5rem 0}.answer .big{font-size:3rem;font-weight:900;color:var(--accent);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--accent);border-left:4px solid var(--accent);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#dcfce7;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}</style></head>
+<body><div class="container">
+<div class="header"><h1>🌲 填空第5题 · 森林中树的个数</h1><p style="color:var(--muted)">森林 F 有 15 条边，25 个结点，F 包含几棵树？</p></div>
+<div class="answer"><div class="big">10</div><div style="color:var(--muted)">棵树</div></div>
+
+<div class="section"><h2>一、每棵树的结构公式</h2>
+<div class="card">
+<p>一棵有 m 个结点的树，<strong>一定有 m-1 条边</strong>。这是树的基本性质。</p>
+<p>反过来说：如果 m 个结点用 m-1 条边连起来且没有回路，那就是一棵树。少一条边就断开成两棵树。</p></div></div>
+
+<div class="section"><h2>二、公式推导</h2>
+<div class="card">
+<p>设森林有 <strong>k</strong> 棵树。</p>
+<p>总边数 = 每棵树的边数之和 = Σ(结点数ᵢ - 1) = 总结点数 - k</p>
+<p style="text-align:center;font-size:1.3rem"><span class="hl">边数 = 结点数 - 树的数量</span></p>
+<p>代入：15 = 25 - k → <strong>k = 10</strong></p></div></div>
+
+<div class="section"><h2>三、直观理解</h2>
+<div class="card">
+<p>25个结点如果连成一棵树，需要24条边。但现在只有15条边——"少了" 24-15=9 条边。</p>
+<p>每少一条边，树就断成两棵。少了9条边→多了9棵树（相对于1棵）。所以总共 <strong>1+9=10 棵</strong>。</p>
+<p style="color:var(--muted)">通俗类比：把一群人连成一个微信群需要N-1个好友关系。如果好友关系不够多，大家就分散成好几个群——群数 = 人数 - 关系数。</p></div></div>
+
+<div class="tip"><strong>🎯 万能公式：</strong>树的数量 = 结点数 - 边数。这个公式对所有森林都成立！</div>
+
+</div></body></html>

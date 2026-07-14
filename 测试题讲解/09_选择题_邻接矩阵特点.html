@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第9题 · 邻接矩阵的特点</title>
+<style>:root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--red:#dc2626;--green:#16a34a;--amber:#d97706;--border:#e2e8f0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem}.header h1{font-size:2rem;font-weight:800;color:var(--blue)}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.3rem;color:var(--blue);border-left:4px solid var(--blue);padding-left:14px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.vs-box{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1rem 0}.vs-card{padding:1.3rem;border-radius:12px;text-align:center}.vs-card.pro{background:#f0fdf4;border:2px solid var(--green)}.vs-card.con{background:#fef2f2;border:2px solid var(--red)}table{width:100%;border-collapse:collapse;margin:1rem 0}td{padding:10px 14px;border-bottom:1px solid var(--border)}tr.good td{background:#f0fdf4}tr.bad td{background:#fef2f2;color:var(--red)}</style></head>
+<body><div class="container">
+
+<div class="header"><h1>📊 邻接矩阵表示图</h1><p style="color:var(--muted)">考虑时空复杂度，邻接矩阵的优点是？</p></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">C — 便于判断两顶点间是否有边</div></div>
+
+<div class="section"><h2>一、邻接矩阵是什么？打个比方</h2>
+<div class="card">
+<p>用一个 n×n 的矩阵 A 表示 n 个顶点的图：</p>
+<p style="text-align:center;font-size:1.1rem"><code>A[i][j] = 1</code>（或权值）如果 i→j 有边；否则 <code>A[i][j] = 0</code></p>
+<p style="color:var(--muted)">通俗理解：就像一张 Excel 表格，行和列都是城市。如果第 i 行第 j 列有数字，说明从城市 i 到城市 j 有直飞航班。想查有没有航班？一秒定位！</p></div></div>
+
+<div class="section"><h2>二、优缺点全面总结</h2>
+<div class="card">
+<div class="vs-box">
+  <div class="vs-card pro"><h3 style="color:var(--green)">✅ 优点</h3><ul style="text-align:left;font-size:.9rem"><li><strong>O(1)判断边</strong>：直接查 A[i][j]</li><li>实现简单直观</li><li>适合稠密图（边多）</li><li>方便矩阵运算</li></ul></div>
+  <div class="vs-card con"><h3 style="color:var(--red)">❌ 缺点</h3><ul style="text-align:left;font-size:.9rem"><li><strong>空间 O(n²)</strong>，不管边多边少</li><li>增删顶点代价大（要重建矩阵）</li><li>不适合稀疏图</li><li>遍历邻接点要扫一整行</li></ul></div>
+</div></div></div>
+
+<div class="section"><h2>三、逐项排查</h2>
+<div class="card">
+<table>
+<tr class="bad"><td style="font-weight:700">A</td><td>便于添加和删除顶点</td><td>❌ 增删顶点要重新分配 n² 矩阵，非常不便！这是邻接表的优势。</td></tr>
+<tr class="bad"><td style="font-weight:700">B</td><td>适合存储稀疏图</td><td>❌ 稀疏图边很少，用 n² 空间太浪费。应该用邻接表。</td></tr>
+<tr class="good"><td style="font-weight:700">C</td><td>便于判断两顶点间是否有边</td><td>✅ 直接查 A[i][j]，O(1) 秒出结果！这是邻接矩阵的核心优势。</td></tr>
+<tr class="bad"><td style="font-weight:700">D</td><td>以上说法都不对</td><td>❌ C 是对的。</td></tr>
+</table></div></div>
+
+<div class="section"><h2>四、邻接矩阵 vs 邻接表 — 场景决定选谁</h2>
+<div class="card">
+<table style="text-align:center">
+<tr style="background:#f1f5f9"><th>操作</th><th>邻接矩阵</th><th>邻接表</th></tr>
+<tr><td>判边是否存在</td><td style="color:var(--green);font-weight:700">O(1) ✅</td><td>O(deg)</td></tr>
+<tr><td>找所有邻接点</td><td>O(n)</td><td style="color:var(--green);font-weight:700">O(deg) ✅</td></tr>
+<tr><td>空间复杂度</td><td>O(n²)</td><td style="color:var(--green);font-weight:700">O(n+e) ✅</td></tr>
+<tr><td>适合场景</td><td>稠密图（边≈n²）</td><td>稀疏图（边≪n²）</td></tr>
+</table>
+<div class="tip"><strong>💡 通俗记忆：</strong>邻接矩阵是全图一张大表，查边秒查但很占地方。邻接表是每个顶点挂一串邻居，省地方但查边要翻链表。</div></div></div>
+
+</div></body></html>

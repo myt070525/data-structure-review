@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：叶结点链表化 - BuildLeafList</title>
+<style>
+    :root {
+        --bg: #fff7ed;
+        --fg: #3e2723;
+        --accent: #ea580c;
+        --accent2: #7c3aed;
+        --green: #059669;
+        --blue: #0f766e;
+        --card-bg: #ffffff;
+        --border: #f0d9c8;
+        --shadow: 0 2px 14px rgba(234,88,12,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #fff7ed 0%, #fef0e6 40%, #fde8d8 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #9a3412, #ea580c);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(154,52,18,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.purple { border-left-color: var(--accent2); }
+    .card.blue   { border-left-color: var(--blue); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #f0d9c8;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #7c2d12; }
+    .code-block {
+        background: #1c1917; color: #e7e5e4; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre;
+    }
+    .code-block .kw { color: #fb923c; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #78716c; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .blank { background: #facc15; color: #1c1917; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.5;
+        background: #faf7f5; padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #e7d6c8;
+        margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #fff7ed; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid #d97706;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .leaf-badge {
+        display: inline-block; background: #4ade80; color: #1a3c2a;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    .nonleaf-badge {
+        display: inline-block; background: #fbbf24; color: #78350f;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    .pointer-symbol {
+        color: #ea580c; font-weight: 700;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #f0d9c8;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.75rem; padding: 0.8rem; }
+        .ascii-art { font-size: 0.7rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🌿 编程题：叶结点链表化（BuildLeafList）</h1>
+    <div class="subtitle">第27题 · 将二叉树的所有叶结点串成双向链表</div>
+    <div class="answer-badge">
+        ✅ 填空答案：(1) T-&gt;Left!=NULL || T-&gt;Right!=NULL &nbsp;
+        (2) BuildLeafList(T-&gt;Left) &nbsp; (3) BuildLeafList(T-&gt;Right) &nbsp;
+        (4) PreLeaf-&gt;Right=T &nbsp; (5) T-&gt;Left=PreLeaf
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目理解：我们要做什么？</h2>
+
+<h3>1.1 问题描述</h3>
+<p>
+给定一棵二叉树，要求编写递归函数 <code>BuildLeafList</code>，<b>将树中所有叶结点（没有孩子的结点）串成一个带头结点的双向循环链表</b>。叶结点原本的 <code>Left</code> 和 <code>Right</code> 指针（原本是NULL）被复用为双向链表的前驱和后继指针。
+</p>
+
+<h3>1.2 关键概念</h3>
+<ul style="margin-left:1.5rem; line-height:2.2;">
+    <li><span class="leaf-badge">叶结点</span>：左右孩子均为NULL的结点。它是树的"末端"。</li>
+    <li><span class="nonleaf-badge">非叶结点</span>：至少有一个孩子不为NULL的结点（包括只有一个孩子的分支结点）。</li>
+    <li><b>头结点H</b>：一个哑结点（dummy node），不存储实际数据，仅作为链表的起点和终点。</li>
+    <li><b>全局指针PreLeaf</b>：始终指向<b>最近访问到的叶结点</b>，用于链表的双向链接。</li>
+</ul>
+
+<h3>1.3 遍历策略：中序遍历（左→根→右）</h3>
+<p>
+函数采用<b>中序遍历</b>框架：先递归处理左子树，然后处理当前结点，最后递归处理右子树。叶结点按中序顺序被依次访问，链表中的顺序 = 叶结点的中序遍历顺序。
+</p>
+</div>
+
+<!-- ============ VISUAL EXAMPLE ============ -->
+<div class="card green">
+<h2>二、可视化示例：一棵二叉树的变化</h2>
+
+<h3>2.1 原始二叉树</h3>
+<div class="ascii-art">
+                     A
+                   /   \
+                  B     C
+                 / \   / \
+                D   E F   G
+               / \         \
+              H   I         J
+
+    其中叶结点（中序顺序）：H → I → E → F → J
+    非叶结点：A, B, C, D, G
+</div>
+
+<h3>2.2 操作完成后的双向链表</h3>
+<div class="ascii-art">
+    ┌─────────────────────────────────────────────────────┐
+    │  (带头结点的双向循环链表)                            │
+    │                                                      │
+    │  head(H) ⇄ H ⇄ I ⇄ E ⇄ F ⇄ J ⇄ head(H)            │
+    │           ←  Left 指针指向前驱                       │
+    │           →  Right 指针指向后继                      │
+    └─────────────────────────────────────────────────────┘
+
+    关键变化：
+    · H.Left 原先为NULL  →  现在指向J（前驱）
+    · H.Right原先为NULL  →  现在指向I（后继）  等等
+    · H.Right 原先为NULL  →  现在指向链表下一个叶结点
+    · H.Left  原先为NULL  →  现在指向链表上一个叶结点
+</div>
+</div>
+
+<!-- ============ FULL CODE ============ -->
+<div class="card purple">
+<h2>三、完整代码 &amp; 逐行解析</h2>
+
+<h3>3.1 数据结构定义</h3>
+<div class="code-block">
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">BiTNode</span> {
+    <span class="type">int</span> Data;
+    <span class="kw">struct</span> <span class="type">BiTNode</span> *Left;   <span class="cmt">// 左孩子 / 链表前驱</span>
+    <span class="kw">struct</span> <span class="type">BiTNode</span> *Right;  <span class="cmt">// 右孩子 / 链表后继</span>
+} <span class="type">BiTNode</span>, *<span class="type">BiTree</span>;
+
+<span class="type">BiTNode</span> *PreLeaf = <span class="kw">NULL</span>;   <span class="cmt">// 全局指针，指向最近访问到的叶结点</span>
+</div>
+
+<h3>3.2 主函数：BuildLeafList</h3>
+<div class="code-block">
+<span class="kw">void</span> <span class="fn">BuildLeafList</span>(<span class="type">BiTree</span> T, <span class="type">BiTree</span> H) {
+    <span class="cmt">// T: 当前遍历到的树结点</span>
+    <span class="cmt">// H: 链表头结点</span>
+
+    <span class="kw">if</span> (T == <span class="kw">NULL</span>)
+        <span class="kw">return</span>;                     <span class="cmt">// 空树/空子树，直接返回</span>
+
+    <span class="cmt">// ─── 填空(1)：判断T是否为非叶结点 ───</span>
+    <span class="kw">if</span> (<span class="blank">T-&gt;Left != NULL || T-&gt;Right != NULL</span>) {
+        <span class="cmt">// 情形一：T不是叶结点 → 继续递归遍历左右子树</span>
+
+        <span class="cmt">// ─── 填空(2)：中序遍历左子树 ───</span>
+        <span class="blank">BuildLeafList(T-&gt;Left)</span>;
+
+        <span class="cmt">// ─── 填空(3)：中序遍历右子树 ───</span>
+        <span class="blank">BuildLeafList(T-&gt;Right)</span>;
+    }
+    <span class="kw">else</span> {
+        <span class="cmt">// 情形二：T是叶结点（Left和Right均为NULL）</span>
+        <span class="cmt">// 将其链入双向链表</span>
+
+        <span class="kw">if</span> (PreLeaf == <span class="kw">NULL</span>) {
+            <span class="cmt">// 这是第一个被访问到的叶结点</span>
+            <span class="cmt">// 建立头结点与第一个叶结点的双向连接</span>
+            H-&gt;Right = T;
+            T-&gt;Left  = H;
+        }
+        <span class="kw">else</span> {
+            <span class="cmt">// 这是第2、3、4...个叶结点</span>
+            <span class="cmt">// 与前一个叶结点PreLeaf建立双向连接</span>
+
+            <span class="cmt">// ─── 填空(4)：前一个叶结点的Right指向当前叶结点 ───</span>
+            <span class="blank">PreLeaf-&gt;Right = T</span>;
+
+            <span class="cmt">// ─── 填空(5)：当前叶结点的Left指向前一个叶结点 ───</span>
+            <span class="blank">T-&gt;Left = PreLeaf</span>;
+        }
+
+        <span class="cmt">// 更新PreLeaf，当前叶结点变为"前一个"</span>
+        PreLeaf = T;
+
+        <span class="cmt">// 将当前叶结点的Right置为NULL（暂时）</span>
+        <span class="cmt">// 如果是最后一个叶结点，后续会与头结点形成循环</span>
+        T-&gt;Right = <span class="kw">NULL</span>;
+    }
+}
+</div>
+
+<h3>3.3 调用入口（考试可能给的框架）</h3>
+<div class="code-block">
+<span class="kw">void</span> <span class="fn">Solve</span>(<span class="type">BiTree</span> root) {
+    <span class="type">BiTNode</span> *H = (<span class="type">BiTNode</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">BiTNode</span>));
+    H-&gt;Left  = H-&gt;Right = <span class="kw">NULL</span>;
+    PreLeaf = <span class="kw">NULL</span>;                         <span class="cmt">// 初始化全局指针</span>
+
+    <span class="fn">BuildLeafList</span>(root, H);
+
+    <span class="cmt">// 形成循环链表：最后一个叶结点 ⇄ 头结点</span>
+    <span class="kw">if</span> (PreLeaf != <span class="kw">NULL</span>) {
+        PreLeaf-&gt;Right = H;    <span class="cmt">// 最后叶结点的后继指向头</span>
+        H-&gt;Left = PreLeaf;     <span class="cmt">// 头结点的前驱指向最后叶结点</span>
+    }
+}
+</div>
+</div>
+
+<!-- ============ FILL-IN REASONING ============ -->
+<div class="card blue">
+<h2>四、填空推理：为什么这样填？</h2>
+
+<h3>填空(1)：<code>T-&gt;Left != NULL || T-&gt;Right != NULL</code></h3>
+<p>
+<b>作用：</b>判断T是否为<b>非叶结点</b>。<br>
+如果一个结点的Left和Right<b>均为NULL</b>，它才是叶结点。所以"不是叶结点"的条件是：至少有一个孩子不为NULL，即 <code>Left != NULL || Right != NULL</code>。<br>
+<b>易错点：</b>不要写成 <code>&amp;&amp;</code>（且）。如果写成&amp;&amp;，则只有"两个孩子都不为NULL"才进入递归，会漏掉只有一个孩子的分支结点。
+</p>
+
+<h3>填空(2)和(3)：递归遍历左右子树</h3>
+<p>
+这是标准的中序遍历框架。先处理左子树（②），再处理右子树（③）。对于非叶结点本身不执行任何链表操作，它只负责"派发"递归。
+</p>
+
+<h3>填空(4)和(5)：双向链表插入操作</h3>
+<p>
+这是<b>双向链表尾部追加结点</b>的标准操作：
+</p>
+<ol style="margin-left:1.5rem; line-height:2;">
+    <li><code>PreLeaf-&gt;Right = T</code> —— 前驱的"后继"指针指向新结点。</li>
+    <li><code>T-&gt;Left = PreLeaf</code> —— 新结点的"前驱"指针指向前驱。</li>
+</ol>
+<p>
+<b>注意顺序：</b>④和⑤的顺序可以互换，因为它们操作的是不同字段。但如果涉及链表中间插入（断开原链），则必须先连后继再连前驱，否则会丢失信息。本题是尾部追加，顺序无影响。
+</p>
+</div>
+
+<!-- ============ STEP BY STEP ============ -->
+<div class="card green">
+<h2>五、逐步执行演示（以上述二叉树为例）</h2>
+
+<table>
+    <tr><th>步骤</th><th>访问结点</th><th>是否为叶？</th><th>动作</th><th>PreLeaf</th><th>链表状态</th></tr>
+    <tr><td>1</td><td>A</td><td>否(有B,C)</td><td>递归左B</td><td>NULL</td><td>空</td></tr>
+    <tr><td>2</td><td>B</td><td>否(有D,E)</td><td>递归左D</td><td>NULL</td><td>空</td></tr>
+    <tr><td>3</td><td>D</td><td>否(有H,I)</td><td>递归左H</td><td>NULL</td><td>空</td></tr>
+    <tr class="highlight"><td>4</td><td>H</td><td><b>是！</b></td><td>首个叶结点，H⇄H</td><td>H</td><td>head ⇄ H</td></tr>
+    <tr><td>5</td><td>D</td><td>-</td><td>递归右I</td><td>H</td><td>head ⇄ H</td></tr>
+    <tr class="highlight"><td>6</td><td>I</td><td><b>是！</b></td><td>追加：H⇄I</td><td>I</td><td>head ⇄ H ⇄ I</td></tr>
+    <tr><td>7</td><td>B</td><td>-</td><td>递归右E</td><td>I</td><td>head ⇄ H ⇄ I</td></tr>
+    <tr class="highlight"><td>8</td><td>E</td><td><b>是！</b></td><td>追加：I⇄E</td><td>E</td><td>head ⇄ H ⇄ I ⇄ E</td></tr>
+    <tr><td>9</td><td>A</td><td>-</td><td>递归右C</td><td>E</td><td>head ⇄ H ⇄ I ⇄ E</td></tr>
+    <tr><td>10</td><td>C</td><td>否(有F,G)</td><td>递归左F</td><td>E</td><td>...</td></tr>
+    <tr class="highlight"><td>11</td><td>F</td><td><b>是！</b></td><td>追加：E⇄F</td><td>F</td><td>head ⇄ H ⇄ I ⇄ E ⇄ F</td></tr>
+    <tr><td>12</td><td>C</td><td>-</td><td>递归右G</td><td>F</td><td>...</td></tr>
+    <tr><td>13</td><td>G</td><td>否(有J)</td><td>递归右J</td><td>F</td><td>...</td></tr>
+    <tr class="highlight"><td>14</td><td>J</td><td><b>是！</b></td><td>追加：F⇄J</td><td>J</td><td>head ⇄ H ⇄ I ⇄ E ⇄ F ⇄ J</td></tr>
+    <tr><td>最后</td><td>-</td><td>-</td><td>循环闭合</td><td>-</td><td>head ⇄ H ⇄ I ⇄ E ⇄ F ⇄ J ⇄ head</td></tr>
+</table>
+
+<div class="tip-box">
+    💡 <b>核心观察：</b>非叶结点（A, B, C, D, G）在遍历中只起到"路由"作用——它们把递归派发到子树，自身不参与链表。只有叶结点被实际链接。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>六、常见错误 &amp; 考点总结</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：混淆叶结点判断条件。</b>叶结点 = Left和Right<b>同时为NULL</b>。非叶结点 = <b>至少一个不为NULL</b>（用 || 而非 &amp;&amp;）。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：遍历顺序写错。</b>题目要求中序（左→根→右）。如果写成先序（根→左→右）或后序（左→右→根），链表顺序会不同。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：忘记更新PreLeaf。</b>每处理完一个叶结点，必须 <code>PreLeaf = T</code>，否则下一个叶结点无法正确链接。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：忘记形成循环。</b>遍历结束后，最后一个叶结点的Right和头结点的Left需要额外处理才能形成完整的双向循环链表。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆技巧：</b>"非叶递归左右跑，叶结点来把链搞。首个叶连头结点，后续叶连前面叶。PreLeaf追着叶结点跑，最后闭环不能少。"
+</div>
+
+<div class="tip-box">
+    💡 <b>考点本质：</b>这道题融合了三个知识点——<b>①二叉树的遍历（中序）</b>、<b>②叶结点的判定条件</b>、<b>③双向链表的尾部插入</b>。三者结合考察综合能力。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测试题讲解 · 叶结点链表化 · 第27题详解
+</footer>
+
+</body>
+</html>

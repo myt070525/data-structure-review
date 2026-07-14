@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>堆排序全过程详解 - [6,3,1,4,5,2]</title>
+<style>
+    :root {
+        --bg: #f5f0ff;
+        --fg: #2d2435;
+        --accent: #7c3aed;
+        --accent2: #db2777;
+        --gold: #d97706;
+        --green: #059669;
+        --cyan: #0891b2;
+        --card-bg: #ffffff;
+        --border: #e0d5f0;
+        --shadow: 0 2px 14px rgba(124,58,237,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #f5f0ff 0%, #ede4fa 40%, #e0d5f0 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center;
+        padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #5b21b6, #7c3aed);
+        color: #fff;
+        border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(91,33,182,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #fbbf24; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1.05rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.pink   { border-left-color: var(--accent2); }
+    .card.gold   { border-left-color: var(--gold); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #e0d5f0;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #4a3570; }
+    .tree-viz {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 1rem; line-height: 1.5;
+        background: #faf8ff; padding: 1.2rem 1.5rem;
+        border-radius: 10px; text-align: center;
+        overflow-x: auto; white-space: pre;
+        border: 2px solid #e0d5f0;
+    }
+    .arr-row {
+        display: flex; gap: 0; margin: 0.8rem 0; justify-content: center;
+        flex-wrap: wrap;
+    }
+    .arr-cell {
+        width: 50px; height: 50px; line-height: 50px;
+        text-align: center; border: 2px solid #c4b5d8;
+        font-weight: 700; font-size: 1.1rem;
+        background: #faf8ff; border-radius: 8px; margin: 2px;
+    }
+    .arr-cell.hl { background: #7c3aed; color: #fff; border-color: #5b21b6; }
+    .arr-cell.sorted { background: #059669; color: #fff; border-color: #047857; }
+    .arr-cell.swap { background: #fbbf24; color: #1a1a2e; border-color: #d97706; }
+    .arr-cell.pivot { background: #db2777; color: #fff; border-color: #be185d; }
+    .arr-idx {
+        width: 50px; text-align: center; font-size: 0.75rem;
+        color: #888; margin: 2px;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #faf8ff; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .code-block {
+        background: #1e1b2e; color: #e0dce8; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.7; overflow-x: auto; margin: 1rem 0;
+    }
+    .code-block .kw { color: #c084fc; }
+    .code-block .fn { color: #6ee7b7; }
+    .code-block .cmt { color: #6b7280; }
+    .code-block .num { color: #fbbf24; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid var(--gold);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 34px; height: 34px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .phase-label {
+        display: inline-block; background: #e0d5f0; color: #5b21b6;
+        font-weight: 700; padding: 0.25rem 1rem; border-radius: 14px;
+        font-size: 0.9rem; margin: 0.6rem 0;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #e0d5f0;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        .arr-cell { width: 38px; height: 38px; line-height: 38px; font-size: 0.9rem; }
+        .arr-idx { width: 38px; font-size: 0.7rem; }
+        header h1 { font-size: 1.3rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🔺 堆排序（Heap Sort）全过程</h1>
+    <div class="subtitle">第25题 · 序列 [6, 3, 1, 4, 5, 2] · 大根堆 → 升序排序</div>
+    <div class="answer-badge">✅ 第1趟后: [5, 4, 2, 1, 3, 6] &nbsp;|&nbsp; 第2趟后: [4, 3, 2, 1, 5, 6]</div>
+</header>
+
+<div class="container">
+
+<!-- ============ WHAT IS HEAP ============ -->
+<div class="card">
+<h2>一、什么是堆（Heap）？</h2>
+
+<h3>1.1 堆的定义</h3>
+<p>
+堆是一种<b>完全二叉树</b>，同时满足<b>堆的性质</b>：
+</p>
+<ul style="margin-left:1.5rem; margin-top:0.5rem;">
+    <li><b>大根堆（Max-Heap）：</b>每个父节点的值 ≥ 所有子节点的值。根节点是全局最大值。</li>
+    <li><b>小根堆（Min-Heap）：</b>每个父节点的值 ≤ 所有子节点的值。根节点是全局最小值。</li>
+</ul>
+<p>堆排序使用<b>大根堆</b>来实现升序排序。</p>
+
+<h3>1.2 完全二叉树的数组表示</h3>
+<p>堆通常用数组存储，父子关系通过下标计算（0-based索引）：</p>
+<ul style="margin-left:1.5rem;">
+    <li>节点 i 的<b>左孩子</b>：<code>2i + 1</code></li>
+    <li>节点 i 的<b>右孩子</b>：<code>2i + 2</code></li>
+    <li>节点 i 的<b>父节点</b>：<code>⌊(i-1)/2⌋</code></li>
+    <li>最后一个<b>非叶节点</b>：<code>⌊n/2⌋ - 1</code></li>
+</ul>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"左孩2i+1，右孩2i+2，找爹(i-1)/2向下取整。"
+</div>
+</div>
+
+<!-- ============ BUILD HEAP ============ -->
+<div class="card green">
+<h2>二、阶段一：建堆（BuildHeap）—— 将数组变成大根堆</h2>
+
+<h3>2.1 初始数组</h3>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell" style="background:#e0d5f0;">6</div>
+    <div class="arr-cell" style="background:#e0d5f0;">3</div>
+    <div class="arr-cell" style="background:#e0d5f0;">1</div>
+    <div class="arr-cell" style="background:#e0d5f0;">4</div>
+    <div class="arr-cell" style="background:#e0d5f0;">5</div>
+    <div class="arr-cell" style="background:#e0d5f0;">2</div>
+</div>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-idx">[0]</div>
+    <div class="arr-idx">[1]</div>
+    <div class="arr-idx">[2]</div>
+    <div class="arr-idx">[3]</div>
+    <div class="arr-idx">[4]</div>
+    <div class="arr-idx">[5]</div>
+</div>
+
+<h3>2.2 对应的完全二叉树（建堆前）</h3>
+<div class="tree-viz">
+        6[0]
+       /    \
+    3[1]    1[2]
+    /  \    /
+  4[3] 5[4] 2[5]
+</div>
+<p style="text-align:center; color:#888;">n=6，最后一个非叶节点下标 = ⌊6/2⌋ - 1 = 2，即索引2的元素1。</p>
+
+<h3>2.3 从最后一个非叶节点开始向下调整（siftDown）</h3>
+
+<!-- Adjust index 2 -->
+<div style="margin:1rem 0;">
+<span class="phase-label">第①步：调整下标2（值为1）</span>
+<p>节点1[2]的左孩子是2[5]（下标 2×2+1=5）。比较：1 &lt; 2 → 交换！</p>
+<div class="tree-viz">
+        6[0]
+       /    \
+    3[1]   <b style="color:#7c3aed;">2[2]</b>
+    /  \    /
+  4[3] 5[4] <b style="color:#db2777;">1[5]</b>
+</div>
+</div>
+
+<!-- Adjust index 1 -->
+<div style="margin:1rem 0;">
+<span class="phase-label">第②步：调整下标1（值为3）</span>
+<p>节点3[1]的孩子：左4[3]、右5[4]。两个孩子中较大的为5[4]。比较：3 &lt; 5 → 交换3和5。</p>
+<div class="tree-viz">
+        6[0]
+       /    \
+   <b style="color:#7c3aed;">5[1]</b>    2[2]
+    /  \    /
+  4[3] <b style="color:#db2777;">3[4]</b> 1[5]
+</div>
+<p>交换后3[4]没有孩子，无需继续向下调整。</p>
+</div>
+
+<!-- Adjust index 0 -->
+<div style="margin:1rem 0;">
+<span class="phase-label">第③步：调整下标0（值为6）</span>
+<p>节点6[0]的孩子：左5[1]、右2[2]。两个孩子中较大的为5[1]。比较：6 ≥ 5 → 不交换，调整完成！</p>
+<div class="tree-viz" style="border-color:#059669;">
+    <span style="color:#059669; font-weight:700;">✅ 大根堆建成！</span>
+        6[0]
+       /    \
+    5[1]    2[2]
+    /  \    /
+  4[3] 3[4] 1[5]
+</div>
+</div>
+
+<p><b>建堆完成后的数组：</b></p>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell" style="background:#059669; color:#fff;">6</div>
+    <div class="arr-cell" style="background:#059669; color:#fff;">5</div>
+    <div class="arr-cell" style="background:#059669; color:#fff;">2</div>
+    <div class="arr-cell" style="background:#059669; color:#fff;">4</div>
+    <div class="arr-cell" style="background:#059669; color:#fff;">3</div>
+    <div class="arr-cell" style="background:#059669; color:#fff;">1</div>
+</div>
+</div>
+
+<!-- ============ SORTING PASSES ============ -->
+<div class="card pink">
+<h2>三、阶段二：排序 —— 反复"交换 + 下沉"</h2>
+<p>
+堆排序的核心操作：<b>① 交换</b>堆顶（最大值）与堆的最后一个元素；<b>② 堆大小减1</b>（最大值"沉底"不动）；<b>③ 对新的堆顶做siftDown</b>恢复大根堆。重复直到堆大小为1。
+</p>
+
+<!-- Pass 1 -->
+<h3>第1趟排序</h3>
+<div class="step-row" style="display:flex; align-items:center; gap:0.8rem; margin:0.8rem 0;">
+    <span class="step-num">A</span> <b>交换</b>：堆顶6[0] ↔ 堆末1[5]
+</div>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell swap">1</div>
+    <div class="arr-cell">5</div>
+    <div class="arr-cell">2</div>
+    <div class="arr-cell">4</div>
+    <div class="arr-cell">3</div>
+    <div class="arr-cell pivot">6</div>
+</div>
+<div style="text-align:center; font-size:0.85rem; color:#888; margin:0.3rem 0;">
+    6已"沉底"，从现在起堆大小缩减为5（下标0~4）
+</div>
+
+<div class="step-row" style="display:flex; align-items:center; gap:0.8rem; margin:0.8rem 0;">
+    <span class="step-num">B</span> <b>siftDown根节点1[0]</b>
+</div>
+<p>1[0]的孩子：左5[1]、右2[2]。较大的是5[1]。1 &lt; 5 → 交换1和5：</p>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell">5</div>
+    <div class="arr-cell swap">1</div>
+    <div class="arr-cell">2</div>
+    <div class="arr-cell">4</div>
+    <div class="arr-cell">3</div>
+    <div class="arr-cell sorted">6</div>
+</div>
+<p>1[1]的孩子：左4[3]、右3[4]。较大的是4[3]。1 &lt; 4 → 交换1和4：</p>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">5</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">4</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">2</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">1</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">3</div>
+    <div class="arr-cell sorted">6</div>
+</div>
+<div style="text-align:center; font-size:0.85rem; color:#059669; font-weight:700; margin:0.5rem 0;">
+    ✅ 第1趟结束：堆恢复大根堆，数组 = [5, 4, 2, 1, 3 | 6]
+</div>
+
+<!-- Pass 2 -->
+<h3>第2趟排序</h3>
+<div class="step-row" style="display:flex; align-items:center; gap:0.8rem; margin:0.8rem 0;">
+    <span class="step-num">A</span> <b>交换</b>：堆顶5[0] ↔ 堆末3[4]
+</div>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell swap">3</div>
+    <div class="arr-cell">4</div>
+    <div class="arr-cell">2</div>
+    <div class="arr-cell">1</div>
+    <div class="arr-cell pivot">5</div>
+    <div class="arr-cell sorted">6</div>
+</div>
+<div style="text-align:center; font-size:0.85rem; color:#888; margin:0.3rem 0;">
+    5沉底，堆大小缩减为4（下标0~3）
+</div>
+
+<div class="step-row" style="display:flex; align-items:center; gap:0.8rem; margin:0.8rem 0;">
+    <span class="step-num">B</span> <b>siftDown根节点3[0]</b>
+</div>
+<p>3[0]的孩子：左4[1]、右2[2]。较大的是4[1]。3 &lt; 4 → 交换3和4：</p>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell">4</div>
+    <div class="arr-cell swap">3</div>
+    <div class="arr-cell">2</div>
+    <div class="arr-cell">1</div>
+    <div class="arr-cell sorted">5</div>
+    <div class="arr-cell sorted">6</div>
+</div>
+<p>3[1]的孩子：左1[3]（下标2×1+1=3），无右孩子。3 ≥ 1 → 不交换。siftDown结束。</p>
+<div style="display:flex; justify-content:center; gap:0; flex-wrap:wrap;">
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">4</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">3</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">2</div>
+    <div class="arr-cell" style="background:#7c3aed; color:#fff;">1</div>
+    <div class="arr-cell sorted">5</div>
+    <div class="arr-cell sorted">6</div>
+</div>
+<div style="text-align:center; font-size:0.85rem; color:#059669; font-weight:700; margin:0.5rem 0;">
+    ✅ 第2趟结束：数组 = [4, 3, 2, 1 | 5, 6]
+</div>
+</div>
+
+<!-- ============ FULL TIMELINE ============ -->
+<div class="card cyan">
+<h2>四、完整过程总览表</h2>
+<table>
+    <tr><th>阶段</th><th>操作</th><th>数组状态</th><th>堆大小</th></tr>
+    <tr><td>初始</td><td>原始序列</td><td>[6, 3, 1, 4, 5, 2]</td><td>-</td></tr>
+    <tr><td>建堆完成</td><td>3次siftDown</td><td>[6, 5, 2, 4, 3, 1]</td><td>6</td></tr>
+    <tr><td>第1趟交换</td><td>swap(0,5)</td><td>[1, 5, 2, 4, 3 | <b>6</b>]</td><td>5</td></tr>
+    <tr><td>第1趟下沉</td><td>siftDown(0)</td><td class="highlight">[5, 4, 2, 1, 3 | 6]</td><td>5</td></tr>
+    <tr><td>第2趟交换</td><td>swap(0,4)</td><td>[3, 4, 2, 1 | <b>5</b>, 6]</td><td>4</td></tr>
+    <tr><td>第2趟下沉</td><td>siftDown(0)</td><td class="highlight">[4, 3, 2, 1 | 5, 6]</td><td>4</td></tr>
+    <tr><td>第3趟交换</td><td>swap(0,3)</td><td>[1, 3, 2 | <b>4</b>, 5, 6]</td><td>3</td></tr>
+    <tr><td>第3趟下沉</td><td>siftDown(0)</td><td>[3, 1, 2 | 4, 5, 6]</td><td>3</td></tr>
+    <tr><td>第4趟交换</td><td>swap(0,2)</td><td>[2, 1 | <b>3</b>, 4, 5, 6]</td><td>2</td></tr>
+    <tr><td>第4趟下沉</td><td>siftDown(0)</td><td>[2, 1 | 3, 4, 5, 6]</td><td>2</td></tr>
+    <tr><td>第5趟交换</td><td>swap(0,1)</td><td>[1 | <b>2</b>, 3, 4, 5, 6]</td><td>1</td></tr>
+    <tr style="font-weight:700; background:#d1fae5;"><td><b>最终</b></td><td>排序完成</td><td><b>[1, 2, 3, 4, 5, 6]</b></td><td>-</td></tr>
+</table>
+<p style="text-align:center; color:#059669; font-weight:700; font-size:1.1rem;">
+    🔥 堆排序每次将当前最大值"沉"到数组末尾，n-1趟后得到升序序列！
+</p>
+</div>
+
+<!-- ============ PSEUDOCODE ============ -->
+<div class="card">
+<h2>五、堆排序伪代码</h2>
+<div class="code-block">
+<span class="cmt">// ========== 向下调整（siftDown / heapify）==========</span>
+<span class="kw">function</span> <span class="fn">siftDown</span>(arr, i, heapSize):
+    largest = i
+    left  = <span class="num">2</span> * i + <span class="num">1</span>
+    right = <span class="num">2</span> * i + <span class="num">2</span>
+
+    <span class="kw">if</span> left &lt; heapSize <span class="kw">and</span> arr[left] &gt; arr[largest]:
+        largest = left
+    <span class="kw">if</span> right &lt; heapSize <span class="kw">and</span> arr[right] &gt; arr[largest]:
+        largest = right
+
+    <span class="kw">if</span> largest != i:
+        <span class="fn">swap</span>(arr[i], arr[largest])
+        <span class="fn">siftDown</span>(arr, largest, heapSize)   <span class="cmt">// 递归向下</span>
+
+<span class="cmt">// ========== 堆排序主函数 ==========</span>
+<span class="kw">function</span> <span class="fn">heapSort</span>(arr):
+    n = arr.length
+
+    <span class="cmt">// 阶段一：建堆（从最后一个非叶节点向前）</span>
+    <span class="kw">for</span> i = <span class="fn">floor</span>(n/<span class="num">2</span>) - <span class="num">1</span> <span class="kw">downto</span> <span class="num">0</span>:
+        <span class="fn">siftDown</span>(arr, i, n)
+
+    <span class="cmt">// 阶段二：排序</span>
+    <span class="kw">for</span> i = n - <span class="num">1</span> <span class="kw">downto</span> <span class="num">1</span>:
+        <span class="fn">swap</span>(arr[<span class="num">0</span>], arr[i])      <span class="cmt">// 堆顶→末尾</span>
+        <span class="fn">siftDown</span>(arr, <span class="num">0</span>, i)       <span class="cmt">// 恢复堆</span>
+</div>
+</div>
+
+<!-- ============ COMPLEXITY & TIPS ============ -->
+<div class="card gold">
+<h2>六、复杂度分析 &amp; 记忆技巧</h2>
+<table>
+    <tr><th>指标</th><th>值</th><th>说明</th></tr>
+    <tr><td>时间复杂度（建堆）</td><td>O(n)</td><td>虽然每个节点可能下沉log n层，但越下层节点数越多、下沉次数越少，级数求和为O(n)</td></tr>
+    <tr><td>时间复杂度（排序）</td><td>O(n log n)</td><td>n-1次交换，每次siftDown O(log n)</td></tr>
+    <tr><td>总时间复杂度</td><td><b>O(n log n)</b></td><td>最好/最坏/平均都是O(n log n)</td></tr>
+    <tr><td>空间复杂度</td><td><b>O(1)</b></td><td>原地排序，仅用常数辅助空间</td></tr>
+    <tr><td>稳定性</td><td><b>不稳定</b></td><td>交换可能破坏相等元素的相对顺序</td></tr>
+</table>
+
+<div class="warn-box">
+    ⚠️ <b>常见错误1：建堆方向搞反。</b>必须从<b>最后一个非叶节点向前</b>依次siftDown，不能从根开始。从根开始无法保证子树先满足堆性质。
+</div>
+<div class="warn-box">
+    ⚠️ <b>常见错误2：siftDown时忘记检查heapSize。</b>排序阶段堆在不断缩小，必须用heapSize限制范围，否则会把已"沉底"的元素重新拉回来。
+</div>
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"建堆从下往上调，排序每次把顶抛。交换之后往下沉，n-1趟就排好。"
+</div>
+<div class="tip-box">
+    💡 <b>考试快速推演法：</b>① 画成完全二叉树；② 从⌊n/2⌋-1向前逐一siftDown建堆；③ 每趟：交换(0, heapSize-1)，heapSize--，siftDown(0)。记录每趟结果即可。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测试题讲解 · 堆排序过程 · 第25题详解
+</footer>
+
+</body>
+</html>

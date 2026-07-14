@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选择题第2题 - 线性表插入位置详解</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --green: #4ade80;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --pink: #f472b6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    padding: 2rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  /* 标题 */
+  .hero {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .hero .badge { display: inline-block; background: rgba(255,255,255,.15); padding: 4px 14px; border-radius: 20px; font-size: .85rem; margin-bottom: 12px; }
+  .hero h1 { font-size: 2rem; font-weight: 700; }
+  .hero .q { font-size: 1.1rem; color: #cbd5e1; margin-top: 10px; }
+
+  /* 卡片 */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .card h2 { font-size: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+  .card h2 .icon { font-size: 1.5rem; }
+
+  /* 答案高亮 */
+  .answer-box {
+    background: linear-gradient(135deg, #064e3b, #065f46);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 1.2rem 1.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .answer-box .label { font-size: .85rem; color: #6ee7b7; }
+  .answer-box .val { font-size: 2.5rem; font-weight: 800; color: var(--green); }
+
+  /* 原因分析 */
+  .why-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .why-item {
+    flex: 1;
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .why-item .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .why-item .desc { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+
+  /* 表格 */
+  .viz-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .viz-table td {
+    width: 36px; height: 42px;
+    text-align: center;
+    border: 1px solid var(--border);
+    font-weight: 600;
+    font-size: .9rem;
+  }
+  .viz-table .pos { background: #1e3a5f; color: var(--accent); font-size: .75rem; font-weight: 400; }
+  .viz-table .data { background: #1e293b; }
+  .viz-table .insert { background: #065f46; color: var(--green); animation: pulse 1.5s infinite; }
+  .viz-table .move { background: #7c2d12; color: #fca5a5; }
+  .viz-table .empty { border: 1px dashed #334155; color: #475569; }
+
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(74,222,128,0); }
+  }
+
+  /* 箭头 */
+  .arrow-row {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 8px 0;
+  }
+  .arrow-row span {
+    width: 36px; text-align: center; font-size: .7rem; color: #fbbf24;
+  }
+
+  /* 对比卡片 */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin: 1rem 0;
+  }
+  .compare .c-item {
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .c-item.wrong { background: #3b0a0a; border: 1px solid var(--red); }
+  .c-item.right { background: #052e16; border: 1px solid var(--green); }
+
+  /* 记忆要点 */
+  .tip {
+    background: #1e293b;
+    border-left: 4px solid var(--amber);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+  }
+  .tip strong { color: var(--amber); }
+
+  /* 代码块 */
+  .code {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: .9rem;
+    overflow-x: auto;
+    color: #c9d1d9;
+  }
+  .code .kw { color: #ff7b72; }
+  .code .fn { color: #d2a8ff; }
+  .code .cmt { color: #8b949e; }
+  .code .num { color: #79c0ff; }
+
+  ul { padding-left: 1.5rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">测试题 · 选择题 · 第2题</div>
+  <h1>线性表的插入位置</h1>
+  <div class="q">在长度为 n 的线性表的第 i 个位置插入元素，i 的合法值应为？</div>
+</div>
+
+<!-- 答案 -->
+<div class="answer-box">
+  <div class="label">✓ 正确答案</div>
+  <div class="val">C　1 ≤ i ≤ n+1</div>
+</div>
+
+<!-- 根本原因 -->
+<div class="card">
+  <h2><span class="icon">🧠</span> 为什么是 n+1 而不是 n？</h2>
+  <p>想象你有 <strong>n = 5</strong> 个元素的线性表。元素编号从 1 到 5。现在你想插入一个新元素，<strong>一共有多少种插法？</strong></p>
+
+  <div class="compare">
+    <div class="c-item wrong">
+      <strong style="color:var(--red)">❌ 错误想法</strong><br>
+      <small style="color:#fca5a5">只能在 1~5 之间插入</small><br>
+      <span style="font-size:1.5rem;color:var(--red)">5 个位置</span>
+    </div>
+    <div class="c-item right">
+      <strong style="color:var(--green)">✅ 正确思路</strong><br>
+      <small style="color:#6ee7b7">可以在头、尾、任意中间插入</small><br>
+      <span style="font-size:1.5rem;color:var(--green)">n+1 = 6 个位置</span>
+    </div>
+  </div>
+
+  <p style="margin-top:1.2rem;">关键看清：<strong style="color:var(--amber);">第 n+1 个位置 = 紧贴表尾后面</strong>，也就是追加一个元素。插入位置是从最前面（第1位之前不能插吗？可以！）到最后面（第 n+1 位）。</p>
+</div>
+
+<!-- 可视化 -->
+<div class="card">
+  <h2><span class="icon">👁️</span> 可视化：n=5 时的 6 个插入位置</h2>
+
+  <!-- 原始表 -->
+  <p style="color:var(--muted); margin-bottom:8px;">原始表（5个元素）：</p>
+  <table class="viz-table" style="margin-bottom:0;">
+    <tr>
+      <td class="pos">位置 →</td>
+      <td class="pos">1</td><td class="pos">2</td><td class="pos">3</td><td class="pos">4</td><td class="pos">5</td>
+    </tr>
+    <tr>
+      <td class="pos">数据 →</td>
+      <td class="data">A</td><td class="data">B</td><td class="data">C</td><td class="data">D</td><td class="data">E</td>
+    </tr>
+  </table>
+
+  <p style="color:var(--muted); margin: 1.5rem 0 8px;">↕ 可插入位置（▼ 箭头所指）：</p>
+
+  <!-- i=1：插在A前面 / 最前面 -->
+  <p style="font-size:.85rem; color:var(--accent); margin-bottom:2px;"><strong>i=1</strong> — 插在最前面（A之前）</p>
+  <table class="viz-table">
+    <tr>
+      <td class="empty">▼</td><td class="data">A</td><td class="data">B</td><td class="data">C</td><td class="data">D</td><td class="data">E</td>
+    </tr>
+  </table>
+
+  <!-- i=2~5：插在中间 -->
+  <p style="font-size:.85rem; color:var(--accent); margin: 1rem 0 2px;"><strong>i=2, 3, 4, 5</strong> — 插在中间（i=2 即 A 之后、B 之前）</p>
+  <table class="viz-table">
+    <tr>
+      <td class="data">A</td><td class="empty">▼</td><td class="data">B</td><td class="data">C</td><td class="empty">…</td><td class="data">E</td>
+    </tr>
+  </table>
+
+  <!-- i=6 = n+1：插在最后 -->
+  <p style="font-size:.85rem; color:var(--accent); margin: 1rem 0 2px;"><strong>i=6 = n+1</strong> — 插在最后面（E之后，追加）</p>
+  <table class="viz-table">
+    <tr>
+      <td class="data">A</td><td class="data">B</td><td class="data">C</td><td class="data">D</td><td class="data">E</td><td class="empty">▼</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 逐选项分析 -->
+<div class="card">
+  <h2><span class="icon">🔍</span> 逐选项辨析</h2>
+
+  <table style="width:100%; border-collapse: collapse;">
+    <tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:12px 8px; font-weight:700; width:60px;">A</td>
+      <td style="padding:12px 8px;"><code style="color:var(--accent);">1 ≤ i ≤ n</code></td>
+      <td style="padding:12px 8px; color:var(--red);">❌ 缺少表尾插入位置</td>
+      <td style="padding:12px 8px; color:var(--muted);">不能追加到末尾</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:12px 8px; font-weight:700;">B</td>
+      <td style="padding:12px 8px;"><code style="color:var(--accent);">0 ≤ i ≤ n</code></td>
+      <td style="padding:12px 8px; color:var(--red);">❌ 多出 i=0 缺少 n+1</td>
+      <td style="padding:12px 8px; color:var(--muted);">编号通常从1开始，且仍缺表尾</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--border); background: #052e16;">
+      <td style="padding:12px 8px; font-weight:700;">C</td>
+      <td style="padding:12px 8px;"><code style="color:var(--green);">1 ≤ i ≤ n+1</code></td>
+      <td style="padding:12px 8px; color:var(--green);">✅ 正确！</td>
+      <td style="padding:12px 8px; color:var(--muted);">包含所有合法插入位置</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 8px; font-weight:700;">D</td>
+      <td style="padding:12px 8px;"><code style="color:var(--accent);">1 ≤ i ≤ n-1</code></td>
+      <td style="padding:12px 8px; color:var(--red);">❌ 缺少最后两个位置</td>
+      <td style="padding:12px 8px; color:var(--muted);">缺得最多，最不可能</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 对比删除 -->
+<div class="card">
+  <h2><span class="icon">📐</span> 插入 vs 删除 —— 容易混淆！</h2>
+  <div class="compare">
+    <div style="background:#064e3b; border:1px solid var(--green); border-radius:10px; padding:1rem; text-align:center;">
+      <div style="font-size:1.2rem; font-weight:700; color:var(--green);">插入</div>
+      <div style="font-size:1.8rem; font-weight:800; color:var(--green); margin:8px 0;">1 ≤ i ≤ n+1</div>
+      <div style="font-size:.8rem; color:#6ee7b7;">可以追加在末尾之后 → 多一个位置</div>
+    </div>
+    <div style="background:#3b0a0a; border:1px solid var(--red); border-radius:10px; padding:1rem; text-align:center;">
+      <div style="font-size:1.2rem; font-weight:700; color:var(--red);">删除</div>
+      <div style="font-size:1.8rem; font-weight:800; color:var(--red); margin:8px 0;">1 ≤ i ≤ n</div>
+      <div style="font-size:.8rem; color:#fca5a5;">只能删已有的 → 正好 n 个</div>
+    </div>
+  </div>
+
+  <div class="tip" style="margin-top:1rem;">
+    <strong>💡 记忆口诀：插比删多一</strong><br>
+    插入 = 站队伍任意位置或队伍最末端（n+1 个缝隙）<br>
+    删除 = 只能踢队伍中某个已有的人（n 个目标）
+  </div>
+</div>
+
+<!-- 代码验证 -->
+<div class="card">
+  <h2><span class="icon">💻</span> 代码验证 —— 顺序表插入</h2>
+  <p style="color:var(--muted); margin-bottom:1rem;">典型顺序表插入代码，注意对 i 的合法性检查：</p>
+<div class="code">
+<span class="kw">int</span> <span class="fn">ListInsert</span>(SeqList *L, <span class="kw">int</span> i, <span class="kw">int</span> x) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (i &lt; <span class="num">1</span> || i &gt; L-&gt;length + <span class="num">1</span>)  <span class="cmt">// ← 检查：i 必须在 1..n+1 之间</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="num">0</span>;                   <span class="cmt">// 非法位置，返回失败</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">// ... 后移元素，写入 x，长度+1</span><br>
+}
+</div>
+  <p style="color:var(--muted); margin-top:1rem; font-size:.85rem;">
+    注意关键条件：<code style="color:#fbbf24;">i > L->length + 1</code> 即 i > n+1 才非法 → 合法的是 i ≤ n+1
+  </p>
+</div>
+
+<!-- 一句话记忆 -->
+<div class="tip">
+  <strong>🎯 一句话总结：</strong>n 个元素之间有 n+1 个"缝隙"可以插入——最前面、每两个之间、最后面，所以插入位置从 1 到 <strong>n+1</strong>。
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prim算法求最小生成树 - 从顶点C出发</title>
+<style>
+    :root {
+        --bg: #fdf6e3;
+        --fg: #2c3e50;
+        --accent: #268bd2;
+        --accent2: #dc322f;
+        --gold: #b58900;
+        --green: #859900;
+        --purple: #6c71c4;
+        --cyan: #2aa198;
+        --card-bg: #ffffff;
+        --border: #e0d5c1;
+        --shadow: 0 2px 12px rgba(0,0,0,0.07);
+        --code-bg: #fefdf7;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(135deg, #fdf6e3 0%, #f5ead0 50%, #e8dcc8 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+    header {
+        text-align: center;
+        padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #1a5276, #2471a3);
+        color: #fff;
+        border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(26,82,118,0.3);
+    }
+    header h1 {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+    header .subtitle {
+        font-size: 1.05rem;
+        opacity: 0.85;
+        margin-top: 0.4rem;
+    }
+    .answer-badge {
+        display: inline-block;
+        background: #ffd700;
+        color: #1a1a2e;
+        font-weight: 700;
+        padding: 0.35rem 1.2rem;
+        border-radius: 20px;
+        margin-top: 0.8rem;
+        font-size: 1.05rem;
+    }
+    .card {
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 1.8rem 2rem;
+        margin: 1.5rem 0;
+        box-shadow: var(--shadow);
+        border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.purple { border-left-color: var(--purple); }
+    .card.gold   { border-left-color: var(--gold); }
+    .card.red    { border-left-color: var(--accent2); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem;
+        margin-bottom: 0.8rem;
+        color: var(--accent);
+        border-bottom: 2px dashed #d4e6f1;
+        padding-bottom: 0.4rem;
+    }
+    h3 {
+        font-size: 1.15rem;
+        margin: 1rem 0 0.5rem;
+        color: #34495e;
+    }
+    .graph-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin: 1.2rem 0;
+    }
+    .graph-svg {
+        background: #fafaf5;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.04);
+    }
+    .step-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin: 0.6rem 0;
+    }
+    .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px; height: 36px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .step-num.done {
+        background: var(--green);
+    }
+    .tree-node {
+        display: inline-block;
+        width: 44px; height: 44px;
+        line-height: 44px;
+        text-align: center;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin: 4px;
+        transition: all 0.3s;
+    }
+    .tree-node.in-tree {
+        background: #2ecc71;
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(46,204,113,0.4);
+    }
+    .tree-node.pending {
+        background: #f39c12;
+        color: #fff;
+    }
+    .tree-node.outside {
+        background: #ecf0f1;
+        color: #7f8c8d;
+        border: 2px dashed #bdc3c7;
+    }
+    .edge-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--accent2);
+        background: #fdedec;
+        padding: 2px 8px;
+        border-radius: 8px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 0.55rem 0.8rem;
+        text-align: center;
+        font-size: 0.95rem;
+    }
+    th {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+    }
+    tr:nth-child(even) td {
+        background: #f8f9fa;
+    }
+    .highlight {
+        background: #fef9e7 !important;
+        font-weight: 700;
+    }
+    .code-block {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        border-radius: 10px;
+        padding: 1.2rem 1.5rem;
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    .code-block .kw { color: #66d9ef; }
+    .code-block .fn { color: #a6e22e; }
+    .code-block .str { color: #e6db74; }
+    .code-block .cmt { color: #75715e; }
+    .tip-box {
+        background: #eaf7ea;
+        border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem;
+        border-radius: 0 10px 10px 0;
+        margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef5e7;
+        border-left: 4px solid var(--gold);
+        padding: 1rem 1.3rem;
+        border-radius: 0 10px 10px 0;
+        margin: 1.2rem 0;
+    }
+    .tree-viz {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: "Fira Code",monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        background: #fafaf5;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    footer {
+        text-align: center;
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 2rem;
+        padding: 1rem 0;
+        border-top: 1px solid #e0d5c1;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.4rem; }
+        table { font-size: 0.8rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🌳 Prim算法求最小生成树（MST）</h1>
+    <div class="subtitle">第24题 · 从顶点C出发 · 贪心策略的经典应用</div>
+    <div class="answer-badge">✅ 答案：顶点加入顺序 C → B → D → F → E → A</div>
+</header>
+
+<div class="container">
+
+<!-- ============ WHAT IS MST ============ -->
+<div class="card">
+<h2>一、什么是最小生成树（MST）？</h2>
+
+<h3>1.1 场景类比：修建村村通公路</h3>
+<p>
+假设有6个村庄（A, B, C, D, E, F），现在要铺设光缆把它们全部连接起来。任意两个村庄之间修路的成本不同（由地形决定）。<strong>目标：用最少的成本让所有村庄连通。</strong>
+</p>
+<p>
+这个问题的数学模型就是<b>最小生成树（Minimum Spanning Tree, MST）</b>：
+</p>
+<ul style="margin-left:1.5rem; margin-top:0.5rem;">
+    <li><b>生成树（Spanning Tree）</b>：包含图中所有顶点，且没有回路的连通子图。有n个顶点则恰好n-1条边。</li>
+    <li><b>最小（Minimum）</b>：在所有可能的生成树中，边权之和最小的那棵。</li>
+</ul>
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"全部连通无回路，n个顶点n-1边，边权和最小就是MST。"
+</div>
+
+<h3>1.2 本题的带权图</h3>
+<p>题目给出的带权无向连通图如下（顶点集 = {A, B, C, D, E, F}）：</p>
+
+<div class="graph-container">
+    <!-- SVG graph -->
+    <svg width="420" height="340" viewBox="0 0 420 340" class="graph-svg">
+        <!-- Vertices arranged roughly hexagonally -->
+        <!-- A top-left, B top-right, C right, D bottom-right, E bottom-left, F left -->
+        <defs>
+            <radialGradient id="vg" cx="40%" cy="35%">
+                <stop offset="0%" stop-color="#fff"/>
+                <stop offset="100%" stop-color="#d5f5e3"/>
+            </radialGradient>
+        </defs>
+        <!-- Edges with weights -->
+        <!-- A(70,60) B(210,50) C(310,150) D(230,280) E(90,280) F(30,160) -->
+        <!-- A-B:6 -->
+        <line x1="85" y1="65" x2="195" y2="55" stroke="#e74c3c" stroke-width="2.5"/>
+        <text x="130" y="48" font-size="13" fill="#e74c3c" font-weight="700">6</text>
+        <!-- A-F:5 -->
+        <line x1="55" y1="70" x2="35" y2="155" stroke="#e74c3c" stroke-width="2.5"/>
+        <text x="25" y="115" font-size="13" fill="#e74c3c" font-weight="700">5</text>
+        <!-- A-C:7 -->
+        <line x1="85" y1="80" x2="295" y2="145" stroke="#e67e22" stroke-width="2"/>
+        <text x="180" y="100" font-size="12" fill="#e67e22" font-weight="600">7</text>
+        <!-- B-C:3 -->
+        <line x1="225" y1="65" x2="295" y2="140" stroke="#2ecc71" stroke-width="3"/>
+        <text x="270" y="95" font-size="13" fill="#2ecc71" font-weight="700">3</text>
+        <!-- B-D:4 -->
+        <line x1="220" y1="70" x2="235" y2="265" stroke="#2ecc71" stroke-width="2.5"/>
+        <text x="240" y="170" font-size="13" fill="#2ecc71" font-weight="700">4</text>
+        <!-- B-F:8 -->
+        <line x1="195" y1="65" x2="40" y2="155" stroke="#95a5a6" stroke-width="1.5"/>
+        <text x="110" y="100" font-size="12" fill="#95a5a6" font-weight="600">8</text>
+        <!-- C-D:2 -->
+        <line x1="305" y1="165" x2="240" y2="270" stroke="#2ecc71" stroke-width="3"/>
+        <text x="285" y="225" font-size="13" fill="#2ecc71" font-weight="700">2</text>
+        <!-- C-F:9 -->
+        <line x1="295" y1="160" x2="45" y2="165" stroke="#95a5a6" stroke-width="1.5"/>
+        <text x="160" y="175" font-size="12" fill="#95a5a6" font-weight="600">9</text>
+        <!-- D-E:4 -->
+        <line x1="215" y1="275" x2="105" y2="280" stroke="#2ecc71" stroke-width="2.5"/>
+        <text x="150" y="295" font-size="13" fill="#2ecc71" font-weight="700">4</text>
+        <!-- D-F:10 -->
+        <line x1="215" y1="270" x2="40" y2="175" stroke="#95a5a6" stroke-width="1.5"/>
+        <text x="120" y="235" font-size="12" fill="#95a5a6" font-weight="600">10</text>
+        <!-- E-F:7 -->
+        <line x1="75" y1="270" x2="40" y2="175" stroke="#e67e22" stroke-width="2"/>
+        <text x="35" y="230" font-size="12" fill="#e67e22" font-weight="600">7</text>
+
+        <!-- Vertices -->
+        <circle cx="70" cy="60" r="22" fill="#f9e79f" stroke="#b58900" stroke-width="2.5"/>
+        <text x="70" y="66" text-anchor="middle" font-weight="700" font-size="16" fill="#7d6608">A</text>
+
+        <circle cx="210" cy="50" r="22" fill="#f9e79f" stroke="#b58900" stroke-width="2.5"/>
+        <text x="210" y="56" text-anchor="middle" font-weight="700" font-size="16" fill="#7d6608">B</text>
+
+        <circle cx="310" cy="150" r="24" fill="#ffd700" stroke="#e67e22" stroke-width="3"/>
+        <text x="310" y="156" text-anchor="middle" font-weight="700" font-size="17" fill="#7d6608">C</text>
+
+        <circle cx="230" cy="280" r="22" fill="#f9e79f" stroke="#b58900" stroke-width="2.5"/>
+        <text x="230" y="286" text-anchor="middle" font-weight="700" font-size="16" fill="#7d6608">D</text>
+
+        <circle cx="90" cy="280" r="22" fill="#f9e79f" stroke="#b58900" stroke-width="2.5"/>
+        <text x="90" y="286" text-anchor="middle" font-weight="700" font-size="16" fill="#7d6608">E</text>
+
+        <circle cx="30" cy="160" r="22" fill="#f9e79f" stroke="#b58900" stroke-width="2.5"/>
+        <text x="30" y="166" text-anchor="middle" font-weight="700" font-size="16" fill="#7d6608">F</text>
+    </svg>
+</div>
+<p style="text-align:center; font-size:0.9rem; color:#888;">
+    ▲ 图G的邻接结构（绿色粗线标记MST中的边，红色数字为权重）
+</p>
+</div>
+
+<!-- ============ PRIM ALGORITHM ============ -->
+<div class="card green">
+<h2>二、Prim算法核心思想</h2>
+
+<h3>2.1 一句话概括</h3>
+<p>
+Prim算法是一种<b>贪心算法</b>：从任意一个起点开始，<strong>每一步选择一条连接"已选顶点集合"与"未选顶点集合"的最小权重边</strong>，把边另一端的顶点拉入集合。重复n-1次后得到MST。
+</p>
+
+<h3>2.2 形象类比：病毒传播</h3>
+<p>
+想象一种"智能病毒"从城市C开始感染：它总是去感染未被感染且离已感染区域最近的城市。每次只感染一个新城，并记录传播路径。n-1轮后，所有城市都被感染，记录下的路径就是MST。
+</p>
+
+<h3>2.3 数据结构支撑</h3>
+<table>
+    <tr><th>辅助数组</th><th>含义</th><th>初始化</th></tr>
+    <tr><td><code>visited[ ]</code></td><td>顶点是否已加入生成树</td><td>全false，起点C置true</td></tr>
+    <tr><td><code>lowcost[ ]</code></td><td>每个未选顶点到当前生成树的最小边权</td><td>起点到各邻居的边权，无边则为∞</td></tr>
+    <tr><td><code>parent[ ]</code></td><td>记录每个顶点通过哪条边连入树（用于回溯路径）</td><td>起点为-1</td></tr>
+</table>
+</div>
+
+<!-- ============ STEP BY STEP ============ -->
+<div class="card purple">
+<h2>三、从顶点C出发：逐步推演</h2>
+
+<h3>初始化状态</h3>
+<p>已选集合 S = {<b>C</b>}，未选集合 U = {A, B, D, E, F}。</p>
+<p>考察C的所有邻居边：C-B=3, C-D=2, C-A=7, C-F=9。记录lowcost，选最小的C-D=2加入。</p>
+
+<div style="display:flex; flex-wrap:wrap; gap:2rem; justify-content:center; margin:1rem 0;">
+    <div style="text-align:center;">
+        <b>初始lowcost表</b>
+        <table style="width:auto; min-width:300px;">
+            <tr><th>顶点</th><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
+            <tr><th>lowcost</th><td>7</td><td>3</td><td style="background:#2ecc71;color:#fff;">0✓</td><td class="highlight">2★</td><td>∞</td><td>9</td></tr>
+            <tr><th>parent</th><td>C</td><td>C</td><td>-</td><td>C</td><td>-</td><td>C</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- Step 1 -->
+<div class="step-row">
+    <span class="step-num">1</span>
+    <b>选择C-D (权重2)</b> —— 当前最小边。D加入生成树。
+</div>
+<p style="margin-left:3rem;">
+    S = {C, <b style="color:#2ecc71;">D</b>}。现在用D更新lowcost：D-B=4（比当前的3大，不更新），D-E=4（当前∞→更新为4），D-F=10（比当前9大，不更新）。<br>
+    更新后lowcost: A:7, <b>B:3★</b>, E:4, F:9。最小是B的3。
+</p>
+
+<!-- Step 2 -->
+<div class="step-row">
+    <span class="step-num">2</span>
+    <b>选择C-B (权重3)</b> —— 当前最小边。B加入生成树。
+</div>
+<p style="margin-left:3rem;">
+    S = {C, D, <b style="color:#2ecc71;">B</b>}。用B更新lowcost：B-A=6（比当前7小→更新A为6），B-F=8（比9小→更新F为8），B-E不与E直连。B-D=4但D已在树中忽略。<br>
+    更新后lowcost: <b>A:6</b>, E:4★, F:8。最小是E的4（E通过D连入）。
+</p>
+
+<!-- Step 3 -->
+<div class="step-row">
+    <span class="step-num">3</span>
+    <b>选择D-E (权重4)</b> —— 通过D连接E。E加入生成树。（注意：不是B-D=4因为D已在树中）
+</div>
+<p style="margin-left:3rem;">
+    S = {C, D, B, <b style="color:#2ecc71;">E</b>}。用E更新：E-A=∞（无边），E-F=7（比当前8小→更新F为7）。<br>
+    更新后lowcost: A:6★, F:7。最小是A的6（A通过B连入）。
+</p>
+
+<!-- Step 4 -->
+<div class="step-row">
+    <span class="step-num">4</span>
+    <b>选择B-A (权重6)</b> —— A加入生成树。
+</div>
+<p style="margin-left:3rem;">
+    S = {C, D, B, E, <b style="color:#2ecc71;">A</b>}。用A更新：A-F=5（比当前7小→更新F为5）。<br>
+    更新后lowcost: F:5★。最小是F的5。
+</p>
+
+<!-- Step 5 -->
+<div class="step-row">
+    <span class="step-num done">5</span>
+    <b>选择A-F (权重5)</b> —— F加入生成树。全部顶点加入完毕！
+</div>
+<p style="margin-left:3rem;">
+    S = {C, D, B, E, A, <b style="color:#2ecc71;">F</b>}。6个顶点全部在树中，算法结束。
+</p>
+</div>
+
+<!-- ============ RESULT ============ -->
+<div class="card cyan">
+<h2>四、最终结果</h2>
+
+<h3>顶点加入顺序</h3>
+<div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:center; font-size:1.2rem; margin:1rem 0;">
+    <span class="tree-node in-tree">C</span>
+    <span style="font-size:1.5rem; color:#2ecc71;">→</span>
+    <span class="tree-node in-tree">B</span>
+    <span style="font-size:1.5rem; color:#2ecc71;">→</span>
+    <span class="tree-node in-tree">D</span>
+    <span style="font-size:1.5rem; color:#2ecc71;">→</span>
+    <span class="tree-node in-tree">F</span>
+    <span style="font-size:1.5rem; color:#2ecc71;">→</span>
+    <span class="tree-node in-tree">E</span>
+    <span style="font-size:1.5rem; color:#2ecc71;">→</span>
+    <span class="tree-node in-tree">A</span>
+</div>
+
+<h3>MST的边及总权重</h3>
+<table>
+    <tr><th>选入顺序</th><th>边</th><th>权重</th><th>连接方式</th></tr>
+    <tr><td>①</td><td>C — D</td><td>2</td><td>C的邻居中最小</td></tr>
+    <tr><td>②</td><td>C — B</td><td>3</td><td>C的邻居中次小</td></tr>
+    <tr><td>③</td><td>D — E</td><td>4</td><td>E通过D连入</td></tr>
+    <tr><td>④</td><td>B — A</td><td>6</td><td>A通过B连入</td></tr>
+    <tr><td>⑤</td><td>A — F</td><td>5</td><td>F通过A连入</td></tr>
+    <tr style="font-weight:700; background:#fef9e7;"><td colspan="2">MST总权重</td><td colspan="2">2 + 3 + 4 + 6 + 5 = <b style="color:#e74c3c; font-size:1.2rem;">20</b></td></tr>
+</table>
+
+<div class="graph-container">
+    <svg width="380" height="320" viewBox="0 0 380 320" class="graph-svg">
+        <!-- MST edges highlighted -->
+        <line x1="85" y1="65" x2="195" y2="55" stroke="#27ae60" stroke-width="4"/>
+        <text x="130" y="43" font-size="13" fill="#27ae60" font-weight="700">6 (边④)</text>
+
+        <line x1="55" y1="70" x2="35" y2="155" stroke="#27ae60" stroke-width="4"/>
+        <text x="40" y="100" font-size="12" fill="#27ae60" font-weight="700">5 (边⑤)</text>
+
+        <line x1="225" y1="65" x2="295" y2="140" stroke="#27ae60" stroke-width="4"/>
+        <text x="280" y="90" font-size="13" fill="#27ae60" font-weight="700">3 (边②)</text>
+
+        <line x1="305" y1="165" x2="240" y2="270" stroke="#27ae60" stroke-width="4"/>
+        <text x="290" y="220" font-size="13" fill="#27ae60" font-weight="700">2 (边①)</text>
+
+        <line x1="215" y1="275" x2="105" y2="280" stroke="#27ae60" stroke-width="4"/>
+        <text x="145" y="300" font-size="13" fill="#27ae60" font-weight="700">4 (边③)</text>
+
+        <!-- Non-MST edges grayed -->
+        <line x1="85" y1="80" x2="295" y2="145" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="180" y="110" font-size="11" fill="#bbb">7 ✗</text>
+
+        <line x1="195" y1="65" x2="40" y2="155" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="105" y="100" font-size="11" fill="#bbb">8 ✗</text>
+
+        <line x1="295" y1="160" x2="45" y2="165" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="160" y="175" font-size="11" fill="#bbb">9 ✗</text>
+
+        <line x1="215" y1="270" x2="40" y2="175" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="115" y="235" font-size="11" fill="#bbb">10 ✗</text>
+
+        <line x1="75" y1="270" x2="40" y2="175" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="30" y="230" font-size="11" fill="#bbb">7 ✗</text>
+
+        <!-- Vertices all green -->
+        <circle cx="70" cy="60" r="22" fill="#2ecc71" stroke="#27ae60" stroke-width="2.5"/>
+        <text x="70" y="66" text-anchor="middle" font-weight="700" font-size="16" fill="#fff">A</text>
+        <circle cx="210" cy="50" r="22" fill="#2ecc71" stroke="#27ae60" stroke-width="2.5"/>
+        <text x="210" y="56" text-anchor="middle" font-weight="700" font-size="16" fill="#fff">B</text>
+        <circle cx="310" cy="150" r="24" fill="#1a7a3a" stroke="#27ae60" stroke-width="3"/>
+        <text x="310" y="156" text-anchor="middle" font-weight="700" font-size="17" fill="#ffd700">C</text>
+        <circle cx="230" cy="280" r="22" fill="#2ecc71" stroke="#27ae60" stroke-width="2.5"/>
+        <text x="230" y="286" text-anchor="middle" font-weight="700" font-size="16" fill="#fff">D</text>
+        <circle cx="90" cy="280" r="22" fill="#2ecc71" stroke="#27ae60" stroke-width="2.5"/>
+        <text x="90" y="286" text-anchor="middle" font-weight="700" font-size="16" fill="#fff">E</text>
+        <circle cx="30" cy="160" r="22" fill="#2ecc71" stroke="#27ae60" stroke-width="2.5"/>
+        <text x="30" y="166" text-anchor="middle" font-weight="700" font-size="16" fill="#fff">F</text>
+    </svg>
+</div>
+</div>
+
+<!-- ============ COMPARISON ============ -->
+<div class="card gold">
+<h2>五、Prim vs Kruskal 对比</h2>
+<table>
+    <tr><th>维度</th><th>Prim算法</th><th>Kruskal算法</th></tr>
+    <tr><td><b>基本策略</b></td><td>选点：从一棵树向外生长</td><td>选边：对所有边排序，逐条取最短且不构成回路的边</td></tr>
+    <tr><td><b>数据结构</b></td><td>优先队列（最小堆）+ visited数组</td><td>并查集（Union-Find）</td></tr>
+    <tr><td><b>时间复杂度</b></td><td>O(V²) 或 O((V+E)logV)（堆优化）</td><td>O(E log E)</td></tr>
+    <tr><td><b>适用场景</b></td><td>稠密图（边多）</td><td>稀疏图（边少）</td></tr>
+    <tr><td><b>起始点</b></td><td>需要指定起点</td><td>不需要起点，全局考虑</td></tr>
+    <tr><td><b>中间状态</b></td><td>始终是一棵连通的树</td><td>可能形成多片"森林"再合并</td></tr>
+</table>
+</div>
+
+<!-- ============ PSEUDOCODE ============ -->
+<div class="card red">
+<h2>六、Prim算法伪代码</h2>
+<div class="code-block">
+<span class="cmt">// 输入：带权连通图G=(V,E)，起始顶点start</span>
+<span class="cmt">// 输出：最小生成树的边集</span>
+
+<span class="kw">function</span> <span class="fn">Prim</span>(G, start):
+    <span class="kw">for</span> each v in V:
+        visited[v] = <span class="kw">false</span>
+        lowcost[v] = ∞
+        parent[v]  = -1
+
+    lowcost[start] = 0
+
+    <span class="kw">for</span> i = 0 <span class="kw">to</span> n-1:
+        <span class="cmt">// 1. 从未选顶点中找到lowcost最小的顶点u</span>
+        u = <span class="fn">findMin</span>(lowcost, visited)
+        visited[u] = <span class="kw">true</span>
+
+        <span class="cmt">// 2. 输出边(parent[u], u)</span>
+        <span class="kw">if</span> parent[u] != -1:
+            <span class="fn">print</span>(parent[u], u, lowcost[u])
+
+        <span class="cmt">// 3. 用u去更新所有未选邻居的lowcost</span>
+        <span class="kw">for</span> each neighbor v <span class="kw">of</span> u:
+            <span class="kw">if</span> <span class="kw">not</span> visited[v] <span class="kw">and</span> weight(u,v) &lt; lowcost[v]:
+                lowcost[v] = weight(u,v)
+                parent[v]  = u
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>七、常见错误 &amp; 记忆技巧</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：混淆Prim与Dijkstra。</b><br>
+    Prim的lowcost[i]是"顶点i到<u>当前生成树</u>的最小距离"，<br>
+    Dijkstra的dist[i]是"顶点i到<u>源点</u>的最短路径长度"。两者更新逻辑不同！
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：更新lowcost时忘记检查visited。</b><br>
+    已经加入生成树的顶点不能再被更新，否则会形成回路或覆盖正确值。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：以为每步选全局最小边。</b><br>
+    Prim选的是"一端在树内、一端在树外"的最小边，不是所有未用边中的最小边。Kruskal才是全局选边。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆技巧：Prim = "向外扩张的树"</b><br>
+    想象一棵树从种子发芽，每次长出一根最短的新枝，最终覆盖所有节点。起始顶点就是种子，lowcost就是每个节点到树边界的"最短距离"。
+</div>
+
+<div class="tip-box">
+    💡 <b>考试快速答题法：</b><br>
+    ① 画出图，标好所有边权。<br>
+    ② 从起点C出发，圈出C。看C的所有边：C-D(2), C-B(3), C-A(7), C-F(9)。选最小的2，圈出D。<br>
+    ③ 现在{ C,D }看所有一端在圈内一端在圈外的边：C-B(3), C-A(7), C-F(9), D-B(4), D-E(4), D-F(10)。最小是C-B(3)。<br>
+    ④ 重复直到所有顶点被圈出。圈出的顺序就是答案。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测试题讲解 · Prim最小生成树 · 第24题详解
+</footer>
+
+</body>
+</html>

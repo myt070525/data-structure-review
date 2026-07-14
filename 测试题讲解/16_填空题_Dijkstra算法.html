@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>填空第6题 · 单源最短路径</title>
+<style>:root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--amber:#d97706;--border:#e2e8f0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter','PingFang SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:16px}.container{max-width:800px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--blue)}.answer{text-align:center;padding:1.5rem;border:3px solid var(--blue);border-radius:10px;background:#eff6ff;margin:1.5rem 0;font-size:1.8rem;font-weight:900;color:var(--blue);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--blue);border-left:4px solid var(--blue);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}table{width:100%;border-collapse:collapse;margin:1rem 0;text-align:center}td{padding:8px 10px;border-bottom:1px solid var(--border)}th{background:#f1f5f9;padding:8px}</style></head>
+<body><div class="container">
+<div class="header"><h1>🗺️ 填空第6题</h1><p style="color:var(--muted)">适合求解单源最短路径的是哪个算法？</p></div>
+<div class="answer">Dijkstra（迪杰斯特拉）</div>
+
+<div class="section"><h2>一、什么场景用什么算法？</h2>
+<div class="card">
+<table>
+<tr><th>问题</th><th>适用算法</th><th>复杂度</th></tr>
+<tr><td>单源最短路径（边权非负）</td><td style="color:var(--blue);font-weight:700">Dijkstra ✅</td><td>O(n²)或O(elogn)</td></tr>
+<tr><td>单源最短路径（可负权）</td><td>Bellman-Ford</td><td>O(n·e)</td></tr>
+<tr><td>所有点对最短路径</td><td>Floyd</td><td>O(n³)</td></tr>
+<tr><td>最小生成树</td><td>Prim / Kruskal</td><td>O(n²)/O(eloge)</td></tr>
+</table>
+<div class="tip" style="margin-top:1rem"><strong>⚠️ 常见混淆：</strong>Prim求<strong>最小生成树</strong>，Dijkstra求<strong>最短路径</strong>——虽然代码框架很像（都是贪心+松弛），但解决的问题不同！生成树关注连通成本最低，最短路径关注起终距离最短。</div></div></div>
+
+<div class="section"><h2>二、Dijkstra 算法思想</h2>
+<div class="card">
+<ol><li>初始：起点距离=0，其他点距离=∞</li><li>每次选<strong>距离最小且未确定</strong>的点</li><li>用这个点<strong>松弛</strong>它的所有邻居（如果经过这个点更短，就更新距离）</li><li>标记这个点为"已确定"，重复直到所有点确定</li></ol>
+<p style="color:var(--muted)">通俗理解：从家出发，每次找"目前已知最近的还没去过的地方"，到了那儿再看看有没有更近的路去其它地方。</p></div></div>
+
+</div></body></html>

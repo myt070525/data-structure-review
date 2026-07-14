@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>第8题 · 快排一趟结果判定</title>
+<style>:root{--bg:#fef2f2;--card:#fff;--text:#1c1917;--muted:#78716c;--red:#c41e3a;--green:#166534;--amber:#d97706;--border:#fecaca}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem}.header h1{font-size:2rem;font-weight:800;color:var(--red)}.header .q-box{display:inline-block;text-align:left;background:#fff;border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:1.05rem;margin-top:1rem}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.3rem;color:var(--red);border-left:4px solid var(--red);padding-left:14px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fef2f2;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.arr-row{display:flex;gap:3px;align-items:center;flex-wrap:wrap;margin:.6rem 0;font-family:'Cascadia Code',monospace;font-size:.85rem}.arr-row span{padding:4px 8px;border-radius:4px;min-width:30px;text-align:center}.arr-row .pv{background:#fef3c7;border:2px solid var(--amber);font-weight:700}.arr-row .lt{background:#dcfce7;border:1px solid var(--green)}.arr-row .gt{background:#fee2e2;border:1px solid var(--red)}.arr-row .bad{background:#fee2e2;border:1px solid var(--red);color:var(--red);text-decoration:line-through}table{width:100%;border-collapse:collapse;margin:1rem 0}td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:.9rem}</style></head>
+<body><div class="container">
+
+<div class="header"><h1>⚡ 快排一趟之后的结果</h1><div class="q-box">下面哪个序列<strong>不可能</strong>是一趟快速排序之后的结果？</div></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">C — 8, 52, 15, 1, 71</div></div>
+
+<div class="section"><h2>一、快排一趟的核心特征</h2>
+<div class="card">
+<p>快速排序每一趟选一个<strong style="color:var(--red)">基准（pivot）</strong>，把序列分成两部分：</p>
+<ul><li><strong>左边：</strong>全部 ≤ pivot</li><li><strong>右边：</strong>全部 ≥ pivot</li></ul>
+<p>一趟结束后，<span class="hl">pivot 被放到它最终的正确位置</span>，而且存在至少一个元素，它<strong>左边全都 ≤ 它，右边全都 ≥ 它</strong>。这就是判断标准！</p>
+<p style="color:var(--muted)">通俗理解：找一个"分界线"——分界线左边的数都不大于它，右边的数都不小于它。</p></div></div>
+
+<div class="section"><h2>二、逐个序列检验</h2>
+<div class="card">
+<h3 style="color:var(--green)">A: 18, 10, 2, 88, 71 → ✅ 可能</h3>
+<div class="arr-row"><span class="pv">18</span><span class="lt">10</span><span class="lt">2</span><span class="gt">88</span><span class="gt">71</span></div>
+<p style="color:var(--muted);font-size:.85rem">pivot=18：左边(10,2)都≤18 ✅  右边(88,71)都≥18 ✅</p>
+
+<h3 style="color:var(--green)">B: 3, 14, 8, 27, 31 → ✅ 可能</h3>
+<div class="arr-row"><span class="pv">3</span><span class="gt">14</span><span class="gt">8</span><span class="gt">27</span><span class="gt">31</span></div>
+<p style="color:var(--muted);font-size:.85rem">pivot=3：左边空✅  右边全≥3 ✅（虽然14和8比3大，但都≥3，没问题）</p>
+
+<h3 style="color:var(--red)">C: 8, 52, 15, 1, 71 → ❌ 不可能</h3>
+<div class="arr-row"><span class="bad">8</span><span class="bad">52</span><span class="bad">15</span><span class="bad">1</span><span class="bad">71</span></div>
+<p style="color:var(--red);font-weight:700">若pivot=8：右边有15<8? ❌ 15>8但1<8→1应该在左边！<br>若pivot=52：左边8≤52✅ 但右边15<52 ❌<br>若pivot=15：左边52>15 ❌<br>没有一个元素能当合格的pivot！</p>
+
+<h3 style="color:var(--green)">D: 23, 19, 28, 37, 50 → ✅ 可能</h3>
+<div class="arr-row"><span class="lt">23</span><span class="lt">19</span><span class="pv">28</span><span class="gt">37</span><span class="gt">50</span></div>
+<p style="color:var(--muted);font-size:.85rem">pivot=28（在原第3位）：左边23,19都≤28✅ 右边37,50都≥28✅</p></div></div>
+
+<div class="section"><h2>三、判断技巧</h2>
+<div class="card">
+<ol><li><strong>逐个尝试：</strong>把每个元素当作pivot候选</li><li><strong>检验条件：</strong>左边全≤它 且 右边全≥它</li><li><strong>找不到：</strong>如果所有元素都不满足 → 不可能是一趟快排结果</li></ol>
+<div class="tip"><strong>🎯 一眼法：</strong>一趟快排后的序列中，至少有一个元素"左小右大"。扫一眼C：8左边空✅但右边52→15→1→71，15和1都跟8没有单调关系，乱糟糟 → 不可能！</div></div></div>
+
+</div></body></html>

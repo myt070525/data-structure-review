@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构简答题精讲：顺序查找与折半查找的ASL</title>
+<style>
+  :root {
+    --bg: #f5f0ff;
+    --card: #fdfbff;
+    --text: #1e1e2f;
+    --accent: #6c3bbf;
+    --accent2: #1a7f6e;
+    --code-bg: #f3effc;
+    --border: #c4b5e0;
+    --highlight: #f0ebff;
+    --danger: #c0392b;
+    --success: #27ae60;
+    --warn: #e67e22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    padding: 2rem 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--accent);
+    border-bottom: 3px double var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    color: var(--accent2);
+    margin: 2rem 0 0.8rem;
+    padding-left: 0.6rem;
+    border-left: 5px solid var(--accent2);
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: #4a3f6b;
+    margin: 1.5rem 0 0.6rem;
+  }
+  p { margin: 0.7rem 0; text-indent: 2em; }
+  p.no-indent { text-indent: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .problem {
+    background: #f5eeff;
+    border-left: 6px solid var(--accent);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .answer-box {
+    background: #e6f5f0;
+    border-left: 6px solid var(--accent2);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip {
+    background: #ede7f6;
+    border-left: 6px solid #7e57c2;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+  }
+  .warning {
+    background: #fff3e0;
+    border-left: 6px solid #e65100;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .step {
+    background: #fafafa;
+    border: 1px solid #e0d8f0;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    margin: 0.6rem 0;
+  }
+  .step-num {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background: var(--accent2);
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0.8rem 0;
+  }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    background: #ece3f8;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  pre code { background: transparent; padding: 0; }
+  code.inline-math {
+    background: #fef9e7;
+    font-weight: bold;
+    color: #b58900;
+  }
+
+  .ascii-tree {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: pre;
+    background: #fafaf7;
+    border: 1px solid #d5cfc0;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .decision-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.2rem 0;
+  }
+  .dt-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    position: relative;
+  }
+  .dt-node {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid #6c3bbf;
+    background: #fdfbff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    z-index: 2;
+    position: relative;
+  }
+  .dt-node.success { border-color: var(--success); background: #e8f5e9; }
+  .dt-node.fail { border-color: var(--danger); background: #fde8e8; border-style: dashed; }
+  .dt-connectors {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    height: 24px;
+  }
+  .dt-connectors span {
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: #b39ddb;
+  }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 0.93rem;
+  }
+  th, td {
+    border: 1px solid #c4b5e0;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  th {
+    background: #e8dff5;
+    color: #4a2874;
+  }
+  td { background: #fdfbff; }
+  tr.highlight-row td { background: #fff9c4; }
+
+  .formula-block {
+    background: #fffde7;
+    border: 2px solid #f9a825;
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: #9a8bb5;
+    font-size: 0.85rem;
+  }
+
+  ul, ol { margin-left: 2em; line-height: 2; }
+</style>
+</head>
+<body>
+
+<h1>🔍 数据结构简答题精讲<br>顺序查找与折半查找的平均查找长度</h1>
+
+<div class="problem">
+  <h3>📋 题目</h3>
+  <p class="no-indent">给定有序表 <strong>[3, 8, 15, 17, 22, 31, 35, 40, 43, 59]</strong>（共10个元素），假设每个元素的查找概率相等。</p>
+  <p class="no-indent">（1）计算<strong>顺序查找</strong>成功时的平均查找长度 ASL<sub>seq</sub>；</p>
+  <p class="no-indent">（2）计算<strong>折半查找</strong>成功时的平均查找长度 ASL<sub>bin</sub>。</p>
+</div>
+
+<div class="answer-box">
+  <h3>✅ 参考答案</h3>
+  <p class="no-indent"><strong>顺序查找 ASL = 11/2 = 5.5</strong></p>
+  <p class="no-indent"><strong>折半查找 ASL = 29/10 = 2.9</strong></p>
+</div>
+
+<!-- ============================================================ -->
+<h2>一、什么是平均查找长度（ASL）？</h2>
+
+<p>平均查找长度（Average Search Length, ASL）是衡量查找算法效率的核心指标。它表示：在<strong>所有可能的查找目标中</strong>，找到目标（或确认目标不存在）平均需要比较<strong>多少次关键字</strong>。</p>
+
+<div class="card">
+  <h3>🔑 公式定义</h3>
+  <p class="no-indent">设查找表中第 <em>i</em> 个元素被查找的概率为 <em>p<sub>i</sub></em>，找到它需要的比较次数为 <em>c<sub>i</sub></em>，则：</p>
+  <div class="formula-block">
+    <strong>ASL<sub>成功</sub> = Σ p<sub>i</sub> · c<sub>i</sub></strong> &nbsp;&nbsp;（i = 1, 2, …, n）
+  </div>
+  <p class="no-indent">当每个元素被查找的概率相等时（等概率假设），p<sub>i</sub> = 1/n，公式简化为：</p>
+  <div class="formula-block">
+    <strong>ASL<sub>成功</sub> = (1/n) · Σ c<sub>i</sub></strong> = 所有比较次数之和 ÷ 元素个数
+  </div>
+</div>
+
+<div class="tip">
+  <strong>💡 直觉理解：</strong>ASL就是"平均要翻多少张牌才能找到目标"。ASL越小，查找效率越高。折半查找的ASL约等于O(log n)，而顺序查找的ASL是O(n)。
+</div>
+
+<!-- ============================================================ -->
+<h2>二、顺序查找的ASL计算</h2>
+
+<h3>2.1 算法回顾</h3>
+<p>顺序查找（Sequential Search）是最朴素的查找方法：从第一个元素开始，一个一个往后比较，直到找到目标或遍历完整个表。对于有10个元素的有序表，查找第 i 个元素需要比较 <strong>i 次</strong>（假设从位置1开始计数）。</p>
+
+<div class="step">
+  <span class="step-num">①</span> 列出每个元素的查找比较次数：
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>元素位置 i</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+  <tr><th>关键字</th><td>3</td><td>8</td><td>15</td><td>17</td><td>22</td><td>31</td><td>35</td><td>40</td><td>43</td><td>59</td></tr>
+  <tr><th>比较次数 c<sub>i</sub></th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+</table>
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> 求和并除以n：
+</div>
+
+<div class="formula-block">
+  Σ c<sub>i</sub> = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = <strong>55</strong><br>
+  ASL<sub>seq</sub> = 55 / 10 = <strong>5.5 = 11/2</strong>
+</div>
+
+<div class="tip">
+  <strong>📐 通项公式：</strong>对长度为n的顺序表，Σ c<sub>i</sub> = n(n+1)/2，所以 <strong>ASL<sub>seq</sub> = (n+1)/2</strong>。代入n=10：(10+1)/2 = 5.5。这个公式很好记——平均要查"一半多一个"的位置。
+</div>
+
+<h3>2.2 为什么顺序查找这么"慢"？</h3>
+<p>顺序查找没有利用数据<strong>有序</strong>这一关键信息。无论目标值是3还是59，算法都老老实实地从头开始逐个比对。这就好比在一本按字母排序的字典里，你想查"Zebra"却从"A"那一页开始逐页翻——虽然你知道Z在最后，但算法不知道。</p>
+
+<!-- ============================================================ -->
+<h2>三、折半查找的ASL计算</h2>
+
+<h3>3.1 算法思想</h3>
+<p>折半查找（Binary Search）充分利用了"有序"这一条件。每次都和<strong>中间位置</strong>的元素比较：</p>
+<ul>
+  <li>如果相等 → 找到，停止。</li>
+  <li>如果目标 &lt; 中间值 → 去<strong>左半区</strong>继续折半。</li>
+  <li>如果目标 &gt; 中间值 → 去<strong>右半区</strong>继续折半。</li>
+</ul>
+<p>每次比较都将搜索范围<strong>减半</strong>，因此时间复杂度为O(log n)。</p>
+
+<h3>3.2 构建折半查找的判定树</h3>
+<p>判定树（Decision Tree）是折半查找过程的图形化表示。每个<strong>内部结点</strong>代表一次比较，<strong>叶子结点</strong>（或虚结点）代表查找失败的位置。对于10个元素的有序表，我们构建判定树如下：</p>
+
+<div class="step">
+  <span class="step-num">①</span> 确定根结点（第1次比较）：mid = ⌊(1+10)/2⌋ = ⌊5.5⌋ = <strong>5</strong>，即元素<strong>22</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> 左半区 [1,4]：mid = ⌊(1+4)/2⌋ = 2，即元素<strong>8</strong>。右半区 [6,10]：mid = ⌊(6+10)/2⌋ = 8，即元素<strong>40</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">③</span> 继续递归划分，直到所有元素都出现在判定树中：
+</div>
+
+<div class="ascii-tree">
+              22 (第1层, 比较1次)
+            /         \
+          8 (第2层)    40 (第2层)
+         /   \        /    \
+       3      15    31      43 (第3层)
+      / \    /  \   /  \   /   \
+     ×  ×  17   ×  ×   35 ×   59  (第4层)
+           /  \        /  \     /  \
+          ×   ×       ×   ×    ×   ×
+</div>
+
+<p>上图是折半查找的<strong>判定树</strong>。"×"表示查找失败的虚结点。每个内部结点标出了它所在的<strong>层数</strong>（即比较次数）。</p>
+
+<div class="card">
+  <h3>📊 判定树的层数与比较次数</h3>
+  <p class="no-indent">注意：<strong>结点的层数 = 查找该元素所需的比较次数</strong>。例如：</p>
+  <ul>
+    <li>第1层（根22）：比较1次即命中。</li>
+    <li>第2层（8和40）：先和22比（1次），再和8或40比（第2次），共2次。</li>
+    <li>第3层（3, 15, 31, 43）：3次比较。</li>
+    <li>第4层（17, 35, 59）：4次比较。</li>
+  </ul>
+</div>
+
+<h3>3.3 统计各层的元素个数</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>层数（比较次数）</th><th>该层元素</th><th>元素个数</th></tr>
+  <tr><td>1</td><td>22</td><td>1</td></tr>
+  <tr><td>2</td><td>8, 40</td><td>2</td></tr>
+  <tr><td>3</td><td>3, 15, 31, 43</td><td>4</td></tr>
+  <tr class="highlight-row"><td>4</td><td>17, 35, 59</td><td>3</td></tr>
+  <tr><th>合计</th><th></th><th>10</th></tr>
+</table>
+</div>
+
+<div class="step">
+  <span class="step-num">④</span> 计算Σ c<sub>i</sub>：
+</div>
+
+<div class="formula-block">
+  Σ c<sub>i</sub> = 1×1 + 2×2 + 3×4 + 4×3<br>
+  = 1 + 4 + 12 + 12<br>
+  = <strong>29</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑤</span> 计算ASL：
+</div>
+
+<div class="formula-block">
+  ASL<sub>bin</sub> = 29 / 10 = <strong>2.9 = 29/10</strong>
+</div>
+
+<div class="tip">
+  <strong>📐 一般公式（等概率）：</strong>ASL<sub>bin</sub> = (1/n) · Σ (层数<sub>i</sub> × 该层结点数)。对于n=2<sup>k</sup>−1（满二叉树），ASL ≈ log₂(n+1) − 1。对于一般的n，ASL仍在O(log n)级别。
+</div>
+
+<!-- ============================================================ -->
+<h2>四、对比分析：顺序 vs 折半</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>指标</th><th>顺序查找</th><th>折半查找</th></tr>
+  <tr><td>ASL（n=10）</td><td><strong>5.5</strong></td><td><strong>2.9</strong></td></tr>
+  <tr><td>ASL通项</td><td>(n+1)/2 ≈ n/2</td><td>≈ log₂(n+1) − 1</td></tr>
+  <tr><td>时间复杂度</td><td>O(n)</td><td>O(log n)</td></tr>
+  <tr><td>前提条件</td><td>无</td><td><strong>必须有序 + 随机存取</strong></td></tr>
+  <tr><td>存储结构</td><td>顺序表或链表均可</td><td>仅限<strong>顺序存储结构</strong></td></tr>
+  <tr><td>适用场景</td><td>小数据量 / 无序数据</td><td>静态有序表 / 大量查找</td></tr>
+</table>
+</div>
+
+<h3>4.1 为什么折半查找是O(log n)？</h3>
+<p>每次比较后，搜索范围缩小为原来的一半。经过k次比较后，最多剩下n/2<sup>k</sup>个候选元素。当n/2<sup>k</sup> ≤ 1时查找结束，解得k ≥ log₂ n。因此最坏情况下比较次数不超过⌈log₂(n+1)⌉，即<strong>对数级别</strong>。</p>
+
+<div class="card">
+  <p class="no-indent">用<strong>判定树</strong>的视角看：折半查找的比较次数 = 判定树中从根到目标结点的<strong>路径长度</strong>。对于n=10的判定树，高度为4（根在第1层）。查找任何元素最多走4步，而顺序查找最多要走10步。随着n增大，这个差距会急剧拉大：n=1000时，折半查找最多约10步，而顺序查找平均约500步。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>五、判定树的构造规则（重点）</h2>
+
+<p>很多同学在构造判定树时容易出错。以下是标准步骤：</p>
+
+<div class="step">
+  <span class="step-num">1</span> 设查找区间为 [low, high]。计算 <strong>mid = ⌊(low + high) / 2⌋</strong>（向下取整）。
+</div>
+<div class="step">
+  <span class="step-num">2</span> 将 mid 位置的元素作为当前子树的根。
+</div>
+<div class="step">
+  <span class="step-num">3</span> 左子树递归处理 [low, mid−1]，右子树递归处理 [mid+1, high]。
+</div>
+<div class="step">
+  <span class="step-num">4</span> 当 low &gt; high 时，该位置为<strong>失败结点</strong>（虚结点，不计入ASL成功）。
+</div>
+
+<div class="warning">
+  <strong>⚠️ 注意：</strong>mid的取整方式（向上还是向下）会影响判定树的形状，但只要保持一致，ASL的计算结果相同。国内教材大多采用<strong>向下取整 ⌊·⌋</strong>。此外，<strong>失败结点的比较次数等于其父结点所在层数</strong>（因为比较到父结点时发现应该走某个方向但该方向为空），但计算ASL<sub>成功</sub>时不考虑失败结点。
+</div>
+
+<h3>5.1 手动验证判定树</h3>
+<p>一个好的判定树必须满足BST性质：左子树的所有值 &lt; 根 &lt; 右子树的所有值。对于我们的有序表：</p>
+<div class="ascii-tree">
+        22          ← 根（索引5，值是22）
+       /  \
+     8     40      ← 左子树值全部<22，右子树值全部>22 ✓
+    / \    / \
+   3  15  31 43    ← 每一层都保持左小右大 ✓
+      /     \  \
+     17     35 59
+</div>
+
+<!-- ============================================================ -->
+<h2>六、完整计算演练（一步一步）</h2>
+
+<h3>6.1 顺序查找计算演练</h3>
+<pre>
+查找 3： 比较1次 → 命中
+查找 8： 比较2次 → 命中
+查找15： 比较3次 → 命中
+查找17： 比较4次 → 命中
+查找22： 比较5次 → 命中
+查找31： 比较6次 → 命中
+查找35： 比较7次 → 命中
+查找40： 比较8次 → 命中
+查找43： 比较9次 → 命中
+查找59： 比较10次 → 命中
+──────────────────────
+总比较次数 = 1+2+3+4+5+6+7+8+9+10 = 55
+ASL = 55/10 = 5.5
+</pre>
+
+<h3>6.2 折半查找计算演练</h3>
+<pre>
+查找22 → 第1次mid=5得22 → 命中，1次
+查找 8 → 第1次mid=5(22), 8<22→左, mid=2得8 → 命中，2次
+查找40 → 第1次mid=5(22), 40>22→右, mid=8得40 → 命中，2次
+查找 3 → 1:mid=5(22)左→2:mid=2(8)左→3:mid=1得3 → 命中，3次
+查找15 → 1:mid=5(22)左→2:mid=2(8)右→3:mid=3得15 → 命中，3次
+查找31 → 1:mid=5(22)右→2:mid=8(40)左→3:mid=6得31 → 命中，3次
+查找43 → 1:mid=5(22)右→2:mid=8(40)右→3:mid=9得43 → 命中，3次
+查找17 → 1:mid=5(22)左→2:mid=2(8)右→3:mid=3(15)右→4:mid=4得17 → 命中，4次
+查找35 → 1:mid=5(22)右→2:mid=8(40)左→3:mid=6(31)右→4:mid=7得35 → 命中，4次
+查找59 → 1:mid=5(22)右→2:mid=8(40)右→3:mid=9(43)右→4:mid=10得59 → 命中，4次
+─────────────────────────────────────────────────────────────
+Σ = 1×1 + 2×2 + 3×4 + 4×3 = 1 + 4 + 12 + 12 = 29
+ASL = 29/10 = 2.9
+</pre>
+
+<!-- ============================================================ -->
+<h2>七、常见错误与避坑指南</h2>
+
+<div class="warning">
+  <h3>❌ 错误1：折半查找的mid下标计算错误</h3>
+  <p>mid = ⌊(low+high)/2⌋。例如low=6, high=10时，mid = ⌊16/2⌋ = 8，不是7或9。算错mid会导致整个判定树结构错误。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误2：判定树中把失败结点也计入ASL成功</h3>
+  <p>ASL<sub>成功</sub>只统计<strong>实际存在的元素</strong>（内部结点）。失败结点（虚结点/外部结点）用于计算ASL<sub>失败</sub>，两者是不同的指标。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误3：混淆比较次数与"探查次数"</h3>
+  <p>在顺序查找中，有些教材将"哨兵"技术引入以减少边界判断，此时比较次数可能为n+1。本题采用标准定义：查找第i个元素比较i次。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误4：忘记有序表也能用顺序查找</h3>
+  <p>虽然有序表支持折半查找，但题目问"顺序查找的ASL"时，就是朴素的从头到尾逐个比较。有序性不影响顺序查找的比较次数（除非采用优化版——但考试一般不假设优化）。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>八、ASL的深层理解</h2>
+
+<div class="card">
+  <h3>🎯 ASL = 期望比较次数</h3>
+  <p class="no-indent">从概率论的角度，ASL就是随机变量"比较次数"的<strong>数学期望</strong>。如果每个元素被查找的概率不同（例如热门数据查得更多），可以给每个p<sub>i</sub>赋不同权重：</p>
+  <div class="formula-block">
+    ASL = p₁·c₁ + p₂·c₂ + … + p<sub>n</sub>·c<sub>n</sub>
+  </div>
+  <p class="no-indent">这就是<strong>哈夫曼树</strong>思想的萌芽——让查找概率高的元素更靠近根，可以进一步降低ASL。</p>
+</div>
+
+<div class="tip">
+  <strong>🧠 记忆技巧：</strong><br>
+  • 顺序查找ASL = (n+1)/2 → "一半再多半个"<br>
+  • 折半查找ASL ≈ log₂n − 1 → "对数级别"<br>
+  • 两者差距随n增大而急剧扩大：n=1000时，顺序≈500，折半≈9
+</div>
+
+<footer>
+  <p>📘 数据结构简答题精讲 · 顺序查找与折半查找ASL · 教学资料</p>
+  <p>建议亲手画出n=10的判定树，并验证每个元素的比较次数。</p>
+</footer>
+
+</body>
+</html>

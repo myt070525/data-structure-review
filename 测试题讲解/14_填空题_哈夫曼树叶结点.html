@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>填空第4题 · 哈夫曼树叶结点数</title>
+<style>:root{--bg:#ecfdf5;--card:#fff;--text:#14532d;--muted:#15803d;--leaf:#166534;--amber:#d97706;--border:#bbf7d0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:16px}.container{max-width:800px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--leaf)}.answer{margin:1.5rem auto;width:200px;height:200px;border-radius:50%;background:linear-gradient(135deg,#166534,#15803d);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(22,101,52,.3)}.answer .num{font-size:3.5rem;font-weight:900;line-height:1}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--leaf);border-left:4px solid var(--leaf);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#dcfce7;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.derive{display:grid;gap:.8rem;margin:1rem 0}.step{display:flex;gap:1rem;align-items:center;padding:.8rem 1rem;background:#f0fdf4;border-radius:8px}.step .eq{font-family:'Cascadia Code',monospace;font-weight:700;color:var(--leaf);font-size:1.1rem}</style></head>
+<body><div class="container">
+<div class="header"><h1>🌳 填空第4题 · 哈夫曼树</h1><p style="color:var(--muted)">一棵哈夫曼树有125个结点，叶结点有几个？</p></div>
+<div class="answer"><div class="num">63</div><div style="font-size:.9rem;opacity:.85">个叶结点</div></div>
+
+<div class="section"><h2>一、哈夫曼树的特殊性质</h2>
+<div class="card">
+<p>哈夫曼树是通过贪心合并构建的最优二叉树。它的关键特征：<span class="hl">哈夫曼树只有度为0（叶子）和度为2（内部）的结点，没有度为1的结点</span>。</p>
+<p>为什么？因为每次合并都是把两棵子树合到一个新根下，新根一定有两个孩子→度=2。</p></div></div>
+
+<div class="section"><h2>二、推导过程</h2>
+<div class="card">
+<div class="derive">
+<div class="step"><span style="font-size:1.5rem">①</span><div><span class="eq">n = n₀ + n₂</span><br><span style="color:var(--muted);font-size:.85rem">总结点 = 叶结点 + 内部结点（没有度为1的结点）</span></div></div>
+<div class="step"><span style="font-size:1.5rem">②</span><div><span class="eq">n₀ = n₂ + 1</span><br><span style="color:var(--muted);font-size:.85rem">二叉树通用性质：叶子数 = 度为2的结点数 + 1</span></div></div>
+<div class="step"><span style="font-size:1.5rem">③</span><div>把②代入①：<span class="eq">n = n₀ + (n₀ - 1) = 2n₀ - 1</span></div></div>
+<div class="step"><span style="font-size:1.5rem">④</span><div><span class="eq">n₀ = (n + 1) / 2 = (125 + 1) / 2 = 63</span></div></div>
+</div></div></div>
+
+<div class="tip"><strong>🎯 万能公式：</strong>对哈夫曼树（无度为1结点）→ <strong>叶子数 = (总结点数 + 1) / 2</strong>。反向：总结点 = 2×叶子数 - 1。永远记住这个！</div>
+
+<div class="tip"><strong>💡 通俗类比：</strong>哈夫曼树像一场淘汰赛。每场比赛（内部结点）淘汰1个人，最后冠军（根）以上没人了。N个选手参赛，需要N-1场比赛。叶子=选手，内部结点=比赛。所以叶子比内部结点多1。</div>
+
+</div></body></html>

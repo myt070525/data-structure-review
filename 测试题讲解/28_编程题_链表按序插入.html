@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：链表按序插入 - Insert_sort</title>
+<style>
+    :root {
+        --bg: #eff6ff;
+        --fg: #1e3a5f;
+        --accent: #2563eb;
+        --accent2: #dc2626;
+        --gold: #d97706;
+        --green: #059669;
+        --cyan: #0891b2;
+        --card-bg: #ffffff;
+        --border: #d0e0f5;
+        --shadow: 0 2px 14px rgba(37,99,235,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #eff6ff 0%, #e3f0fd 40%, #d6e8fa 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(30,64,175,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.6;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.gold   { border-left-color: var(--gold); }
+    .card.red    { border-left-color: var(--accent2); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #d0e0f5;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #1e3a5f; }
+    .code-block {
+        background: #0f172a; color: #e2e8f0; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre;
+    }
+    .code-block .kw { color: #38bdf8; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #64748b; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .blank { background: #facc15; color: #0f172a; padding: 1px 8px; border-radius: 3px; font-weight: 700; }
+    .ll-diagram {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.3;
+        background: #f8fafc; padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #d0e0f5;
+        margin: 1rem 0;
+    }
+    .node-box {
+        display: inline-flex; flex-direction: column; align-items: center;
+        margin: 0 2px; vertical-align: middle;
+    }
+    .node-data {
+        width: 48px; height: 36px; line-height: 36px;
+        text-align: center; font-weight: 700; font-size: 1rem;
+        border: 2px solid #2563eb; border-radius: 6px 6px 0 0;
+        background: #dbeafe; color: #1e3a5f;
+    }
+    .node-next {
+        width: 48px; height: 22px; line-height: 22px;
+        text-align: center; font-size: 0.65rem;
+        border: 2px solid #94a3b8; border-radius: 0 0 6px 6px;
+        border-top: none; background: #f1f5f9; color: #64748b;
+    }
+    .node-box.hl .node-data { background: #facc15; border-color: #d97706; color: #78350f; }
+    .node-box.new .node-data { background: #4ade80; border-color: #059669; color: #1a3c2a; }
+    .arrow-right { font-size: 1.4rem; font-weight: 700; color: #2563eb; margin: 0 1px; }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #eff6ff; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid var(--gold);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .danger-box {
+        background: #fef2f2; border-left: 4px solid var(--accent2);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #d0e0f5;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.72rem; padding: 0.7rem; }
+        .ll-diagram { font-size: 0.72rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🔗 编程题：有序链表插入（Insert_sort）</h1>
+    <div class="subtitle">第28题 · 向递增有序单链表中插入新元素</div>
+    <div class="answer-badge">
+        ✅ 填空答案：<br>
+        (1) p-&gt;Next != NULL &nbsp; (2) p = p-&gt;Next &nbsp; (3) q-&gt;Data = X<br>
+        (4) q-&gt;Next = p-&gt;Next &nbsp; (5) p-&gt;Next = q
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目理解：我们要做什么？</h2>
+
+<h3>1.1 问题描述</h3>
+<p>
+已知一个<b>带头结点的递增有序单链表</b>，要求编写函数 <code>Insert_sort</code>，将值为 <code>X</code> 的新结点插入到链表的正确位置，<b>保持链表递增有序</b>。（假设链表中没有与X相等的元素）
+</p>
+
+<h3>1.2 核心任务</h3>
+<ol style="margin-left:1.5rem; line-height:2.2;">
+    <li><b>定位</b>：找到插入位置的前驱结点p（p之后就是X应该插入的位置）。</li>
+    <li><b>创建</b>：为新结点q分配内存，存入数据X。</li>
+    <li><b>插入</b>：将q插入到p之后，即"挂"在p和p-&gt;Next之间。</li>
+</ol>
+
+<h3>1.3 链表结构定义</h3>
+<div class="code-block">
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">LNode</span> {
+    <span class="type">int</span> Data;
+    <span class="kw">struct</span> <span class="type">LNode</span> *Next;
+} <span class="type">LNode</span>, *<span class="type">LinkList</span>;
+</div>
+</div>
+
+<!-- ============ INSERTION PATTERN ============ -->
+<div class="card green">
+<h2>二、链表插入的"四步法"——核心模式</h2>
+
+<h3>2.1 通用链表插入范式</h3>
+<p>在结点<b>p之后</b>插入新结点<b>q</b>，需要执行两步指针操作：</p>
+
+<div class="ll-diagram">
+    插入前：  p ──→ [p-&gt;Next 结点]
+                   ↑
+                   要在这里插入 q
+
+    插入后：  p ──→ q ──→ [原 p-&gt;Next 结点]
+</div>
+
+<h3>2.2 关键两步（顺序不可颠倒！）</h3>
+<table>
+    <tr><th>步骤</th><th>代码</th><th>含义</th><th>为什么不能先做⑤？</th></tr>
+    <tr>
+        <td><b>第④步</b></td>
+        <td><code>q-&gt;Next = p-&gt;Next</code></td>
+        <td>让新结点q的Next指向p的后继</td>
+        <td rowspan="2" style="vertical-align:middle; text-align:left;">
+            ⚠️ 如果先执行 <code>p-&gt;Next = q</code>，那么 <code>p-&gt;Next</code> 已经被改写成q，<b>原来的后继结点地址就丢失了</b>！q-&gt;Next 将无法指向正确位置。<br><br>
+            <b>规则：永远先让新结点指向后继，再让前驱指向新结点。</b>
+        </td>
+    </tr>
+    <tr>
+        <td><b>第⑤步</b></td>
+        <td><code>p-&gt;Next = q</code></td>
+        <td>让前驱p的Next指向新结点q</td>
+    </tr>
+</table>
+
+<h3>2.3 形象类比：插队</h3>
+<p>
+想象你在排队买奶茶。小明（q）想插到小红（p）后面、小刚（原p的后一个人）前面。
+</p>
+<ol style="margin-left:1.5rem; line-height:2;">
+    <li><b>先做④：</b>小明先把手搭在小刚的肩膀上（q-&gt;Next = 小刚），这样就不会跟丢小刚。</li>
+    <li><b>再做⑤：</b>小红转身把手搭在小明肩膀上（p-&gt;Next = q），完成插入。</li>
+</ol>
+<p style="color:#dc2626; font-weight:700;">
+    如果反过来——小红先搭小明（⑤先做），那小刚在哪儿就彻底不知道了！这就是"断链"错误。
+</p>
+</div>
+
+<!-- ============ FULL CODE ============ -->
+<div class="card cyan">
+<h2>三、完整代码 &amp; 逐行解析</h2>
+
+<div class="code-block">
+<span class="kw">void</span> <span class="fn">Insert_sort</span>(<span class="type">LinkList</span> L, <span class="type">int</span> X) {
+    <span class="cmt">// L: 带头结点的递增有序单链表</span>
+    <span class="cmt">// X: 待插入的元素值</span>
+
+    <span class="type">LNode</span> *p, *q;
+
+    <span class="cmt">// ─── 阶段一：定位插入位置的前驱结点p ───</span>
+    p = L;                          <span class="cmt">// 从头结点开始</span>
+    <span class="kw">while</span> (<span class="blank">p-&gt;Next != NULL</span>) {    <span class="cmt">// 填空(1)：只要还有后继结点</span>
+        <span class="kw">if</span> (p-&gt;Next-&gt;Data &gt; X)
+            <span class="kw">break</span>;              <span class="cmt">// 找到了！p的后继比X大，X应插在p之后</span>
+        <span class="blank">p = p-&gt;Next</span>;              <span class="cmt">// 填空(2)：没找到，p向后移动</span>
+    }
+
+    <span class="cmt">// ─── 阶段二：创建新结点 ───</span>
+    q = (<span class="type">LNode</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">LNode</span>));
+    <span class="blank">q-&gt;Data = X</span>;                 <span class="cmt">// 填空(3)：存入数据</span>
+
+    <span class="cmt">// ─── 阶段三：执行插入（关键！④必须在⑤之前）───</span>
+    <span class="blank">q-&gt;Next = p-&gt;Next</span>;          <span class="cmt">// 填空(4)：新结点先指向后继</span>
+    <span class="blank">p-&gt;Next = q</span>;                <span class="cmt">// 填空(5)：前驱再指向新结点</span>
+}
+</div>
+
+<h3>逐行详细解释</h3>
+
+<table>
+    <tr><th>填空</th><th>代码</th><th>解释</th></tr>
+    <tr>
+        <td>(1)</td>
+        <td><code>p-&gt;Next != NULL</code></td>
+        <td>
+            while循环的继续条件：只要p后面还有结点，就继续比较。<br>
+            如果写成 <code>p != NULL</code>，p最终会走到NULL，之后p-&gt;Next就会空指针异常。<br>
+            如果写成 <code>p-&gt;Next-&gt;Data &lt; X</code>，等于把循环条件和break条件合并了（也可以，但题目显然分开写）。
+        </td>
+    </tr>
+    <tr>
+        <td>(2)</td>
+        <td><code>p = p-&gt;Next</code></td>
+        <td>
+            p向后移动一步，相当于"指针滑动"——这是遍历链表的最基本操作。<br>
+            注意：这里p始终指向"待比较结点的前驱"，所以是p先移再比较p-&gt;Next。
+        </td>
+    </tr>
+    <tr>
+        <td>(3)</td>
+        <td><code>q-&gt;Data = X</code></td>
+        <td>
+            为新分配的结点q填入数据X。这是malloc之后的常规操作。
+        </td>
+    </tr>
+    <tr>
+        <td>(4)</td>
+        <td><code>q-&gt;Next = p-&gt;Next</code></td>
+        <td>
+            <b>必须先执行！</b>让新结点q接管p的后继链。此时p-&gt;Next还是原来的后继结点。
+        </td>
+    </tr>
+    <tr>
+        <td>(5)</td>
+        <td><code>p-&gt;Next = q</code></td>
+        <td>
+            修改p的后继指针指向q，完成插入。此时原p-&gt;Next的地址已经安全地保存在q-&gt;Next中了。
+        </td>
+    </tr>
+</table>
+</div>
+
+<!-- ============ VISUAL DEMO ============ -->
+<div class="card gold">
+<h2>四、可视化演示：向 [2, 5, 8] 中插入 X=6</h2>
+
+<h3>初始链表</h3>
+<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0; padding:1rem 0;">
+    <span class="node-box"><span class="node-data">L(head)</span><span class="node-next">Next→</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box"><span class="node-data">2</span><span class="node-next">Next→</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box"><span class="node-data">5</span><span class="node-next">Next→</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box"><span class="node-data">8</span><span class="node-next">NULL</span></span>
+</div>
+
+<h3>阶段一：定位——p指针的移动过程</h3>
+<table>
+    <tr><th>迭代</th><th>p指向</th><th>p-&gt;Next指向</th><th>p-&gt;Next-&gt;Data</th><th>与X=6比较</th><th>动作</th></tr>
+    <tr><td>初始</td><td>L (head)</td><td>结点2</td><td>2</td><td>2 ≤ 6</td><td>p后移→指向2</td></tr>
+    <tr><td>第1轮</td><td>结点2</td><td>结点5</td><td>5</td><td>5 ≤ 6</td><td>p后移→指向5</td></tr>
+    <tr class="highlight"><td>第2轮</td><td>结点5</td><td>结点8</td><td>8</td><td>8 &gt; 6 ✓</td><td><b>break！p停在5</b></td></tr>
+</table>
+<p style="text-align:center; font-weight:700; color:#2563eb;">
+    p最终指向值为5的结点，新结点应插在5之后、8之前。
+</p>
+
+<h3>阶段二：创建新结点q（Data=6）</h3>
+<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0.5rem; padding:0.8rem 0;">
+    <span class="node-box new"><span class="node-data">6</span><span class="node-next">?</span></span>
+    <span style="font-weight:700;">← 新结点q，malloc后Data=6，Next未初始化</span>
+</div>
+
+<h3>阶段三：执行插入</h3>
+<p style="margin-left:1rem;"><b>④ 先执行：</b><code>q-&gt;Next = p-&gt;Next</code>（q-&gt;Next指向结点8）</p>
+
+<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0; padding:0.5rem 0;">
+    <span class="node-box"><span class="node-data">5</span><span class="node-next">Next→</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box"><span class="node-data">8</span><span class="node-next">NULL</span></span>
+    <span style="margin:0 0.8rem;"></span>
+    <span class="node-box new"><span class="node-data">6</span><span class="node-next">Next→</span></span>
+    <span class="arrow-right" style="color:#059669;">↗</span>
+    <span style="font-size:0.8rem; color:#059669; font-weight:700;">q-&gt;Next指向8</span>
+</div>
+
+<p style="margin-left:1rem;"><b>⑤ 再执行：</b><code>p-&gt;Next = q</code>（结点5的Next指向q）</p>
+
+<div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0; padding:0.5rem 0;">
+    <span class="node-box"><span class="node-data">L</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box"><span class="node-data">2</span></span>
+    <span class="arrow-right">→</span>
+    <span class="node-box hl"><span class="node-data">5</span></span>
+    <span class="arrow-right" style="color:#059669;">→</span>
+    <span class="node-box new"><span class="node-data">6</span></span>
+    <span class="arrow-right" style="color:#059669;">→</span>
+    <span class="node-box"><span class="node-data">8</span></span>
+</div>
+
+<p style="text-align:center; font-weight:700; color:#059669; font-size:1.1rem; margin-top:0.8rem;">
+    🎉 插入完成！链表变为 [2, 5, 6, 8]，依然递增有序！
+</p>
+</div>
+
+<!-- ============ BOUNDARY CASES ============ -->
+<div class="card red">
+<h2>五、边界情况分析</h2>
+
+<h3>情况1：插入到链表头部（X比所有元素都小）</h3>
+<p>例如链表[3,5,8]，插入X=1。</p>
+<p>while循环：p-&gt;Next-&gt;Data=3 &gt; 1 → 直接break。p停在头结点L。</p>
+<p>插入操作：q插在L之后、3之前 → 链表变为[1,3,5,8]。✅ 正确！</p>
+
+<h3>情况2：插入到链表尾部（X比所有元素都大）</h3>
+<p>例如链表[3,5,8]，插入X=10。</p>
+<p>while循环：依次比较3≤10、5≤10、8≤10，都满足，p最终指向8。下一轮p-&gt;Next==NULL，循环条件不满足退出。</p>
+<p>插入操作：q-&gt;Next = p-&gt;Next = NULL，p-&gt;Next = q。链表变为[3,5,8,10]。✅ 正确！</p>
+
+<h3>情况3：空链表（只有头结点）</h3>
+<p>L-&gt;Next == NULL → while条件直接不满足 → p停在L。</p>
+<p>q-&gt;Next = NULL，L-&gt;Next = q。链表变为[X]。✅ 正确！</p>
+
+<div class="tip-box">
+    💡 三个边界情况都无需特殊处理——代码已经自然覆盖。这是<b>带头结点</b>链表设计的优雅之处。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>六、常见错误 &amp; 考点总结</h2>
+
+<div class="danger-box">
+    🔴 <b>致命错误1：④和⑤顺序颠倒！</b><br>
+    如果先写 <code>p-&gt;Next = q</code> 再写 <code>q-&gt;Next = p-&gt;Next</code>，第二句的p-&gt;Next已经被改成q了，q-&gt;Next指向自己，链表断裂。<br>
+    <b>记忆口诀："先接后，再接前；先指后继，再改前驱。"</b>
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：while循环条件写成 p != NULL。</b><br>
+    p最终会走到链表尾结点的Next（NULL），但我们需要p停在尾结点而不是NULL。正确条件是 <code>p-&gt;Next != NULL</code>。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：p初始化为 L-&gt;Next 而非 L。</b><br>
+    如果p从第一个数据结点开始，插入到头部的情况就无法处理（找不到头结点作为前驱）。必须从L开始。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：忘记malloc就直接用q。</b><br>
+    必须先分配内存，才能使用q-&gt;Data和q-&gt;Next。
+</div>
+
+<div class="tip-box">
+    💡 <b>考试心法：</b>这道题的5个空分别考察——<br>
+    ① while循环边界条件<br>
+    ② 链表指针后移<br>
+    ③ 结构体成员赋值<br>
+    ④⑤ 链表插入的双指针操作（顺序是关键！）<br>
+    理解"为什么④在⑤之前"比记住答案更重要。
+</div>
+</div>
+
+<!-- ============ COMPARISON ============ -->
+<div class="card cyan">
+<h2>七、拓展：链表插入 vs 数组插入</h2>
+<table>
+    <tr><th>维度</th><th>有序链表插入</th><th>有序数组插入</th></tr>
+    <tr><td>定位</td><td>O(n) 从头遍历</td><td>O(log n) 二分查找（但移动仍是O(n)）</td></tr>
+    <tr><td>插入动作</td><td><b>O(1)</b> 改两个指针即可</td><td><b>O(n)</b> 需要批量右移元素</td></tr>
+    <tr><td>总时间</td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>空间</td><td>O(1) 额外</td><td>O(1) 额外（原地）</td></tr>
+    <tr><td>优势场景</td><td>频繁插入/删除的动态数据</td><td>频繁随机访问的静态数据</td></tr>
+</table>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测试题讲解 · 有序链表插入 · 第28题详解
+</footer>
+
+</body>
+</html>

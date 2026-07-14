@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>插入排序全过程详解 - [6,3,1,4,5,2]</title>
+<style>
+    :root {
+        --bg: #f0fdf4;
+        --fg: #1a3c2a;
+        --accent: #16a34a;
+        --accent2: #ea580c;
+        --blue: #2563eb;
+        --pink: #db2777;
+        --card-bg: #ffffff;
+        --border: #d1e7d6;
+        --shadow: 0 2px 14px rgba(22,163,74,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #f0fdf4 0%, #e6f7ec 40%, #d8f0df 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #15803d, #16a34a);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(21,128,61,0.25);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1.05rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.orange { border-left-color: var(--accent2); }
+    .card.blue   { border-left-color: var(--blue); }
+    .card.pink   { border-left-color: var(--pink); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #d1e7d6;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #166534; }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #f0fdf4; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .arr-row {
+        display: flex; gap: 0; margin: 0.6rem 0; justify-content: center; flex-wrap: wrap;
+    }
+    .arr-cell {
+        width: 52px; height: 52px; line-height: 52px;
+        text-align: center; border: 2px solid #b8d4be;
+        font-weight: 700; font-size: 1.15rem;
+        background: #fafdfb; border-radius: 8px; margin: 2px;
+        transition: all 0.3s;
+    }
+    .arr-cell.sorted   { background: #bbf7d0; border-color: #16a34a; color: #166534; }
+    .arr-cell.current  { background: #facc15; border-color: #ea580c; color: #1a1a2e; box-shadow: 0 0 10px rgba(250,204,21,0.6); }
+    .arr-cell.moving   { background: #fde68a; border-color: #d97706; color: #78350f; }
+    .arr-idx {
+        width: 52px; text-align: center; font-size: 0.7rem;
+        color: #888; margin: 2px;
+    }
+    .card-visual {
+        display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;
+        justify-content: center; margin: 0.5rem 0;
+        font-family: "Fira Code",monospace;
+    }
+    .hand-card {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 46px; height: 60px; border-radius: 6px;
+        font-weight: 700; font-size: 1.2rem;
+        border: 2px solid #999; transition: all 0.4s;
+    }
+    .hand-card.face-up { background: #fff; border-color: #2563eb; box-shadow: 2px 3px 8px rgba(0,0,0,0.15); }
+    .hand-card.face-down { background: #1e40af; color: #fff; border-color: #1e3a8a; }
+    .hand-card.inserting { background: #facc15; border-color: #ea580c; animation: pulse 0.6s infinite; }
+    @keyframes pulse {
+        0%,100% { box-shadow: 0 0 0 0 rgba(250,204,21,0.5); }
+        50%     { box-shadow: 0 0 0 12px rgba(250,204,21,0); }
+    }
+    .code-block {
+        background: #1a2e1a; color: #d8f0d8; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.7; overflow-x: auto; margin: 1rem 0;
+    }
+    .code-block .kw { color: #86efac; }
+    .code-block .fn { color: #fbbf24; }
+    .code-block .cmt { color: #6b7280; }
+    .code-block .num { color: #fca5a5; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--accent);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid #d97706;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .compare-arrow {
+        font-size: 1.5rem; color: var(--accent2); font-weight: 700;
+        margin: 0 0.3rem;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #d1e7d6;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        .arr-cell { width: 40px; height: 40px; line-height: 40px; font-size: 0.9rem; }
+        .arr-idx { width: 40px; font-size: 0.65rem; }
+        header h1 { font-size: 1.3rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🃏 直接插入排序（Insertion Sort）</h1>
+    <div class="subtitle">第26题 · 序列 [6, 3, 1, 4, 5, 2] · 摸牌插牌全过程</div>
+    <div class="answer-badge">✅ 第1趟: [3, 6, 1, 4, 5, 2] &nbsp;|&nbsp; 第2趟: [1, 3, 6, 4, 5, 2]</div>
+</header>
+
+<div class="container">
+
+<!-- ============ ANALOGY ============ -->
+<div class="card">
+<h2>一、核心思想：打牌时"摸牌—插牌"</h2>
+
+<h3>1.1 经典比喻</h3>
+<p>
+想象你在打扑克牌，摸到一张新牌后，你会：
+</p>
+<ol style="margin-left:1.5rem; line-height:2.2;">
+    <li>右手拿起新牌（当前待插入元素）。</li>
+    <li>在左手已排好的牌中<b>从右向左</b>扫描。</li>
+    <li>找到第一个比新牌小的位置，把新牌<b>插入</b>它后面。</li>
+    <li>插入时，比新牌大的牌都要向右挪一位"腾位置"。</li>
+</ol>
+
+<div class="card-visual" style="gap:0.5rem; margin:1.2rem 0;">
+    <span style="font-weight:700; color:#16a34a;">左手（已排序）：</span>
+    <span class="hand-card face-up">3</span>
+    <span class="hand-card face-up">6</span>
+    <span style="margin:0 0.8rem; font-size:1.5rem;">←</span>
+    <span style="font-weight:700; color:#ea580c;">右手（新摸的牌）：</span>
+    <span class="hand-card inserting">1</span>
+</div>
+<p style="text-align:center; color:#888;">把1插入到3前面 → [1, 3, 6]</p>
+
+<h3>1.2 算法框架</h3>
+<p>
+将数组分为<b>已排序区间</b>（左侧）和<b>未排序区间</b>（右侧）。初始时第一个元素自成已排序区间。每趟从未排序区间取第一个元素，插入到已排序区间的正确位置。
+</p>
+</div>
+
+<!-- ============ INITIAL STATE ============ -->
+<div class="card blue">
+<h2>二、初始状态 &amp; 每趟详解</h2>
+
+<h3>初始数组</h3>
+<div class="arr-row">
+    <div class="arr-cell sorted">6</div>
+    <div class="arr-cell">3</div>
+    <div class="arr-cell">1</div>
+    <div class="arr-cell">4</div>
+    <div class="arr-cell">5</div>
+    <div class="arr-cell">2</div>
+</div>
+<div class="arr-row">
+    <div class="arr-idx">[0]</div>
+    <div class="arr-idx">[1]</div>
+    <div class="arr-idx">[2]</div>
+    <div class="arr-idx">[3]</div>
+    <div class="arr-idx">[4]</div>
+    <div class="arr-idx">[5]</div>
+</div>
+<p style="text-align:center;">初始：<b>已排序 = [6]</b>（仅第0个元素），未排序 = [3, 1, 4, 5, 2]</p>
+</div>
+
+<!-- ============ PASS BY PASS ============ -->
+<div class="card orange">
+<h2>三、逐趟推演</h2>
+
+<!-- PASS 1 -->
+<h3>🔹 第1趟：i=1，待插入元素 arr[1] = 3</h3>
+<div style="margin-left:1rem;">
+    <p><b>前情：</b>已排序区间 = [6]（下标0~0），待插入值 <code>key = 3</code></p>
+    <p><b>比较：</b>j=0，arr[0]=6 &gt; key=3 → 6向右挪一位到位置1。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell moving">6</div>
+        <div class="arr-cell">1</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p style="text-align:center; font-size:0.85rem; color:#888;">j变为-1，退出循环。将key=3放入j+1=0处。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell">1</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p style="text-align:center; font-weight:700; color:#16a34a;">✅ 第1趟结束：[3, 6 | 1, 4, 5, 2] &nbsp; 已排序区间扩大为 [3, 6]</p>
+</div>
+
+<!-- PASS 2 -->
+<h3>🔹 第2趟：i=2，待插入元素 arr[2] = 1</h3>
+<div style="margin-left:1rem;">
+    <p><b>前情：</b>已排序区间 = [3, 6]（下标0~1），待插入值 <code>key = 1</code></p>
+    <p><b>第①步：</b>j=1，arr[1]=6 &gt; 1 → 6向右挪到位置2。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell moving">6</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p><b>第②步：</b>j=0，arr[0]=3 &gt; 1 → 3向右挪到位置1。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell moving">3</div>
+        <div class="arr-cell moving">6</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p>j变为-1，退出循环。将key=1放入j+1=0处。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">1</div>
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell">4</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p style="text-align:center; font-weight:700; color:#16a34a;">✅ 第2趟结束：[1, 3, 6 | 4, 5, 2] &nbsp; 已排序区间扩大为 [1, 3, 6]</p>
+</div>
+
+<!-- PASS 3 -->
+<h3>🔹 第3趟：i=3，待插入元素 arr[3] = 4</h3>
+<div style="margin-left:1rem;">
+    <p>已排序区间 = [1, 3, 6]，key=4。</p>
+    <p>j=2: 6 &gt; 4 → 6右移；j=1: 3 ≤ 4 → 停止。key放入j+1=2。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">1</div>
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">4</div>
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell">5</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p style="text-align:center;color:#16a34a;font-weight:700;">✅ [1, 3, 4, 6 | 5, 2]</p>
+</div>
+
+<!-- PASS 4 -->
+<h3>🔹 第4趟：i=4，待插入元素 arr[4] = 5</h3>
+<div style="margin-left:1rem;">
+    <p>已排序区间 = [1, 3, 4, 6]，key=5。</p>
+    <p>j=3: 6 &gt; 5 → 6右移；j=2: 4 ≤ 5 → 停止。key放入j+1=3。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">1</div>
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">4</div>
+        <div class="arr-cell sorted">5</div>
+        <div class="arr-cell sorted">6</div>
+        <div class="arr-cell">2</div>
+    </div>
+    <p style="text-align:center;color:#16a34a;font-weight:700;">✅ [1, 3, 4, 5, 6 | 2]</p>
+</div>
+
+<!-- PASS 5 -->
+<h3>🔹 第5趟：i=5，待插入元素 arr[5] = 2</h3>
+<div style="margin-left:1rem;">
+    <p>已排序区间 = [1, 3, 4, 5, 6]，key=2。</p>
+    <p>依次比较：6&gt;2右移、5&gt;2右移、4&gt;2右移、3&gt;2右移、1≤2停止。key放入j+1=1。</p>
+    <div class="arr-row">
+        <div class="arr-cell sorted">1</div>
+        <div class="arr-cell sorted">2</div>
+        <div class="arr-cell sorted">3</div>
+        <div class="arr-cell sorted">4</div>
+        <div class="arr-cell sorted">5</div>
+        <div class="arr-cell sorted">6</div>
+    </div>
+    <p style="text-align:center;color:#16a34a;font-weight:700; font-size:1.1rem;">🎉 最终结果：[1, 2, 3, 4, 5, 6] 全部有序！</p>
+</div>
+
+</div>
+
+<!-- ============ SUMMARY TABLE ============ -->
+<div class="card">
+<h2>四、完整过程总览表</h2>
+<table>
+    <tr><th>趟数</th><th>待插入元素</th><th>比较次数</th><th>移动次数</th><th>结果数组</th></tr>
+    <tr><td>初始</td><td>-</td><td>-</td><td>-</td><td>[<b>6</b>, 3, 1, 4, 5, 2]</td></tr>
+    <tr class="highlight"><td>第1趟</td><td>3 (i=1)</td><td>1次</td><td>1次</td><td>[3, 6 | 1, 4, 5, 2]</td></tr>
+    <tr class="highlight"><td>第2趟</td><td>1 (i=2)</td><td>2次</td><td>2次</td><td>[1, 3, 6 | 4, 5, 2]</td></tr>
+    <tr><td>第3趟</td><td>4 (i=3)</td><td>1次</td><td>1次</td><td>[1, 3, 4, 6 | 5, 2]</td></tr>
+    <tr><td>第4趟</td><td>5 (i=4)</td><td>1次</td><td>1次</td><td>[1, 3, 4, 5, 6 | 2]</td></tr>
+    <tr><td>第5趟</td><td>2 (i=5)</td><td>4次</td><td>4次</td><td>[1, 2, 3, 4, 5, 6]</td></tr>
+</table>
+</div>
+
+<!-- ============ PSEUDOCODE ============ -->
+<div class="card pink">
+<h2>五、插入排序伪代码</h2>
+<div class="code-block">
+<span class="kw">function</span> <span class="fn">insertionSort</span>(arr, n):
+    <span class="cmt">// 外层循环：从未排序区间逐个取元素</span>
+    <span class="kw">for</span> i = <span class="num">1</span> <span class="kw">to</span> n-<span class="num">1</span>:
+        key = arr[i]          <span class="cmt">// "右手"摸到的新牌</span>
+        j = i - <span class="num">1</span>            <span class="cmt">// 从已排序区间的末尾开始比较</span>
+
+        <span class="cmt">// 内层循环：从右向左找插入位置，一边找一边右移</span>
+        <span class="kw">while</span> j &gt;= <span class="num">0</span> <span class="kw">and</span> arr[j] &gt; key:
+            arr[j+<span class="num">1</span>] = arr[j]  <span class="cmt">// 比key大的元素向右挪一位</span>
+            j = j - <span class="num">1</span>
+
+        arr[j+<span class="num">1</span>] = key          <span class="cmt">// 插入到正确位置</span>
+</div>
+</div>
+
+<!-- ============ COMPLEXITY ============ -->
+<div class="card blue">
+<h2>六、复杂度分析 &amp; 特性</h2>
+<table>
+    <tr><th>指标</th><th>值</th><th>说明</th></tr>
+    <tr><td>最好时间复杂度</td><td><b>O(n)</b></td><td>数组已经有序时，内层while一次都不执行</td></tr>
+    <tr><td>最坏时间复杂度</td><td><b>O(n²)</b></td><td>数组完全逆序时，每趟需移动所有已排序元素</td></tr>
+    <tr><td>平均时间复杂度</td><td><b>O(n²)</b></td><td>平均每趟需移动i/2个元素</td></tr>
+    <tr><td>空间复杂度</td><td><b>O(1)</b></td><td>原地排序，仅用key和j两个辅助变量</td></tr>
+    <tr><td>稳定性</td><td><b>✅ 稳定</b></td><td>while条件用 &gt;（不用≥），相等元素相对顺序不变</td></tr>
+</table>
+
+<h3 style="margin-top:1.2rem;">为什么插入排序在小规模数据中很受欢迎？</h3>
+<ul style="margin-left:1.5rem;">
+    <li>常数因子极小——没有递归开销，没有额外内存分配。</li>
+    <li>对于"基本有序"的数组（如每个元素离最终位置不超过k），时间复杂度接近O(kn)。</li>
+    <li>TimSort和Introsort（C++ std::sort）在子问题规模小时会切换到插入排序。</li>
+</ul>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card orange">
+<h2>七、常见错误 &amp; 记忆技巧</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：while条件写成 arr[j] ≥ key。</b><br>
+    如果使用 ≥，相等元素也会被移动，破坏稳定性。正确写法是 <code>arr[j] &gt; key</code>。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：忘记保存key，覆盖后丢失原始值。</b><br>
+    arr[i]在移动过程中会被覆盖，必须先用 <code>key = arr[i]</code> 保存。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：数组越界。j从i-1减到-1时必须停止。</b><br>
+    while条件必须同时检查 <code>j &gt;= 0</code> 和 <code>arr[j] &gt; key</code>（先检查边界！）。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"外层i从1到n-1，key存当前值别忘记。内层j从i-1往左移，大的右移小的停，最后key放j+1。"
+</div>
+
+<div class="tip-box">
+    💡 <b>考试快速推演法：</b>① 画一条竖线，线左边是已排序，线右边是未排序。<br>
+    ② 每趟把线右边第一个元素拿到左手，在左手从右向左找位置插入。<br>
+    ③ 找位置的过程中把比它大的元素都右移一格。<br>
+    ④ 插入后，竖线向右挪一位。重复n-1次。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测试题讲解 · 直接插入排序 · 第26题详解
+</footer>
+
+</body>
+</html>

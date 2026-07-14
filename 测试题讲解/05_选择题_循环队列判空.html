@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第5题 · 循环队列判空</title>
+<style>:root{--bg:#f0f9ff;--card:#fff;--text:#0c4a6e;--muted:#0369a1;--blue:#0284c7;--red:#ef4444;--green:#10b981;--amber:#f59e0b;--border:#bae6fd}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem}.header .tag{font-size:.75rem;letter-spacing:3px;color:var(--muted)}.header h1{font-size:2rem;font-weight:800;color:var(--blue);margin:8px 0}.header .q-box{display:inline-block;text-align:left;background:#e0f2fe;border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:1.05rem}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2.5rem 0}.section h2{font-size:1.3rem;color:var(--blue);border-left:4px solid var(--blue);padding-left:14px;margin-bottom:1rem}.section h3{font-size:1.05rem;margin:1.3rem 0 .6rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0;box-shadow:0 1px 3px rgba(0,0,0,.03)}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#f0f9ff;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}li::marker{color:var(--blue)}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.ring-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0}.ring-cell{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Cascadia Code',monospace;font-size:.85rem;border:3px solid #bae6fd}.ring-cell.fill{background:#dbeafe;border-color:var(--blue);color:var(--blue)}.ring-cell.empty{background:#f8fafc;border-color:#e0f2fe;color:#cbd5e1}.ring-cell.fr{background:#fee2e2;border-color:var(--red);color:var(--red);position:relative}.ring-cell.fr::after{content:'F/R';position:absolute;top:-18px;font-size:9px;font-weight:900;color:var(--red)}.vs-box{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}.vs-card{padding:1.3rem;border-radius:12px;text-align:center;font-weight:700}.vs-card.emp{background:#f0fdf4;border:2px solid var(--green)}.vs-card.ful{background:#fef2f2;border:2px solid var(--red)}.vs-card .v{font-size:1.5rem;font-family:'Cascadia Code',monospace}</style></head>
+<body><div class="container">
+
+<div class="header"><div class="tag">测试题 · 选择题 · 第5题</div><h1>怎么判断循环队列为空？</h1>
+<div class="q-box">可用于判断循环队列是否为空的代码为？<br>A、Front == Rear　　B、Front+1 == Rear　　C、Front == 0　　D、Rear == 0</div></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">A — Front == Rear</div></div>
+
+<div class="section"><h2>一、循环队列的"轮回"设计</h2>
+<div class="card">
+<p>循环队列用数组实现，不是直筒子——队尾到了数组末端就<strong>绕回</strong>到数组开头（模运算）。就像操场跑圈，跑完一圈又回到起点。</p>
+<p style="color:var(--muted)">问题来了：队空和队满时，Front 和 Rear 都在同一个位置。怎么区分？</p>
+<p><span class="hl">常见方案：牺牲一个存储空间</span>，规定当 (Rear+1) % M == Front 时为队满，Front == Rear 时为队空。</p>
+<p style="margin-top:.5rem">通俗理解：就像停车场留一个空位方便倒车——<strong>留一个空格来区分空和满</strong>。</p></div></div>
+
+<div class="section"><h2>二、队空 vs 队满</h2>
+<div class="card">
+<div class="vs-box">
+  <div class="vs-card emp"><div style="color:var(--green)">🟢 队空</div><div class="v" style="color:var(--green)">Front == Rear</div><div style="font-size:.8rem;color:var(--muted)">队头追上了队尾 → 没东西了</div></div>
+  <div class="vs-card ful"><div style="color:var(--red)">🔴 队满</div><div class="v" style="color:var(--red)">(Rear+1)%M == Front</div><div style="font-size:.8rem;color:var(--muted)">队尾快追上队头 → 满了</div></div>
+</div>
+<div class="tip"><strong>💡 通俗类比：</strong>Front 像顾客，Rear 像厨师。顾客追上厨师 = 没菜了（空）。厨师追上一圈快撞到顾客 = 菜满了要等（满）。</div></div></div>
+
+<div class="section"><h2>三、逐项排查</h2>
+<div class="card">
+<table style="width:100%;border-collapse:collapse">
+<tr style="border-bottom:1px solid var(--border);background:#f0fdf4"><td style="padding:10px;font-weight:700;color:var(--green)">A</td><td style="padding:10px"><code>Front == Rear</code></td><td style="padding:10px;color:var(--green)">✅ 队空标准条件</td></tr>
+<tr style="border-bottom:1px solid var(--border);background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">B</td><td style="padding:10px"><code>Front+1 == Rear</code></td><td style="padding:10px;color:var(--red)">❌ 这是另一种设计风格下的判满或是一种特殊情况，不是标准判空</td></tr>
+<tr style="border-bottom:1px solid var(--border);background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">C</td><td style="padding:10px"><code>Front == 0</code></td><td style="padding:10px;color:var(--red)">❌ Front=0 只是队列物理上在数组开头而已，跟空不空没关系</td></tr>
+<tr style="background:#fef2f2"><td style="padding:10px;font-weight:700;color:var(--red)">D</td><td style="padding:10px"><code>Rear == 0</code></td><td style="padding:10px;color:var(--red)">❌ 同理，Rear=0 不代表队空</td></tr>
+</table></div></div>
+
+<div class="section"><h2>四、考题关联——测验卷也考了</h2>
+<div class="card">
+<p>测验卷第4题：循环队列大小9，初始front=rear=4（空）。操作后front=7，rear=2，求队列元素个数。</p>
+<p>公式：<strong>元素个数 = (rear - front + M) % M</strong></p>
+<p>计算：(2 - 7 + 9) % 9 = 4 % 9 = <strong>4个元素</strong>。</p>
+<div class="tip"><strong>🎯 记忆：</strong>Front 追 Rear = 空。Rear 追 Front = 满。永远记住这两个条件！</div></div></div>
+
+</div></body></html>

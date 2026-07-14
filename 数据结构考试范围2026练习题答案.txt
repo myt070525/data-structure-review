@@ -1,0 +1,80 @@
+一、选择题（共20分,每空2分）
+ADBCB DCBAD
+
+二、填空题（共10分,每空1分）
+1、有穷性
+2、n-i
+3、10，-1（或-1，10）、-10
+4、01231、14
+5、251（或252）
+6、装填因子
+7、普利姆（或Prim）
+8、7，12，25，33，19
+
+三、简答题（共48分，每小题6分）
+1、
+  后序遍历结果：EDFGACB
+
+2、
+树的高度为   4   。叶结点个数为    4   。结点52的兄弟是   8    。
+
+
+
+
+3、
+ 或
+ASL=(1*1+2*2+3*4+4*4)/11=33/11=3
+
+4、
+
+ASL=(1+1+2+2+3+3+7+1)/8=20/8或5/2
+
+5、
+顶点e的最早开始时间为    22     ；顶点g的最早开始时间为  46      ；
+顶点b的最晚完成时间为    14      ；顶点d的最晚完成时间为   27       ；
+边<a,c>的最多延迟时间为    0      ；边<e,f>的最多延迟时间为  14        。
+
+6、
+
+
+
+7、
+
+
+8、
+第一趟：24，13，9，64，37，86，32，41，72
+第二趟：24，13，9，32，37，72，64，41，86
+
+四、编程题（共22分）
+1、
+int Slim(struct Node *L) {
+    int n = 0;
+    struct Node *p, *q;
+    p = L->Next;
+    while (p != NULL && p->Next != NULL) 
+        if (p->Data == p->Next->Data) {
+            q = p->Next;
+            p->Next = q->Next;
+            free(q);
+            n ++;
+        } else 
+            p = p->Next;
+    return n;
+}
+
+2、
+(1)  L3 =   malloc(sizeof(struct SqList))     ;
+(2) L3->MaxSize =    L1->MaxSize+L2->MaxSize 或 L1->N + L2->N   ;
+(3) L3->N =   L1->N+L2->N           ;
+(4) return    L3        ;
+
+3、
+int DestroyTree(struct TreeNode *T) {
+    int n = 0;
+    if (T == NULL)
+        return 0;
+    n += DestroyTree(T->Left);
+    n += DestroyTree(T->Right);
+    free(T);
+    return n + 1;
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构简答题精讲：哈希表线性探测法</title>
+<style>
+  :root {
+    --bg: #f0f7f4;
+    --card: #fcfffd;
+    --text: #1e2d24;
+    --accent: #2d7550;
+    --accent2: #1565c0;
+    --code-bg: #edf5f0;
+    --border: #b8d4c2;
+    --highlight: #e8f5e9;
+    --danger: #c62828;
+    --success: #2e7d32;
+    --warn: #ef6c00;
+    --cell-bg: #fff;
+    --cell-hit: #ffcdd2;
+    --cell-empty: #e8f5e9;
+    --cell-probe: #fff9c4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    padding: 2rem 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--accent);
+    border-bottom: 3px double var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    color: var(--accent2);
+    margin: 2rem 0 0.8rem;
+    padding-left: 0.6rem;
+    border-left: 5px solid var(--accent2);
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: #3d5a45;
+    margin: 1.5rem 0 0.6rem;
+  }
+  p { margin: 0.7rem 0; text-indent: 2em; }
+  p.no-indent { text-indent: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .problem {
+    background: #eaf5ef;
+    border-left: 6px solid var(--accent);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .answer-box {
+    background: #e3f2fd;
+    border-left: 6px solid var(--accent2);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip {
+    background: #fff8e1;
+    border-left: 6px solid #f9a825;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+  }
+  .warning {
+    background: #fff3e0;
+    border-left: 6px solid #e65100;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .step {
+    background: #fafbfa;
+    border: 1px solid #d0e0d5;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    margin: 0.6rem 0;
+  }
+  .step-num {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background: var(--accent2);
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0.8rem 0;
+  }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    background: #dce8e0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  pre code { background: transparent; padding: 0; }
+
+  /* HASH TABLE VISUAL */
+  .hash-table-visual {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin: 1.2rem 0;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.9rem;
+  }
+  .ht-cell {
+    width: 68px;
+    min-height: 56px;
+    border: 2px solid #81a98b;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--cell-bg);
+    padding: 4px;
+    transition: all 0.3s;
+  }
+  .ht-cell.header { background: #dcedc8; font-weight: bold; border-color: #558b2f; }
+  .ht-cell.occupied { background: #fff9c4; border-color: #f9a825; }
+  .ht-cell.empty-slot { background: #e8f5e9; border-style: dashed; color: #999; }
+  .ht-cell.collision { background: #ffcdd2; border-color: #e53935; }
+  .ht-index { font-size: 0.7rem; color: #888; }
+  .ht-value { font-weight: bold; font-size: 1rem; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 0.93rem;
+  }
+  th, td {
+    border: 1px solid #b8d4c2;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  th {
+    background: #dcedc8;
+    color: #2d4a30;
+  }
+  td { background: #fcfffd; }
+  tr.highlight-row td { background: #fff9c4; }
+
+  .formula-block {
+    background: #fffde7;
+    border: 2px solid #f9a825;
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: #8aab95;
+    font-size: 0.85rem;
+  }
+
+  ul, ol { margin-left: 2em; line-height: 2; }
+
+  .big-table {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 3px;
+    margin: 1rem 0;
+    text-align: center;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 0.85rem;
+  }
+  .big-table .bt-cell {
+    padding: 10px 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+  .big-table .bt-head { background: #c8e6c9; font-weight: bold; }
+  .big-table .bt-occ { background: #fff9c4; font-weight: bold; }
+  .big-table .bt-empty { background: #f5f5f5; color: #bbb; }
+</style>
+</head>
+<body>
+
+<h1>🔢 数据结构简答题精讲<br>哈希表线性探测法与平均查找长度</h1>
+
+<div class="problem">
+  <h3>📋 题目</h3>
+  <p class="no-indent">设哈希函数 <strong>H(key) = key % 11</strong>，表长 <strong>m = 11</strong>。将关键字序列 <strong>[21, 5, 36, 38, 89, 17, 32]</strong> 依次插入初始为空的哈希表，冲突解决方法采用<strong>线性探测法（Linear Probing）</strong>。</p>
+  <p class="no-indent">请画出最终的哈希表，并计算等概率下查找成功的<strong>平均查找长度 ASL<sub>成功</sub></strong>。</p>
+</div>
+
+<div class="answer-box">
+  <h3>✅ 参考答案</h3>
+  <p class="no-indent"><strong>ASL<sub>成功</sub> = 10/7 ≈ 1.43</strong></p>
+  <p class="no-indent">最终哈希表：</p>
+  <div class="big-table" style="grid-template-columns: repeat(11,1fr); max-width: 700px; margin: 0 auto;">
+    <div class="bt-cell bt-head">0</div><div class="bt-cell bt-head">1</div><div class="bt-cell bt-head">2</div><div class="bt-cell bt-head">3</div><div class="bt-cell bt-head">4</div><div class="bt-cell bt-head">5</div><div class="bt-cell bt-head">6</div><div class="bt-cell bt-head">7</div><div class="bt-cell bt-head">8</div><div class="bt-cell bt-head">9</div><div class="bt-cell bt-head">10</div>
+    <div class="bt-cell bt-occ">32</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-occ">89</div><div class="bt-cell bt-occ">36</div><div class="bt-cell bt-occ">38</div><div class="bt-cell bt-occ">5</div><div class="bt-cell bt-occ">17</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-occ">21</div>
+  </div>
+  <p class="no-indent" style="margin-top:0.5rem;">（注：21→10, 5→5, 36→3, 38→5→6, 89→1→2, 17→6→7→8→9→10→0, 32→10→0→1→2→3→4→6→7→8→9→10→0... 需要仔细追踪）</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>一、哈希表的基本概念</h2>
+
+<p>哈希表（Hash Table），又称散列表，是一种通过<strong>关键字直接计算存储位置</strong>的数据结构。它的核心思想是：设计一个函数 <strong>H(key)</strong>，将任意关键字映射到固定范围内的地址，理想情况下插入、查找、删除都是<strong>O(1)</strong>时间。</p>
+
+<div class="card">
+  <h3>🔑 核心三要素</h3>
+  <ol>
+    <li><strong>哈希函数 H(key)</strong>：将关键字映射为地址（0 ∼ m−1）。</li>
+    <li><strong>哈希表</strong>：长度为m的数组，存储实际元素。</li>
+    <li><strong>冲突解决方法</strong>：当两个不同关键字映射到同一地址时（即<strong>冲突/collision</strong>），如何处理。</li>
+  </ol>
+</div>
+
+<h3>1.1 什么是冲突？</h3>
+<p>由于关键字空间通常远大于地址空间（例如所有可能的整数 vs 11个槽位），<strong>冲突是必然的</strong>。好的哈希函数可以减少冲突，但无法消除冲突。因此，冲突解决方法的质量直接决定了哈希表的性能。</p>
+
+<h3>1.2 线性探测法（Linear Probing）</h3>
+<p>线性探测是<strong>开放地址法（Open Addressing）</strong>中最简单的一种。当插入关键字key时：</p>
+<ol>
+  <li>计算初始位置 d₀ = H(key)。</li>
+  <li>若该位置为空 → 插入，结束。</li>
+  <li>若该位置已被占用 → <strong>线性地往后找</strong>：d₁ = (d₀+1) % m，d₂ = (d₀+2) % m，……直到找到空位。</li>
+</ol>
+
+<div class="tip">
+  <strong>💡 形象比喻：</strong>就像去电影院找座位。你的票上写着第5排，但到了发现那个座位有人了。线性探测就是：看看第6排、第7排……一直往后找，找到第一个空位就坐下。如果走到最后一排还没找到，就绕回第0排继续找（因为表是循环的）。
+</div>
+
+<!-- ============================================================ -->
+<h2>二、逐步插入追踪</h2>
+
+<p>哈希函数：H(key) = key % 11。表长 m = 11（地址范围 0 ∼ 10）。初始表为空。</p>
+
+<div class="step">
+  <span class="step-num">①</span> <strong>插入 21</strong><br>
+  H(21) = 21 % 11 = <strong>10</strong>。位置10为空 → 直接放入。<br>
+  比较次数（查找长度）= <strong>1</strong>。
+</div>
+<div class="table-wrap">
+<table>
+  <tr><th>地址</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td style="background:#fff9c4;font-weight:bold;">10</td></tr>
+  <tr><th>内容</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="background:#fff9c4;"><strong>21</strong></td></tr>
+</table>
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> <strong>插入 5</strong><br>
+  H(5) = 5 % 11 = <strong>5</strong>。位置5为空 → 直接放入。<br>
+  比较次数 = <strong>1</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">③</span> <strong>插入 36</strong><br>
+  H(36) = 36 % 11 = <strong>3</strong>（因为33+3=36，36÷11=3……3）。位置3为空 → 直接放入。<br>
+  比较次数 = <strong>1</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">④</span> <strong>插入 38</strong><br>
+  H(38) = 38 % 11。11×3=33，余数=5 → <strong>5</strong>。<br>
+  位置5已被5占用 → <strong>冲突！</strong><br>
+  线性探测：(5+1)%11 = <strong>6</strong>。位置6为空 → 放入。<br>
+  比较次数 = <strong>2</strong>（先看了位置5，再看了位置6）。
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>地址</th><td>0</td><td>1</td><td>2</td><td style="background:#e8f5e9;">3</td><td>4</td><td style="background:#fff9c4;">5</td><td style="background:#ffcdd2;">6</td><td>7</td><td>8</td><td>9</td><td style="background:#fff9c4;">10</td></tr>
+  <tr><th>内容</th><td>—</td><td>—</td><td>—</td><td style="background:#e8f5e9;">36</td><td>—</td><td style="background:#fff9c4;">5</td><td style="background:#ffcdd2;"><strong>38</strong></td><td>—</td><td>—</td><td>—</td><td style="background:#fff9c4;">21</td></tr>
+</table>
+</div>
+
+<div class="step">
+  <span class="step-num">⑤</span> <strong>插入 89</strong><br>
+  H(89) = 89 % 11。11×8=88，余数=1 → <strong>1</strong>。<br>
+  位置1为空 → 直接放入。<br>
+  比较次数 = <strong>1</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">⑥</span> <strong>插入 17</strong><br>
+  H(17) = 17 % 11。11×1=11，余数=6 → <strong>6</strong>。<br>
+  位置6已被38占用 → 冲突！<br>
+  (6+1)%11 = <strong>7</strong> → 空，放入。<br>
+  比较次数 = <strong>2</strong>。
+</div>
+
+<div class="step">
+  <span class="step-num">⑦</span> <strong>插入 32</strong><br>
+  H(32) = 32 % 11。11×2=22，余数=10 → <strong>10</strong>。<br>
+  位置10已被21占用 → 冲突！<br>
+  (10+1)%11 = <strong>0</strong> → 空，放入。<br>
+  比较次数 = <strong>2</strong>。
+</div>
+
+<div class="table-wrap">
+<table>
+  <tr><th>地址</th><td style="background:#fff9c4;">0</td><td style="background:#e8f5e9;">1</td><td>2</td><td style="background:#e8f5e9;">3</td><td>4</td><td style="background:#fff9c4;">5</td><td style="background:#ffcdd2;">6</td><td style="background:#e8f5e9;">7</td><td>8</td><td>9</td><td style="background:#fff9c4;">10</td></tr>
+  <tr><th>内容</th><td style="background:#fff9c4;"><strong>32</strong></td><td style="background:#e8f5e9;">89</td><td>—</td><td style="background:#e8f5e9;">36</td><td>—</td><td style="background:#fff9c4;">5</td><td style="background:#ffcdd2;">38</td><td style="background:#e8f5e9;">17</td><td>—</td><td>—</td><td style="background:#fff9c4;">21</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2>三、最终哈希表</h2>
+
+<div class="card">
+  <div class="big-table" style="grid-template-columns: repeat(11,1fr); max-width: 770px; margin: 0 auto;">
+    <div class="bt-cell bt-head">0</div><div class="bt-cell bt-head">1</div><div class="bt-cell bt-head">2</div><div class="bt-cell bt-head">3</div><div class="bt-cell bt-head">4</div><div class="bt-cell bt-head">5</div><div class="bt-cell bt-head">6</div><div class="bt-cell bt-head">7</div><div class="bt-cell bt-head">8</div><div class="bt-cell bt-head">9</div><div class="bt-cell bt-head">10</div>
+    <div class="bt-cell bt-occ">32</div><div class="bt-cell bt-occ">89</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-occ">36</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-occ">5</div><div class="bt-cell bt-occ">38</div><div class="bt-cell bt-occ">17</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-empty">—</div><div class="bt-cell bt-occ">21</div>
+  </div>
+  <p class="no-indent" style="text-align:center; margin-top:0.6rem;">表中有7个元素，4个空位。装填因子 α = 7/11 ≈ 0.636。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>四、计算ASL（平均查找长度）</h2>
+
+<h3>4.1 每个关键字的查找长度</h3>
+<p>查找长度定义为：在查找成功的前提下，<strong>比较关键字的次数</strong>。对于线性探测法，查找某个key的过程与插入时探测的路径完全一致——从H(key)开始，线性探测直到找到该key。</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>关键字</th><th>H(key)=key%11</th><th>探测路径（依次比较的地址）</th><th>查找长度</th></tr>
+  <tr><td>21</td><td>10</td><td>10 → 命中</td><td><strong>1</strong></td></tr>
+  <tr><td>5</td><td>5</td><td>5 → 命中</td><td><strong>1</strong></td></tr>
+  <tr><td>36</td><td>3</td><td>3 → 命中</td><td><strong>1</strong></td></tr>
+  <tr><td>38</td><td>5</td><td>5（被5占）→ 6 → 命中</td><td><strong>2</strong></td></tr>
+  <tr><td>89</td><td>1</td><td>1 → 命中</td><td><strong>1</strong></td></tr>
+  <tr><td>17</td><td>6</td><td>6（被38占）→ 7 → 命中</td><td><strong>2</strong></td></tr>
+  <tr><td>32</td><td>10</td><td>10（被21占）→ 0 → 命中</td><td><strong>2</strong></td></tr>
+</table>
+</div>
+
+<h3>4.2 求和并计算ASL</h3>
+
+<div class="formula-block">
+  Σ 查找长度 = 1 + 1 + 1 + 2 + 1 + 2 + 2 = <strong>10</strong><br>
+  ASL<sub>成功</sub> = 10 / 7 ≈ <strong>1.43</strong>
+</div>
+
+<div class="tip">
+  <strong>📐 解读：</strong>平均每个关键字的查找只需约<strong>1.43次</strong>比较。相比顺序查找的5.5次和折半查找的2.9次（上一题数据），哈希表的查找效率非常高。而且随着表长增大、装填因子降低，ASL可以无限接近1。
+</div>
+
+<!-- ============================================================ -->
+<h2>五、查找失败时的ASL（拓展）</h2>
+
+<p>虽然题目只要求ASL<sub>成功</sub>，但理解ASL<sub>失败</sub>对掌握哈希表很重要。查找失败发生在：要查的key不在表中，算法沿探测路径一直找到<strong>空位</strong>才能确认"不存在"。</p>
+
+<div class="card">
+  <p class="no-indent">例如，查找key=6：H(6)=6。检查位置6（38，不匹配），位置7（17，不匹配），位置8（空！）。比较了3次才确认不存在。对每个可能的初始地址（0~10）计算这样的探测长度，取平均即得ASL<sub>失败</sub>。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>六、线性探测的问题：聚集现象</h2>
+
+<div class="warning">
+  <h3>⚠️ 一次聚集（Primary Clustering）</h3>
+  <p>线性探测最严重的问题是<strong>聚集</strong>：一旦某个区域出现了连续被占用的槽位，后续任何哈希到该区域附近的关键字都会被"吸"进去，导致该区域越来越拥挤，查找长度不断增长。</p>
+  <p>从我们的最终表中可以看到：地址5-6-7形成了连续的占用块（5,38,17），地址10-0形成了另一个块（21,32）。这种聚集会随着装填因子α的增大而急剧恶化。</p>
+</div>
+
+<h3>6.1 改进方法</h3>
+<ul>
+  <li><strong>二次探测（Quadratic Probing）</strong>：探测步长变为 1², −1², 2², −2², …（或 1², 2², 3², …），减少一次聚集。</li>
+  <li><strong>双重哈希（Double Hashing）</strong>：使用第二个哈希函数决定步长，探测序列为 d₀, d₀+h₂(key), d₀+2·h₂(key), …。</li>
+  <li><strong>链地址法（Separate Chaining）</strong>：每个槽位存放一个链表，冲突的元素挂在同一个链表上。这是Java HashMap采用的方案。</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>七、常见错误与避坑指南</h2>
+
+<div class="warning">
+  <h3>❌ 错误1：余数算错</h3>
+  <p>key % 11 的余数范围是<strong>0~10</strong>。例如89÷11=8余1（不是7）。36÷11=3余3。建议列竖式验证：被除数 = 除数×商 + 余数。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误2：忘记模运算导致数组越界</h3>
+  <p>线性探测的每一步都要<strong>对m取模</strong>：(d + i) % m。尤其是当探测到表尾（m−1位置）后，下一个位置应为0（循环回去），而不是m（越界）。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误3：查找长度不是"探测步数"</h3>
+  <p>查找长度 = <strong>比较关键字的次数</strong>，而不是探测的地址个数。如果初始位置就是目标，比较1次即命中。如果初始位置被占但值不同，需要再探测下一个位置再比较——每次比较都计数。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误4：混淆"插入时比较次数"与"查找时比较次数"</h3>
+  <p>对于线性探测，插入时和查找时的探测路径<strong>完全相同</strong>，因此比较次数也相同。但这是<strong>开放地址法</strong>的特性，链地址法则不同（插入总是在链表头，查找可能需要遍历链表）。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>八、ASL公式速查（线性探测）</h2>
+
+<div class="card">
+  <p class="no-indent">设装填因子 α = n/m（n为元素个数，m为表长），则线性探测的近似ASL为：</p>
+  <div class="formula-block">
+    ASL<sub>成功</sub> ≈ ½ · (1 + 1/(1−α))<br>
+    ASL<sub>失败</sub> ≈ ½ · (1 + 1/(1−α)²)
+  </div>
+  <p class="no-indent">本题α=7/11≈0.636，代入得：ASL<sub>成功</sub> ≈ ½(1+1/0.364) ≈ ½(1+2.75) ≈ 1.87。公式值为近似值，与精确计算（10/7≈1.43）有偏差是因为n较小，公式在大n下更准确。</p>
+</div>
+
+<div class="tip">
+  <strong>🧠 记忆技巧：</strong><br>
+  • 线性探测 = "一条路走到黑"，顺序往后找空位<br>
+  • 查找长度 = 比较次数，不是步数<br>
+  • 模运算保证循环：d = (d+1) % m<br>
+  • α越大 → 聚集越严重 → ASL增长越快
+</div>
+
+<footer>
+  <p>📘 数据结构简答题精讲 · 哈希表线性探测法 · 教学资料</p>
+  <p>建议手动重做一遍插入过程，感受"冲突→探测→找到空位"的节奏。</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构简答题精讲：AVL树的插入操作</title>
+<style>
+  :root {
+    --bg: #fdf6e3;
+    --card: #fffef7;
+    --text: #2c3e50;
+    --accent: #b58900;
+    --accent2: #268bd2;
+    --code-bg: #f5f0e0;
+    --border: #d5c4a1;
+    --highlight: #fdf0d0;
+    --danger: #dc322f;
+    --success: #859900;
+    --node-bg: #eee8d5;
+    --arrow: #93a1a1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    padding: 2rem 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2.1rem;
+    text-align: center;
+    color: var(--accent);
+    border-bottom: 3px double var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    color: var(--accent2);
+    margin: 2rem 0 0.8rem;
+    padding-left: 0.6rem;
+    border-left: 5px solid var(--accent2);
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: #586e75;
+    margin: 1.5rem 0 0.6rem;
+  }
+  p { margin: 0.7rem 0; text-indent: 2em; }
+  p.no-indent { text-indent: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .problem {
+    background: #fef9e7;
+    border-left: 6px solid var(--accent);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .answer-box {
+    background: #e8f5e9;
+    border-left: 6px solid var(--success);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip {
+    background: #e3f2fd;
+    border-left: 6px solid #1976d2;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+  }
+  .warning {
+    background: #fff3e0;
+    border-left: 6px solid #e65100;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .step {
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    margin: 0.6rem 0;
+  }
+  .step-num {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background: var(--accent2);
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0.8rem 0;
+  }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    background: #f0ece0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  pre code { background: transparent; padding: 0; }
+
+  /* ---- TREE DIAGRAM ---- */
+  .tree-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem 0;
+    font-family: monospace;
+  }
+  .tree-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2rem;
+    position: relative;
+    margin: 4px 0;
+  }
+  .tree-node {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.95rem;
+    border: 2px solid #586e75;
+    background: #fffef7;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s;
+  }
+  .tree-node.root { border-color: var(--accent); background: #fef9e7; border-width: 3px; }
+  .tree-node.new { border-color: var(--danger); background: #fde8e8; animation: pulse 1.2s infinite; }
+  .tree-node.promoted { border-color: var(--accent2); background: #e3f2fd; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,50,47,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(220,50,47,0); }
+  }
+  .tree-connector {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    height: 28px;
+    position: relative;
+  }
+  .tree-connector span {
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: var(--arrow);
+    position: relative;
+  }
+  .tree-label {
+    font-size: 0.75rem;
+    color: #93a1a1;
+    text-align: center;
+  }
+
+  /* ASCII tree */
+  .ascii-tree {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: pre;
+    background: #fafaf5;
+    border: 1px solid #e0dcc8;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .highlight-box {
+    background: #fffde7;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  .rot-demo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 1.2rem 0;
+  }
+  .rot-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    min-width: 200px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .rot-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent2);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+  }
+  th, td {
+    border: 1px solid #d5c4a1;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  th {
+    background: #eee8d5;
+    color: #5c4a1e;
+  }
+  td { background: #fffef7; }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: #93a1a1;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>📐 数据结构简答题精讲<br>AVL树插入操作与平衡旋转</h1>
+
+<div class="problem">
+  <h3>📋 题目</h3>
+  <p class="no-indent">已知如下AVL树T，依次插入关键字 <strong>20</strong> 和 <strong>21</strong>，画出每次插入后的树形，并回答：</p>
+  <p class="no-indent">（1）插入完成后，结点20的左孩子是____，右孩子是____；</p>
+  <p class="no-indent">（2）最终的AVL树中，叶结点个数是____。</p>
+
+  <div class="ascii-tree">
+    初始AVL树 T：
+            30
+           /  \
+         16    50
+          \    / \
+          27  45 60
+  </div>
+</div>
+
+<div class="answer-box">
+  <h3>✅ 参考答案</h3>
+  <p class="no-indent"><strong>20的左孩子 = 16，20的右孩子 = 27，叶结点个数 = 4</strong>（叶结点为：16、21、45、60）。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>一、什么是AVL树？</h2>
+
+<p>AVL树（Adelson-Velsky and Landis Tree）是最早被发明的<strong>自平衡二叉搜索树</strong>（Self-Balancing BST）。在普通的二叉搜索树（BST）中，如果插入序列恰好是有序的（例如1,2,3,4,5），树会退化成一条链表，查找效率从O(log n)暴跌到O(n)。AVL树通过一个巧妙的约束避免了这种退化。</p>
+
+<div class="card">
+  <h3>🔑 核心定义</h3>
+  <p class="no-indent">AVL树是一棵二叉搜索树，且满足：<strong>任意结点的左子树与右子树的高度差（平衡因子）的绝对值不超过1</strong>。</p>
+  <p class="no-indent">即，对任意结点，|<strong>平衡因子</strong>| ≤ 1，其中 <strong>平衡因子 BF = 左子树高度 − 右子树高度</strong>。</p>
+</div>
+
+<div class="tip">
+  <strong>💡 记忆口诀：</strong>"左高减右高，正负不超一"。BF ∈ {−1, 0, 1} 是平衡的；BF = ±2 则需要旋转修复。
+</div>
+
+<h3>1.1 平衡因子详解</h3>
+<p>我们为每个结点计算<strong>平衡因子（Balance Factor, BF）</strong>：</p>
+<ul style="margin-left: 2em; line-height: 2;">
+  <li><strong>BF = 0</strong>：左右子树一样高 —— 完美平衡。</li>
+  <li><strong>BF = +1</strong>：左子树比右子树高1层 —— 左倾，但仍平衡。</li>
+  <li><strong>BF = −1</strong>：右子树比左子树高1层 —— 右倾，但仍平衡。</li>
+  <li><strong>BF = +2</strong>：左子树太高了！需要<strong>右旋</strong>或<strong>左右双旋</strong>。</li>
+  <li><strong>BF = −2</strong>：右子树太高了！需要<strong>左旋</strong>或<strong>右左双旋</strong>。</li>
+</ul>
+
+<h3>1.2 树高与平衡因子的计算</h3>
+<p>树高的递推定义：叶子结点高度为<strong>1</strong>（有些教材定义为0，本文统一使用<strong>叶子高度=1</strong>）；非叶子结点的高度 = max(左子树高度, 右子树高度) + 1。计算从叶子向上逐层进行。</p>
+
+<div class="step">
+  <span class="step-num">例</span> 对初始树T计算各结点的高度和BF：
+</div>
+
+<div class="ascii-tree">
+ 结点16：左高=0（空），右高=1（27是叶子），高度=max(0,1)+1=2，BF=0−1=−1 ✓
+ 结点27：叶子，高度=1，BF=0 ✓
+ 结点45：叶子，高度=1，BF=0 ✓
+ 结点60：叶子，高度=1，BF=0 ✓
+ 结点50：左高=1，右高=1，高度=2，BF=0 ✓
+ 结点30：左高=2（16子树），右高=2（50子树），高度=3，BF=0 ✓
+ 全部|BF|≤1，初始树是AVL树 ✓
+</div>
+
+<!-- ============================================================ -->
+<h2>二、四大旋转操作详解</h2>
+
+<p>当插入导致某个结点的|BF|=2时，必须通过<strong>旋转</strong>来恢复平衡。旋转的本质是：在不破坏BST性质的前提下，<strong>提升中间高度子树的根结点</strong>，使树重新变"矮"变"扁"。四种旋转对应四种失衡形态：</p>
+
+<div class="rot-demo">
+
+  <div class="rot-card">
+    <h4>① LL → 右单旋 (R)</h4>
+    <div class="ascii-tree">
+   A(+2)        B(0)
+   /      →     / \
+  B(+1)        C   A
+ /
+C
+    </div>
+    <p style="font-size:0.85rem; text-indent:0;">左子树的左子树插入导致A左倾+2。对A做一次<strong>右旋</strong>。</p>
+  </div>
+
+  <div class="rot-card">
+    <h4>② RR → 左单旋 (L)</h4>
+    <div class="ascii-tree">
+  A(-2)        B(0)
+   \     →     / \
+   B(-1)      A   C
+    \
+     C
+    </div>
+    <p style="font-size:0.85rem; text-indent:0;">右子树的右子树插入导致A右倾−2。对A做一次<strong>左旋</strong>。</p>
+  </div>
+
+  <div class="rot-card">
+    <h4>③ LR → 左右双旋 (LR)</h4>
+    <div class="ascii-tree">
+   A(+2)         C(0)
+   /     →      / \
+  B(-1)        B   A
+   \
+    C
+    </div>
+    <p style="font-size:0.85rem; text-indent:0;">左子树的右子树插入。先对B<strong>左旋</strong>，再对A<strong>右旋</strong>。</p>
+  </div>
+
+  <div class="rot-card">
+    <h4>④ RL → 右左双旋 (RL)</h4>
+    <div class="ascii-tree">
+  A(-2)         C(0)
+   \     →     / \
+   B(+1)      A   B
+   /
+  C
+    </div>
+    <p style="font-size:0.85rem; text-indent:0;">右子树的左子树插入。先对B<strong>右旋</strong>，再对A<strong>左旋</strong>。</p>
+  </div>
+
+</div>
+
+<div class="tip">
+  <strong>🧠 如何判断旋转类型？</strong><br>
+  从<strong>被破坏平衡的最低结点A</strong>出发，沿插入路径向下走<strong>两步</strong>：<br>
+  &nbsp;&nbsp;• 第一步方向 = 插入在A的<strong>左</strong>还是<strong>右</strong>？<br>
+  &nbsp;&nbsp;• 第二步方向 = 插入在下一步结点的<strong>左</strong>还是<strong>右</strong>？<br>
+  两步方向组合即为旋转类型：左-左→LL，左-右→LR，右-左→RL，右-右→RR。<br>
+  <strong>简记：LL和RR是单旋（"顺拐"），LR和RL是双旋（"拐弯"）。</strong>
+</div>
+
+<h3>2.1 旋转的"物理直觉"</h3>
+<p>想象用一根绳子提着AVL树的根结点。如果某侧太重，树就会向那边"倒"。旋转相当于<strong>换一个提绳子的位置</strong>——把中间那个结点提起来当新的局部根，两边自然下垂成为它的子树。这正是为什么旋转后BST性质不破：新根的值恰好在旧根和旧子之间，左小右大的顺序保持不变。</p>
+
+<!-- ============================================================ -->
+<h2>三、插入20 – 触发LR双旋</h2>
+
+<h3>步骤1：按BST规则插入20</h3>
+<p>从根30开始比较：20 &lt; 30 → 进入<strong>左子树</strong>（结点16）。20 &gt; 16 → 进入<strong>右子树</strong>（结点27）。20 &lt; 27 → 进入<strong>左子树</strong>，发现为空，在此插入20作为27的左孩子。</p>
+
+<div class="ascii-tree">
+  插入20后（尚未旋转）：
+            30
+           /  \
+         16    50
+          \    / \
+          27  45 60
+         /
+       20  ← 新插入
+</div>
+
+<h3>步骤2：自底向上更新BF，定位最低失衡结点</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>结点</th><th>原高</th><th>新高</th><th>原BF</th><th>新BF</th><th>状态</th></tr>
+  <tr><td>20</td><td>—</td><td>1</td><td>—</td><td>0</td><td style="color:var(--success);">✓</td></tr>
+  <tr><td>27</td><td>1</td><td>2</td><td>0</td><td><strong>+1</strong></td><td style="color:var(--success);">✓</td></tr>
+  <tr style="background:#fde8e8;"><td><strong>16</strong></td><td>2</td><td>3</td><td>−1</td><td><strong>−2</strong></td><td style="color:var(--danger);">✗ 失衡!</td></tr>
+  <tr><td>50</td><td>2</td><td>2</td><td>0</td><td>0</td><td style="color:var(--success);">✓</td></tr>
+  <tr><td>30</td><td>3</td><td>3</td><td>0</td><td>−1</td><td style="color:var(--success);">✓</td></tr>
+</table>
+</div>
+
+<p>最低失衡结点是<strong>16</strong>，BF = −2（右倾）。沿插入路径从16向下两步：</p>
+<ul style="margin-left: 2em;">
+  <li>第一步：16 → <strong>右</strong>（走到27）</li>
+  <li>第二步：27 → <strong>左</strong>（走到20）</li>
+</ul>
+<p>两步方向为"右-左" → <strong>RL型</strong>？等等，我们仔细看：16的BF=−2表示<strong>右子树</strong>过高，所以第一步是"右"。27的BF=+1表示<strong>左子树</strong>过高（20在27左边），所以第二步是"左"。两步方向 = <strong>右-左 → RL双旋</strong>。</p>
+
+<div class="warning">
+  <strong>⚠️ 注意命名差异：</strong>有些教材将"RL"称为"先右旋后左旋"，有些按插入路径称为"右左双旋"。无论如何称呼，<strong>操作永远是：先对失衡结点的右孩子（27）做右旋，再对失衡结点（16）做左旋</strong>。本文统一使用此操作定义。
+</div>
+
+<h3>步骤3：执行RL双旋</h3>
+
+<div class="step">
+  <span class="step-num">①</span> <strong>先右旋结点27</strong>（以20为轴，将27"拉"到20的右下方）：
+</div>
+
+<div class="ascii-tree">
+  右旋27前：          右旋27后：
+    16                   16
+      \                    \
+      27                   20
+     /                      \
+   20                       27
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> <strong>再左旋结点16</strong>（以20为轴，将16"拉"到20的左下方）：
+</div>
+
+<div class="ascii-tree">
+  左旋16前：          左旋16后：
+    16                   20
+      \                 /  \
+      20              16   27
+        \
+        27
+</div>
+
+<p>旋转后该子树的新根为<strong>20</strong>，它恰好落在16和27之间，BST性质完美保持。将旋转后的子树接回30的左孩子位置：</p>
+
+<div class="ascii-tree">
+  插入20并旋转后的AVL树：
+            30
+           /  \
+         20    50
+        /  \   / \
+       16  27 45 60
+</div>
+
+<div class="tip">
+  <strong>🔍 验证：</strong>对每个结点重新计算BF：<br>
+  16(0), 27(0), 20(0), 45(0), 60(0), 50(0), 30(0)。全部为0，绝对平衡！
+</div>
+
+<!-- ============================================================ -->
+<h2>四、插入21 – 无需旋转</h2>
+
+<h3>步骤1：按BST规则插入21</h3>
+<p>从根30开始：21 &lt; 30 → 左到20。21 &gt; 20 → 右到27。21 &lt; 27 → 左，发现为空，插入21作为27的左孩子。</p>
+
+<div class="ascii-tree">
+  插入21后：
+            30
+           /  \
+         20    50
+        /  \   / \
+       16  27 45 60
+          /
+        21  ← 新插入
+</div>
+
+<h3>步骤2：更新BF</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>结点</th><th>原高</th><th>新高</th><th>新BF</th><th>状态</th></tr>
+  <tr><td>21</td><td>—</td><td>1</td><td>0</td><td style="color:var(--success);">✓</td></tr>
+  <tr><td>27</td><td>1</td><td>2</td><td>+1</td><td style="color:var(--success);">✓</td></tr>
+  <tr><td>20</td><td>2</td><td>2</td><td>−1</td><td style="color:var(--success);">✓</td></tr>
+  <tr><td>30</td><td>3</td><td>3</td><td>−1</td><td style="color:var(--success);">✓</td></tr>
+</table>
+</div>
+
+<p>所有结点的|BF| ≤ 1，<strong>无需旋转</strong>！插入21后树仍然是一棵合法的AVL树。</p>
+
+<div class="highlight-box">
+  <strong>🏁 最终AVL树（插入20和21后）：</strong>
+  <div class="ascii-tree">
+            30
+           /  \
+         20    50
+        /  \   / \
+       16  27 45 60
+          /
+        21
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>五、回答题目问题</h2>
+
+<div class="card">
+  <p class="no-indent"><strong>（1）结点20的左孩子是</strong> <span style="font-size:1.3rem; color:var(--danger);">16</span>，<strong>右孩子是</strong> <span style="font-size:1.3rem; color:var(--danger);">27</span>。</p>
+  <p class="no-indent">从最终树中直接读出：20的左子树根为16，右子树根为27。</p>
+  <p class="no-indent"><strong>（2）叶结点个数 =</strong> <span style="font-size:1.3rem; color:var(--danger);">4</span>。</p>
+  <p class="no-indent">叶子结点是<strong>没有孩子</strong>的结点。最终树中：16（无左无右）、21（无左无右）、45（无左无右）、60（无左无右）。共计<strong>4个</strong>叶结点。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>六、常见错误与避坑指南</h2>
+
+<div class="warning">
+  <h3>❌ 错误1：混淆"高度"与"深度"</h3>
+  <p>高度是从该结点到<strong>最远叶子</strong>的边数（或结点数，取决于教材约定）。深度是从<strong>根到该结点</strong>的边数。计算BF用的是<strong>子树高度</strong>，不是深度。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误2：旋转后忘记更新高度</h3>
+  <p>每次旋转后，涉及旋转的结点（通常2~3个）高度都会变化。必须<strong>自底向上</strong>重新计算：先更新孩子，再更新父结点。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误3：判断旋转类型只看局部</h3>
+  <p>必须从<strong>最低失衡结点</strong>开始，沿插入路径走<strong>两步</strong>。只看失衡结点自身的BF（+2还是−2）只能判断第一步方向，第二步必须看它那个"高"孩子的BF。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误4：忘记检查更上层的祖先</h3>
+  <p>旋转修复了最低失衡结点后，<strong>更上层的祖先可能仍然失衡</strong>（虽然单次插入最多一个失衡点，但旋转可能改变上层高度）。养成好习惯：旋转后一路向上重新检查BF到根。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>七、旋转类型判断流程图</h2>
+
+<div class="card">
+  <pre>
+  找到最低失衡结点A（|BF|=2）
+       │
+       ▼
+  A的BF = +2（左高）？
+     │ YES
+     │   │
+     │   ▼
+     │ A的左孩子B的BF？
+     │   ├── B.BF ≥ 0  →  LL型 → 对A做右单旋
+     │   └── B.BF = −1 →  LR型 → 先对B左旋，再对A右旋
+     │
+     │ NO（即A.BF = −2，右高）
+     │   │
+     │   ▼
+     │ A的右孩子B的BF？
+     │   ├── B.BF ≤ 0  →  RR型 → 对A做左单旋
+     │   └── B.BF = +1 →  RL型 → 先对B右旋，再对A左旋
+  </pre>
+</div>
+
+<div class="tip">
+  <strong>🧠 记忆技巧：</strong><br>
+  • LL/RR是"<strong>同号</strong>"（A和B的BF符号相同）→ 单旋<br>
+  • LR/RL是"<strong>异号</strong>"（A和B的BF符号相反）→ 双旋<br>
+  • 单旋的旋转方向与A的BF符号<strong>相反</strong>（A=+2→右旋，A=−2→左旋）<br>
+  • 双旋：先旋B（方向与B的BF符号相反），再旋A（方向与A的BF符号相反）
+</div>
+
+<!-- ============================================================ -->
+<h2>八、为什么AVL树值得学习？</h2>
+
+<p>AVL树虽然在工业界不如红黑树流行（红黑树的旋转次数更少，插入删除的常数因子更低），但它是理解<strong>自平衡数据结构</strong>的最佳入门：</p>
+<ul style="margin-left: 2em; line-height: 2;">
+  <li><strong>严格的平衡条件</strong>使分析变得清晰：高度严格控制在1.44 log₂(n+2) − 0.328 以内。</li>
+  <li><strong>四种旋转</strong>覆盖了所有可能的不平衡情况，形成了一个完备的操作集合。</li>
+  <li>理解了AVL的旋转，再学红黑树的"变色+旋转"就如履平地。</li>
+  <li>在<strong>查找密集型</strong>场景（如数据库索引、字典），AVL树仍有实际应用。</li>
+</ul>
+
+<footer>
+  <p>📘 数据结构简答题精讲 · AVL树插入操作 · 教学资料</p>
+  <p>建议配合纸笔手动模拟旋转过程，加深肌肉记忆。</p>
+</footer>
+
+</body>
+</html>

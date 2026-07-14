@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>填空第1题 · 时间复杂度 O(1)</title>
+<style>:root{--bg:#faf7f2;--card:#fff;--text:#2c2416;--muted:#78716c;--red:#c53030;--amber:#b6561b;--border:#e5ddd0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Georgia','PingFang SC','Microsoft YaHei',serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:17px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:2px solid var(--border)}.header h1{font-size:2rem;font-weight:700;color:var(--red)}.answer{text-align:center;padding:1.5rem;border:3px solid var(--red);border-radius:10px;background:#fef2f2;margin:1.5rem 0}.answer .big{font-size:3rem;font-weight:900;color:var(--red);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.3rem;color:var(--red);border-left:4px solid var(--red);padding-left:14px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fdf6e8;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.code-block{background:#2c2416;color:#faf7f2;border-radius:8px;padding:1.2rem 1.5rem;font-family:'Cascadia Code',monospace;font-size:.9rem;line-height:1.8;overflow-x:auto;margin:1rem 0}.code-block .kw{color:#f87171}.code-block .num{color:#fbbf24}.code-block .cmt{color:#a8a29e}</style></head>
+<body><div class="container">
+
+<div class="header"><h1>⏱️ 填空题第1题 · 时间复杂度</h1><p style="color:var(--muted)">下面程序段的时间复杂度是？</p></div>
+
+<div class="code-block"><span class="kw">for</span> (i = <span class="num">0</span>; i &lt; <span class="num">1000</span>; i ++)<br>    <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; i; j ++)<br>        sum += i + j;</div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">O(1)</div></div>
+
+<div class="section"><h2>一、为什么是 O(1) 而不是 O(n²)？</h2>
+<div class="card">
+<p>看到两重 for 循环，很多人脱口而出"O(n²)"——<strong>这是一个经典的陷阱</strong>。</p>
+<p>仔细看：外层循环上限是 <code class="hl">1000</code>，不是 <code>n</code>！</p>
+<p><strong>1000 是一个常量</strong>。无论输入规模 n 多大，这个循环最多执行 1000×999/2 ≈ 500,000 次。这是一个<strong>固定的数字</strong>，不随 n 变化。</p>
+<p style="color:var(--muted)">时间复杂度衡量的是"随着输入规模 n 增大，执行时间怎么增长"。如果执行时间和 n 无关，那就是常数阶 O(1)。</p></div></div>
+
+<div class="section"><h2>二、通俗理解</h2>
+<div class="card">
+<p>假设你有一个函数 <code>f(n)</code>：</p>
+<ul><li>如果 n=10，执行 500,000 次</li><li>如果 n=100万，还是执行 500,000 次</li><li>如果 n=100亿，<strong>依然是 500,000 次</strong></li></ul>
+<p>执行次数不变 = 常数时间 = <span class="hl">O(1)</span>。</p></div></div>
+
+<div class="danger"><strong>⚠️ 关键判断：</strong>循环上限是<strong>常量</strong>还是<strong>变量 n</strong>？常量 → O(1)；变量 n → O(n)或更高。</div>
+
+<div class="tip"><strong>🎯 一句话：</strong>O(1) 不代表快，只代表"不管你输入多大，我都是一个速度"。500,000 次也可以算 O(1)，因为它是常数。</div>
+
+</div></body></html>

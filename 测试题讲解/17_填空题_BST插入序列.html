@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>填空第7题 · BST插入序列种数</title>
+<style>:root{--bg:#fef9f4;--card:#fff;--text:#2d1b0e;--muted:#8b6f55;--accent:#b45309;--blue:#1e40af;--amber:#d97706;--border:#e8d5c4}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Georgia','PingFang SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:17px}.container{max-width:800px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--accent)}.answer{text-align:center;padding:1.5rem;border:3px solid var(--accent);border-radius:10px;background:#fffbeb;margin:1.5rem 0}.answer .big{font-size:3rem;font-weight:900;color:var(--accent);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--accent);border-left:4px solid var(--accent);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fdf6e8;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}</style></head>
+<body><div class="container">
+<div class="header"><h1>🌲 填空第7题 · BST 插入序列种数</h1><p style="color:var(--muted)">从空树开始插入得到给定BST，可能的输入序列有几种？</p></div>
+<div class="answer"><div class="big">6</div><div style="color:var(--muted)">种</div></div>
+
+<div class="section"><h2>一、核心原理</h2>
+<div class="card">
+<p>构建 BST 时，<span class="hl">第一个插入的元素一定是根</span>。之后插入时：</p>
+<ul><li>左子树的结点必须在根之后、但可以在右子树结点<strong>之前或之间</strong></li><li>右子树的结点也必须在根之后，但和左子树结点<strong>可以交错</strong></li><li>关键约束：<strong>每棵子树内部的先后顺序是固定的</strong>（子树的根一定在子树的其它结点之前）</li></ul></div></div>
+
+<div class="section"><h2>二、计算方法</h2>
+<div class="card">
+<p>设左子树有 L 个结点，右子树有 R 个结点。</p>
+<p style="text-align:center;font-size:1.2rem">合法序列数 = <span class="hl">C(L+R, L)</span> × (左子树合法序列数) × (右子树合法序列数)</p>
+<p><strong>C(L+R, L)</strong>：在 L+R 个位置中选 L 个放左子树结点（剩下的放右子树）。左右子树的结点可以交错排列，但各自的内部顺序不变。</p>
+<p>然后<strong>递归计算</strong>左子树和右子树内部的合法序列数，全部相乘。</p></div></div>
+
+<div class="section"><h2>三、解题套路总结</h2>
+<div class="card">
+<ol><li><strong>根固定第1位</strong></li>
+<li>递归算左子树内部排列数、右子树内部排列数</li>
+<li>乘以 <strong>C(左+右, 左)</strong>（左右穿插组合数）</li>
+<li><strong>乘积即答案</strong></li></ol></div></div>
+
+<div class="tip"><strong>🎯 关键：</strong>BST 的插入序列 = 根固定第一 + 左右子树交错但内部有序 = 组合数 × 子树答案。这是第6章二叉排序树的经典题型。</div>
+
+</div></body></html>

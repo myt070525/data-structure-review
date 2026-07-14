@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第3题 · 循环链表判空</title>
+<style>:root{--bg:#0a0a0a;--card:#1a1a1a;--text:#e0e0e0;--muted:#888;--green:#4ade80;--red:#f87171;--amber:#fbbf24;--cyan:#22d3ee;--border:#333}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem}.header .tag{font-size:.75rem;letter-spacing:3px;color:var(--muted)}.header h1{font-size:2rem;font-weight:800;color:var(--green);margin:8px 0}.header .q-box{display:inline-block;text-align:left;background:#0a2a0a;border:1px solid #1a4a1a;border-radius:8px;padding:1rem 1.5rem;font-size:1.05rem;color:#ccc}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#0a2a0a;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2.5rem 0}.section h2{font-size:1.3rem;color:var(--green);border-left:4px solid var(--green);padding-left:14px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#1a1a0a;border:1px solid #3a3a1a;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#2a0a0a;border:1px solid #5a1a1a;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#222;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}li::marker{color:var(--green)}.hl{background:#2a2a0a;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.ring-viz{display:flex;justify-content:center;margin:1.5rem 0}.ring-viz svg{max-width:500px}table{width:100%;border-collapse:collapse;margin:1rem 0}td{padding:10px 14px;border-bottom:1px solid var(--border)}tr.ok td{background:#0a2a0a}tr.no td{background:#2a0a0a;color:var(--red)}.code-block{background:#000;color:#0f0;border-radius:8px;padding:1.2rem 1.5rem;font-family:'Cascadia Code',monospace;font-size:.85rem;line-height:1.7;overflow-x:auto;margin:1rem 0;border:1px solid #333}</style></head>
+<body><div class="container">
+
+<div class="header"><div class="tag">测试题 · 选择题 · 第3题</div><h1>循环链表怎么判断为空？</h1>
+<div class="q-box">L 是带头结点的循环链表，判断 L 是否为空的代码为？</div></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">B — L->Next == L</div></div>
+
+<div class="section"><h2>一、先搞懂什么叫"带头结点的循环链表"</h2>
+<div class="card">
+<p>拆开三个概念：</p>
+<ul><li><strong>带头结点：</strong>链表有一个"虚拟"的头结点（不存实际数据），只是方便操作。头结点用 <code>L</code> 指向。</li>
+<li><strong>循环：</strong>最后一个结点的 Next 指针不是 NULL，而是<strong>指向头结点</strong>，形成一个环。</li>
+<li><strong>空表：</strong>头结点后面没有数据结点了。也就是说，头结点的 Next 指向<strong>自己</strong>。</li></ul>
+<p style="color:var(--muted);margin-top:1rem">通俗地说：头结点是"哨兵"，站在队伍最前面。当队伍里<strong>只有哨兵一个人</strong>的时候，哨兵后面还是哨兵自己——表是空的。</p></div></div>
+
+<div class="section"><h2>二、图解：空表 vs 非空表</h2>
+<div class="card">
+<div class="ring-viz">
+<svg width="500" height="180" viewBox="0 0 500 180">
+  <text x="80" y="20" fill="#4ade80" font-size="12" text-anchor="middle">空表</text>
+  <circle cx="80" cy="90" r="30" fill="none" stroke="#4ade80" stroke-width="3"/>
+  <text x="80" y="95" fill="#4ade80" text-anchor="middle" font-size="13" font-weight="700">L(头)</text>
+  <path d="M110,90 C140,90 140,50 110,50" stroke="#4ade80" stroke-width="3" fill="none" marker-end="url(#ag)"/>
+  <text x="150" y="60" fill="#4ade80" font-size="10">L->Next == L</text>
+
+  <text x="320" y="20" fill="#888" font-size="12" text-anchor="middle">非空表</text>
+  <circle cx="280" cy="90" r="30" fill="none" stroke="#888" stroke-width="3"/>
+  <text x="280" y="95" fill="#888" text-anchor="middle" font-size="13" font-weight="700">L(头)</text>
+  <circle cx="360" cy="90" r="30" fill="none" stroke="#22d3ee" stroke-width="3"/>
+  <text x="360" y="95" fill="#22d3ee" text-anchor="middle" font-size="13" font-weight="700">A</text>
+  <path d="M310,90 L325,90" stroke="#888" stroke-width="2" marker-end="url(#ag2)"/>
+  <path d="M390,90 C420,90 420,50 390,50 C370,50 340,50 310,50 L295,65" stroke="#22d3ee" stroke-width="2" marker-end="url(#ag2)"/>
+  <defs><marker id="ag" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4ade80"/></marker><marker id="ag2" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#888"/></marker></defs>
+</svg></div>
+<p style="text-align:center;"><strong style="color:var(--green)">空表：头结点指向自己 L->Next==L</strong> ｜ 非空表：头结点→数据结点→...→头结点</p></div></div>
+
+<div class="section"><h2>三、逐项辨析</h2>
+<div class="card">
+<table>
+<tr class="no"><td style="font-weight:700;width:40px">A</td><td><code>L->Next == NULL</code></td><td>❌ 这是<strong>不带头结点的单链表</strong>的判空条件。循环链表没有 NULL！</td></tr>
+<tr class="ok"><td style="font-weight:700">B</td><td><code>L->Next == L</code></td><td>✅ <strong>带头结点的循环链表</strong>，头结点指向自己 = 空表。</td></tr>
+<tr class="no"><td style="font-weight:700">C</td><td><code>L == NULL</code></td><td>❌ L 是头结点的地址，只要链表存在，L 就不会是 NULL（因为头结点已经分配了）</td></tr>
+<tr class="no"><td style="font-weight:700">D</td><td><code>L[0] == NULL</code></td><td>❌ 数组写法，链表根本没有下标操作。这是凑数的干扰项。</td></tr>
+</table></div></div>
+
+<div class="section"><h2>四、对比：各种链表的判空条件</h2>
+<div class="card">
+<table style="text-align:center">
+<tr style="background:#1a1a1a"><th style="padding:8px">链表类型</th><th style="padding:8px">判空条件</th><th style="padding:8px">说明</th></tr>
+<tr><td style="padding:8px">不带头结点的单链表</td><td style="padding:8px;font-family:'Cascadia Code',monospace;color:var(--cyan)">L == NULL</td><td style="padding:8px;color:var(--muted);font-size:.85rem">连头结点都没有</td></tr>
+<tr><td style="padding:8px">带头结点的单链表</td><td style="padding:8px;font-family:'Cascadia Code',monospace;color:var(--cyan)">L->Next == NULL</td><td style="padding:8px;color:var(--muted);font-size:.85rem">头结点后面没东西</td></tr>
+<tr><td style="padding:8px">不带头结点的循环链表</td><td style="padding:8px;font-family:'Cascadia Code',monospace;color:var(--cyan)">L == NULL</td><td style="padding:8px;color:var(--muted);font-size:.85rem">啥都没有</td></tr>
+<tr style="background:#0a2a0a"><td style="padding:8px;font-weight:700">带头结点的循环链表</td><td style="padding:8px;font-family:'Cascadia Code',monospace;color:var(--green);font-weight:700">L->Next == L</td><td style="padding:8px"><strong style="color:var(--green)">✅ 本题答案</strong></td></tr>
+</table></div></div>
+
+<div class="tip"><strong>🎯 通俗记忆：</strong>循环链表的空，就是"头结点自己在转圈圈"。L->Next == L，自己指自己，环里只有一个人。</div>
+
+</div></body></html>

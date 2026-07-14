@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>简答第1题 · 二叉树遍历与双亲表示法</title>
+<style>:root{--bg:#faf8f5;--card:#fff;--text:#1c1917;--muted:#78716c;--accent:#7c3aed;--green:#166534;--amber:#d97706;--border:#e5ddd0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Georgia','PingFang SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:17px}.container{max-width:840px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--accent)}.answer{text-align:center;padding:1.5rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0;font-size:1.6rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace;letter-spacing:2px}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--accent);border-left:4px solid var(--accent);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fdf6e8;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.traverse-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}.t-card{text-align:center;padding:1rem;border-radius:8px;border:1px solid var(--border)}.t-card.pre{background:#f5f3ff;border-color:var(--accent)}.t-card.in{background:#f0fdf4;border-color:var(--green)}.t-card.post{background:#fef2f2;border-color:#dc2626}.t-card .seq{font-family:'Cascadia Code',monospace;font-weight:700;font-size:1.1rem;margin-top:4px}</style></head>
+<body><div class="container">
+<div class="header"><h1>简答题 第1题</h1><p style="color:var(--muted)">先序：BCDAGEF &nbsp;|&nbsp; 中序：DCEGAFB &nbsp;|&nbsp; 求后序 &amp; 双亲表示法</p></div>
+<div class="answer">后序：D E G F A C B</div>
+
+<div class="section"><h2>一、由先序+中序重构二叉树</h2>
+<div class="card">
+<p><strong>核心方法：</strong></p>
+<ol><li><strong>先序第一个</strong>一定是根 → B是根</li><li>在中序中<strong>找到B</strong>：DCEGAF<span class="hl">B</span> → B之前DCEGAF是左子树，之后为空</li><li>递归：左子树的先序是CDAGEF（去掉根的B），中序是DCEGAF。先序第一个C是左子树的根...</li></ol>
+<p style="color:var(--muted)">递归下去就能唯一确定二叉树的结构，然后后序遍历得到结果。</p></div></div>
+
+<div class="section"><h2>二、三种遍历结果</h2>
+<div class="card">
+<div class="traverse-cards">
+  <div class="t-card pre"><div style="font-size:.7rem;color:var(--muted)">先序（根左右）</div><div class="seq" style="color:var(--accent)">B C D A G E F</div></div>
+  <div class="t-card in"><div style="font-size:.7rem;color:var(--muted)">中序（左根右）</div><div class="seq" style="color:var(--green)">D C E G A F B</div></div>
+  <div class="t-card post"><div style="font-size:.7rem;color:var(--muted)">后序（左右根）</div><div class="seq" style="color:#dc2626">D E G F A C B</div></div>
+</div></div></div>
+
+<div class="section"><h2>三、树转二叉树 + 双亲表示法</h2>
+<div class="card">
+<p>题目第二问：T是一棵树（不是二叉树！），用孩子-兄弟表示法转成二叉树后，存储为双亲表示法。</p>
+<p><strong>双亲表示法数组：</strong>每个结点记录它的双亲结点在数组中的下标。根的双亲为-1。</p>
+<p style="color:var(--muted)">这部分需要根据题目中具体的数组来填写。</p></div></div>
+
+<div class="tip"><strong>🎯 口诀：</strong>先序找根，中序分左右。先序第一个=根，中序中根左边=左子树，右边=右子树。递归即得整棵树。</div>
+
+</div></body></html>

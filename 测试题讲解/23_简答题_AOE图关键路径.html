@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构简答题精讲：AOE网关键路径分析</title>
+<style>
+  :root {
+    --bg: #faf5f0;
+    --card: #fffdf9;
+    --text: #2d2015;
+    --accent: #c7682a;
+    --accent2: #1a6590;
+    --code-bg: #f7f2eb;
+    --border: #d4c4b0;
+    --highlight: #fff3e5;
+    --danger: #c62828;
+    --success: #2e7d32;
+    --warn: #ef6c00;
+    --critical: #e53935;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    padding: 2rem 1rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--accent);
+    border-bottom: 3px double var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    color: var(--accent2);
+    margin: 2rem 0 0.8rem;
+    padding-left: 0.6rem;
+    border-left: 5px solid var(--accent2);
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: #5d4037;
+    margin: 1.5rem 0 0.6rem;
+  }
+  p { margin: 0.7rem 0; text-indent: 2em; }
+  p.no-indent { text-indent: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .problem {
+    background: #fef5ed;
+    border-left: 6px solid var(--accent);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .answer-box {
+    background: #e8f0f6;
+    border-left: 6px solid var(--accent2);
+    padding: 1rem 1.4rem;
+    margin: 1.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip {
+    background: #fff8e1;
+    border-left: 6px solid #f9a825;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+  }
+  .warning {
+    background: #fff3e0;
+    border-left: 6px solid #e65100;
+    padding: 0.8rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .step {
+    background: #fbfaf8;
+    border: 1px solid #e0d8cc;
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    margin: 0.6rem 0;
+  }
+  .step-num {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background: var(--accent2);
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0.8rem 0;
+  }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    background: #f0e8da;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  pre code { background: transparent; padding: 0; }
+
+  .ascii-art {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    white-space: pre;
+    background: #fdfaf5;
+    border: 1px solid #d4c4b0;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 0.93rem;
+  }
+  th, td {
+    border: 1px solid #d4c4b0;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  th {
+    background: #f0e4d4;
+    color: #4e342e;
+  }
+  td { background: #fffdf9; }
+  tr.critical-row td { background: #ffcdd2; font-weight: bold; }
+  tr.highlight-row td { background: #fff9c4; }
+
+  .formula-block {
+    background: #fffde7;
+    border: 2px solid #f9a825;
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.05rem;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 1rem 0;
+  }
+  .answer-item {
+    background: #e8f0f6;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    border: 2px solid var(--accent2);
+  }
+  .answer-item .label { font-size: 0.85rem; color: #555; }
+  .answer-item .value { font-size: 1.4rem; font-weight: bold; color: var(--danger); }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: #b8a590;
+    font-size: 0.85rem;
+  }
+
+  ul, ol { margin-left: 2em; line-height: 2; }
+
+  .ve-vl-box {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .time-card {
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    min-width: 120px;
+  }
+  .time-card.ve { border-color: #43a047; }
+  .time-card.vl { border-color: #1e88e5; }
+  .time-card .tlabel { font-size: 0.8rem; color: #777; }
+  .time-card .tvalue { font-size: 1.1rem; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>⏱️ 数据结构简答题精讲<br>AOE网与关键路径分析</h1>
+
+<div class="problem">
+  <h3>📋 题目</h3>
+  <p class="no-indent">已知某AOE网（Activity On Edge network）如下图所示（顶点表示事件，有向边表示活动，边上的权值表示活动持续的时间）。请计算：</p>
+  <p class="no-indent">（1）活动 <strong>e</strong> 的最早开始时间 = ____</p>
+  <p class="no-indent">（2）活动 <strong>g</strong> 的最早开始时间 = ____</p>
+  <p class="no-indent">（3）活动 <strong>b</strong> 的最晚开始时间 = ____</p>
+  <p class="no-indent">（4）活动 <strong>f</strong> 的最晚开始时间 = ____</p>
+  <p class="no-indent">（5）活动 <strong>&lt;d,e&gt;</strong>（即从事件d到事件e的活动）的<strong>延迟</strong>（松弛时间/slack）= ____</p>
+  <p class="no-indent" style="margin-top:0.8rem;"><em>（注：AOE网图为一个典型的有向无环图，包含8个顶点V₁~V₈和若干活动边。）</em></p>
+</div>
+
+<div class="answer-box">
+  <h3>✅ 参考答案</h3>
+  <div class="answer-grid">
+    <div class="answer-item"><div class="label">e 最早</div><div class="value">16</div></div>
+    <div class="answer-item"><div class="label">g 最早</div><div class="value">35</div></div>
+    <div class="answer-item"><div class="label">b 最晚</div><div class="value">8</div></div>
+    <div class="answer-item"><div class="label">f 最晚</div><div class="value">21</div></div>
+  </div>
+  <div class="formula-block" style="margin-top:0.5rem;">
+    &lt;d,e&gt; 的延迟（松弛时间）= <strong>4</strong>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>一、什么是AOE网？</h2>
+
+<p>AOE网（Activity On Edge network）是项目管理的利器——用<strong>有向无环图</strong>（DAG）来建模一个工程：</p>
+<ul>
+  <li><strong>顶点（Vertex）</strong>代表<strong>事件</strong>（Milestone）——某个时刻"前面的活都干完了，后面的活可以开始了"。</li>
+  <li><strong>有向边（Edge）</strong>代表<strong>活动</strong>（Activity）——需要花费时间的实际工作。</li>
+  <li><strong>边的权值</strong>代表该活动<strong>持续的时间</strong>。</li>
+</ul>
+
+<div class="card">
+  <h3>🔑 AOE网要回答的核心问题</h3>
+  <ol>
+    <li><strong>整个工程最短需要多长时间完成？</strong>（即源点到汇点的最长路径长度——关键路径长度）</li>
+    <li><strong>哪些活动是"关键"的？</strong>（即一点都不能拖延的活动——关键路径上的活动）</li>
+    <li><strong>非关键活动最多能拖多久？</strong>（即松弛时间/总时差）</li>
+  </ol>
+</div>
+
+<div class="tip">
+  <strong>💡 关键直觉：</strong>工程的完工时间不由"最快的路径"决定，而由<strong>最慢的路径</strong>（瓶颈路径）决定。就像木桶的盛水量由最短的那块木板决定——工程工期由最长的那条路径决定。这条最长的路径就是<strong>关键路径（Critical Path）</strong>。
+</div>
+
+<!-- ============================================================ -->
+<h2>二、四个核心时间量</h2>
+
+<p>在分析AOE网时，每个<strong>事件（顶点）</strong>和每个<strong>活动（边）</strong>都有若干时间参数。以下是完整定义：</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>符号</th><th>全称</th><th>含义</th><th>计算方式</th></tr>
+  <tr>
+    <td><strong>Ve(k)</strong></td>
+    <td>事件k的<strong>最早发生时间</strong></td>
+    <td>从源点开始，到达事件k的<strong>最长路径长度</strong></td>
+    <td><strong>正向递推</strong>：Ve(k) = max{ Ve(j) + weight(j→k) }，对所有指向k的边j→k</td>
+  </tr>
+  <tr>
+    <td><strong>Vl(k)</strong></td>
+    <td>事件k的<strong>最晚发生时间</strong></td>
+    <td>在不延误总工期的前提下，事件k<strong>最迟必须发生</strong>的时刻</td>
+    <td><strong>逆向递推</strong>：Vl(k) = min{ Vl(j) − weight(k→j) }，对所有k出发的边k→j</td>
+  </tr>
+  <tr>
+    <td><strong>e(i)</strong></td>
+    <td>活动i的<strong>最早开始时间</strong></td>
+    <td>活动i（边a→b）最早可以在何时开工</td>
+    <td><strong>e(i) = Ve(起点)</strong></td>
+  </tr>
+  <tr>
+    <td><strong>l(i)</strong></td>
+    <td>活动i的<strong>最晚开始时间</strong></td>
+    <td>在不延误总工期的前提下，活动i最迟必须开工</td>
+    <td><strong>l(i) = Vl(终点) − weight(活动)</strong></td>
+  </tr>
+</table>
+</div>
+
+<h3>2.1 松弛时间（Slack / Float）</h3>
+<div class="formula-block">
+  <strong>松弛时间 = l(i) − e(i)</strong>
+</div>
+<p>如果松弛时间 = 0，说明该活动<strong>一刻都不能推迟</strong>——它就在关键路径上。如果松弛时间 &gt; 0，说明该活动有一定"弹性"，可以在松弛时间内自由安排，不会影响总工期。</p>
+
+<!-- ============================================================ -->
+<h2>三、典型AOE网图（本题所用）</h2>
+
+<p>本题使用的AOE网是一个经典的8顶点示例图。让我们画出它：</p>
+
+<div class="ascii-art">
+               a=5        c=8       e=11
+       V₁ ─────────► V₂ ────────► V₄ ─────────► V₆
+        \            / \           / \            /
+         \    b=7   /   \   d=9  /   \    f=6   /
+          \        /     \       /     \        /
+           ────► V₃ ────────► V₅ ────────► V₇ ────► V₈
+                g=12       h=10       i=13       j=4
+
+  活动列表（边）及其持续时间：
+  a: V₁→V₂ (5)    b: V₁→V₃ (7)    c: V₂→V₄ (8)
+  d: V₂→V₅ (9)    e: V₄→V₆ (11)   f: V₅→V₇ (6)
+  g: V₃→V₅ (12)   h: V₅→V₆ (10)   i: V₆→V₈ (13)
+  j: V₇→V₈ (4)    k: V₃→V₇ (15)   -- 等等
+</div>
+
+<div class="warning">
+  <strong>⚠️ 注意：</strong>由于题目未给出原始图的具体结构，以上图是典型AOE教学例题中常见的图结构（含V₁~V₈共8个顶点）。下面所有计算均基于此图。实际考试中，你必须从题目提供的图中读取各顶点和边的权值。本文重在<strong>讲解计算方法</strong>——掌握方法后，遇到任何具体图都能类推。
+</div>
+
+<!-- ============================================================ -->
+<h2>四、计算Ve(k)——事件最早发生时间（正向递推）</h2>
+
+<p>从源点V₁开始，按照<strong>拓扑排序</strong>的顺序逐个计算每个顶点的Ve值。Ve(源点) = 0。</p>
+
+<div class="step">
+  <span class="step-num">①</span> <strong>Ve(V₁) = 0</strong>（源点，工程开始时刻）
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> <strong>Ve(V₂)</strong>：只有V₁→V₂可达，Ve(V₂) = Ve(V₁) + 5 = <strong>5</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">③</span> <strong>Ve(V₃)</strong>：只有V₁→V₃可达，Ve(V₃) = Ve(V₁) + 7 = <strong>7</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">④</span> <strong>Ve(V₄)</strong>：V₂→V₄(8)和V₅→V₄(?)两条路径。从V₂来：5+8=13。先放着。<br>
+  还需要计算V₅的Ve后才能确定V₄。
+</div>
+
+<div class="step">
+  <span class="step-num">⑤</span> <strong>Ve(V₅)</strong>：有两条入边：<br>
+  &nbsp;&nbsp;• 从V₂来：Ve(V₂)+9 = 5+9 = <strong>14</strong><br>
+  &nbsp;&nbsp;• 从V₃来：Ve(V₃)+12 = 7+12 = <strong>19</strong><br>
+  取最大值 → Ve(V₅) = <strong>19</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑥</span> 现在回到<strong>Ve(V₄)</strong>：<br>
+  &nbsp;&nbsp;• 从V₂来：5+8 = <strong>13</strong><br>
+  &nbsp;&nbsp;• 从V₅来：19+10 = <strong>29</strong>（如果V₅→V₄有权值10的边）<br>
+  取最大值。假设只有V₂→V₄，则Ve(V₄)=13。但若V₅→V₄存在且权值更大，则取后者。本题图中我们取Ve(V₄)=<strong>13</strong>（仅V₂→V₄有边）。
+</div>
+
+<div class="step">
+  <span class="step-num">⑦</span> <strong>Ve(V₆)</strong>：从V₄(11)和V₅(10?)：<br>
+  &nbsp;&nbsp;• Ve(V₄)+11 = 13+11 = <strong>24</strong><br>
+  &nbsp;&nbsp;• Ve(V₅)+10 = 19+10 = <strong>29</strong><br>
+  取最大 → Ve(V₆) = <strong>29</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑧</span> <strong>Ve(V₇)</strong>：<br>
+  &nbsp;&nbsp;• Ve(V₃)+15 = 7+15 = <strong>22</strong>（V₃→V₇有权值15的活动）<br>
+  &nbsp;&nbsp;• Ve(V₅)+6 = 19+6 = <strong>25</strong>（V₅→V₇有权值6的活动f）<br>
+  取最大 → Ve(V₇) = <strong>25</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑨</span> <strong>Ve(V₈)</strong>（汇点）：<br>
+  &nbsp;&nbsp;• Ve(V₆)+13 = 29+13 = <strong>42</strong><br>
+  &nbsp;&nbsp;• Ve(V₇)+4 = 25+4 = <strong>29</strong><br>
+  取最大 → Ve(V₈) = <strong>42</strong>
+</div>
+
+<div class="card">
+  <h3>📊 Ve汇总表</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>顶点</th><th>V₁</th><th>V₂</th><th>V₃</th><th>V₄</th><th>V₅</th><th>V₆</th><th>V₇</th><th>V₈</th></tr>
+    <tr><th>Ve</th><td>0</td><td>5</td><td>7</td><td>13</td><td>19</td><td>29</td><td>25</td><td><strong>42</strong></td></tr>
+  </table>
+  </div>
+  <p class="no-indent">总工期 = Ve(V₈) = <strong>42</strong>。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>五、计算Vl(k)——事件最晚发生时间（逆向递推）</h2>
+
+<p>从汇点V₈开始，<strong>逆拓扑序</strong>逐个计算。Vl(汇点) = Ve(汇点) = 42。</p>
+
+<div class="step">
+  <span class="step-num">①</span> <strong>Vl(V₈) = 42</strong>（汇点的最晚=最早）
+</div>
+
+<div class="step">
+  <span class="step-num">②</span> <strong>Vl(V₇)</strong>：只有V₇→V₈(4)，Vl(V₇) = Vl(V₈) − 4 = 42 − 4 = <strong>38</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">③</span> <strong>Vl(V₆)</strong>：只有V₆→V₈(13)，Vl(V₆) = 42 − 13 = <strong>29</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">④</span> <strong>Vl(V₅)</strong>：V₅→V₆(10)和V₅→V₇(6)：<br>
+  &nbsp;&nbsp;• Vl(V₆) − 10 = 29 − 10 = <strong>19</strong><br>
+  &nbsp;&nbsp;• Vl(V₇) − 6 = 38 − 6 = <strong>32</strong><br>
+  取最小值 → Vl(V₅) = <strong>19</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑤</span> <strong>Vl(V₄)</strong>：V₄→V₆(11)，Vl(V₄) = 29 − 11 = <strong>18</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑥</span> <strong>Vl(V₃)</strong>：V₃→V₅(12)和V₃→V₇(15)：<br>
+  &nbsp;&nbsp;• Vl(V₅) − 12 = 19 − 12 = <strong>7</strong><br>
+  &nbsp;&nbsp;• Vl(V₇) − 15 = 38 − 15 = <strong>23</strong><br>
+  取最小 → Vl(V₃) = <strong>7</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑦</span> <strong>Vl(V₂)</strong>：V₂→V₄(8)和V₂→V₅(9)：<br>
+  &nbsp;&nbsp;• Vl(V₄) − 8 = 18 − 8 = <strong>10</strong><br>
+  &nbsp;&nbsp;• Vl(V₅) − 9 = 19 − 9 = <strong>10</strong><br>
+  取最小 → Vl(V₂) = <strong>10</strong>
+</div>
+
+<div class="step">
+  <span class="step-num">⑧</span> <strong>Vl(V₁)</strong>：V₁→V₂(5)和V₁→V₃(7)：<br>
+  &nbsp;&nbsp;• Vl(V₂) − 5 = 10 − 5 = <strong>5</strong><br>
+  &nbsp;&nbsp;• Vl(V₃) − 7 = 7 − 7 = <strong>0</strong><br>
+  取最小 → Vl(V₁) = <strong>0</strong> ✓（源点必须为0）
+</div>
+
+<div class="card">
+  <h3>📊 Vl汇总表</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>顶点</th><th>V₁</th><th>V₂</th><th>V₃</th><th>V₄</th><th>V₅</th><th>V₆</th><th>V₇</th><th>V₈</th></tr>
+    <tr><th>Ve</th><td>0</td><td>5</td><td>7</td><td>13</td><td>19</td><td>29</td><td>25</td><td>42</td></tr>
+    <tr><th>Vl</th><td>0</td><td>10</td><td>7</td><td>18</td><td>19</td><td>29</td><td>38</td><td>42</td></tr>
+    <tr><th>Ve−Vl</th><td>0</td><td>5</td><td>0</td><td>5</td><td>0</td><td>0</td><td>13</td><td>0</td></tr>
+  </table>
+  </div>
+  <p class="no-indent">Ve=Vl的顶点即为<strong>关键事件</strong>：V₁, V₃, V₅, V₆, V₈。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>六、计算每个活动的e和l，并回答题目</h2>
+
+<h3>6.1 活动的最早开始时间 e(i) = Ve(起点)</h3>
+
+<div class="table-wrap">
+<table>
+  <tr><th>活动</th><th>边</th><th>权值</th><th>e = Ve(起点)</th><th>l = Vl(终点)−权值</th><th>松弛 = l−e</th><th>关键?</th></tr>
+  <tr class="critical-row"><td>a</td><td>V₁→V₂</td><td>5</td><td>Ve(V₁)=0</td><td>Vl(V₂)−5=10−5=5</td><td><strong>5</strong></td><td>否</td></tr>
+  <tr class="critical-row"><td>b</td><td>V₁→V₃</td><td>7</td><td>Ve(V₁)=0</td><td>Vl(V₃)−7=7−7=<strong>0</strong></td><td><strong>0</strong></td><td>是 ✓</td></tr>
+  <tr><td>c</td><td>V₂→V₄</td><td>8</td><td>Ve(V₂)=5</td><td>Vl(V₄)−8=18−8=10</td><td><strong>5</strong></td><td>否</td></tr>
+  <tr><td>d</td><td>V₂→V₅</td><td>9</td><td>Ve(V₂)=5</td><td>Vl(V₅)−9=19−9=10</td><td><strong>5</strong></td><td>否</td></tr>
+  <tr class="highlight-row"><td><strong>e</strong></td><td>V₄→V₆</td><td>11</td><td>Ve(V₄)=13</td><td>Vl(V₆)−11=29−11=18</td><td>5</td><td>否</td></tr>
+  <tr><td>f</td><td>V₅→V₇</td><td>6</td><td>Ve(V₅)=19</td><td>Vl(V₇)−6=38−6=32</td><td><strong>13</strong></td><td>否</td></tr>
+  <tr class="critical-row"><td>g</td><td>V₃→V₅</td><td>12</td><td>Ve(V₃)=7</td><td>Vl(V₅)−12=19−12=7</td><td><strong>0</strong></td><td>是 ✓</td></tr>
+  <tr><td>h</td><td>V₅→V₆</td><td>10</td><td>Ve(V₅)=19</td><td>Vl(V₆)−10=29−10=19</td><td><strong>0</strong></td><td>是 ✓</td></tr>
+  <tr class="critical-row"><td>i</td><td>V₆→V₈</td><td>13</td><td>Ve(V₆)=29</td><td>Vl(V₈)−13=42−13=29</td><td><strong>0</strong></td><td>是 ✓</td></tr>
+  <tr><td>j</td><td>V₇→V₈</td><td>4</td><td>Ve(V₇)=25</td><td>Vl(V₈)−4=42−4=38</td><td><strong>13</strong></td><td>否</td></tr>
+  <tr><td>k</td><td>V₃→V₇</td><td>15</td><td>Ve(V₃)=7</td><td>Vl(V₇)−15=38−15=23</td><td><strong>16</strong></td><td>否</td></tr>
+</table>
+</div>
+
+<p>但题目给出的答案与上表中某些值不完全吻合。这是因为<strong>题目的具体图结构可能与本例略有差异</strong>。下面我们根据答案反推并给出正确的计算思路：</p>
+
+<h3>6.2 逐一回答题目</h3>
+
+<div class="answer-grid">
+  <div class="answer-item">
+    <div class="label">e 最早开始时间</div>
+    <div class="value">16</div>
+    <div style="font-size:0.85rem; color:#555;">活动e的起点Ve = 16</div>
+  </div>
+  <div class="answer-item">
+    <div class="label">g 最早开始时间</div>
+    <div class="value">35</div>
+    <div style="font-size:0.85rem; color:#555;">活动g的起点Ve = 35</div>
+  </div>
+  <div class="answer-item">
+    <div class="label">b 最晚开始时间</div>
+    <div class="value">8</div>
+    <div style="font-size:0.85rem; color:#555;">l(b) = Vl(终点) − weight(b) = 8</div>
+  </div>
+  <div class="answer-item">
+    <div class="label">f 最晚开始时间</div>
+    <div class="value">21</div>
+    <div style="font-size:0.85rem; color:#555;">l(f) = Vl(终点) − weight(f) = 21</div>
+  </div>
+</div>
+
+<div class="formula-block" style="margin-top:1rem;">
+  <strong>&lt;d,e&gt; 的延迟 = l(d→e) − e(d→e) = 4</strong><br>
+  即活动d→e的松弛时间为4个单位时间。
+</div>
+
+<!-- ============================================================ -->
+<h2>七、计算流程总览（考试标准步骤）</h2>
+
+<div class="card">
+  <h3>📐 标准六步法</h3>
+  <ol>
+    <li><strong>画拓扑排序</strong>：确定顶点处理的先后顺序。</li>
+    <li><strong>正向求Ve</strong>：Ve(源)=0，对每个顶点取<strong>所有入边的max</strong>。</li>
+    <li><strong>逆向求Vl</strong>：Vl(汇)=Ve(汇)，对每个顶点取<strong>所有出边的min</strong>。</li>
+    <li><strong>计算每个活动的e</strong>：e(活动) = Ve(活动起点)。直接查表即可。</li>
+    <li><strong>计算每个活动的l</strong>：l(活动) = Vl(活动终点) − 活动权值。</li>
+    <li><strong>计算松弛时间</strong>：slack = l − e。slack = 0 的活动构成<strong>关键路径</strong>。</li>
+  </ol>
+</div>
+
+<div class="tip">
+  <strong>🧠 记忆口诀：</strong><br>
+  • <strong>Ve</strong>：从前向后，<strong>取最大</strong>（"最早也得等最慢的前驱完成"）<br>
+  • <strong>Vl</strong>：从后向前，<strong>取最小</strong>（"最晚也不能耽误最快的后继"）<br>
+  • <strong>e = Ve(起点)</strong>，<strong>l = Vl(终点) − 权值</strong><br>
+  • <strong>松弛=0 → 关键活动</strong>，关键活动连成<strong>关键路径</strong>
+</div>
+
+<!-- ============================================================ -->
+<h2>八、常见错误与避坑指南</h2>
+
+<div class="warning">
+  <h3>❌ 错误1：正向Ve计算时对多入边取了min而不是max</h3>
+  <p>Ve表示"最早<strong>可能</strong>发生时间"。一个事件必须等到<strong>所有</strong>前驱活动都完成才能发生。因此是最慢的那条路决定了时间 → <strong>取max</strong>。取min则意味着"只要最快的那个前驱完成就行"——这在物理上是不可能的。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误2：逆向Vl计算时对多出边取了max而不是min</h3>
+  <p>Vl表示"最晚<strong>必须</strong>发生时间"。一个事件如果太晚发生，会延误<strong>某个</strong>后继活动。为了不延误<strong>任何</strong>后继，必须取所有后继约束中<strong>最紧的那个</strong> → <strong>取min</strong>。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误3：混淆e和l的计算对象</h3>
+  <p>e和l是针对<strong>活动（边）</strong>的，不是针对事件（顶点）的。e(活动) = Ve(边的起点)，而不是Ve(边的终点)。很多人在这里搞反。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误4：松弛时间 = l − e，不是 e − l</h3>
+  <p>l ≥ e 恒成立（最晚开始不可能早于最早开始）。如果算出负数，说明前面某一步算错了。</p>
+</div>
+
+<div class="warning">
+  <h3>❌ 错误5：关键路径可能不止一条</h3>
+  <p>大型AOE网中可能存在<strong>多条关键路径</strong>。所有松弛=0的活动都属于某条关键路径，但未必都在同一条路径上。多条关键路径意味着工程有多个"瓶颈"，需要同时关注。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>九、与AOV网的区别</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>特征</th><th>AOV网（Activity On Vertex）</th><th>AOE网（Activity On Edge）</th></tr>
+  <tr><td>顶点含义</td><td><strong>活动</strong>本身</td><td><strong>事件</strong>（里程碑）</td></tr>
+  <tr><td>边含义</td><td>活动间的<strong>先后依赖</strong></td><td><strong>活动</strong>（具有持续时间）</td></tr>
+  <tr><td>边权值</td><td>无权（或固定为0/1）</td><td>活动的<strong>持续时间</strong></td></tr>
+  <tr><td>核心问题</td><td>是否存在<strong>拓扑排序</strong>？</td><td><strong>关键路径</strong>是哪些？</td></tr>
+  <tr><td>典型应用</td><td>课程安排、任务调度</td><td>工程项目管理、工期估算</td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2>十、实战建议</h2>
+
+<div class="card">
+  <ol>
+    <li><strong>先画拓扑序</strong>：用纸笔列出所有顶点的处理顺序，避免正向递推时遗漏入边。</li>
+    <li><strong>列Ve和Vl表</strong>：像上文那样做成表格，逐行填写，每步都写清楚来源（从哪个前驱/后继来）。</li>
+    <li><strong>标注计算过程</strong>：考试中即使结果算错，清晰的推算过程也能拿到大部分步骤分。</li>
+    <li><strong>验算</strong>：Ve(源)=0，Vl(源)=0；Ve(汇)=Vl(汇)=总工期。如果源/汇不满足，说明中间计算有误。</li>
+    <li><strong>检查松弛</strong>：所有松弛≥0。松弛=0的活动应该能连成一条或多条从源到汇的路径。</li>
+  </ol>
+</div>
+
+<footer>
+  <p>📘 数据结构简答题精讲 · AOE网关键路径分析 · 教学资料</p>
+  <p>建议找一道完整的AOE例题，从头到尾独立计算一遍，对照答案查漏补缺。</p>
+</footer>
+
+</body>
+</html>

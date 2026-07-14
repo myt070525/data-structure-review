@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>填空第3题 · KMP 算法详解</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --text: #c9d1d9; --muted: #8b949e;
+    --accent: #58a6ff; --green: #3fb950; --red: #f85149; --amber: #d2991d;
+    --purple: #bc8cff; --border: #30363d; --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.85; font-size: 16px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+  .header { text-align: center; margin-bottom: 2.5rem; }
+  .header .tag { font-size: 0.75rem; letter-spacing: 3px; color: var(--muted); }
+  .header h1 { font-size: 2rem; font-weight: 800; color: var(--accent); margin: 8px 0; }
+
+  .answer { text-align: center; padding: 1.2rem; border: 2px solid var(--green); border-radius: 10px; background: #0d2a1a; margin: 1.5rem 0; }
+  .answer .big { font-size: 2rem; font-weight: 900; color: var(--green); font-family: 'Cascadia Code',monospace; }
+  .answer .row { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-top: 0.8rem; }
+  .answer .row .item { text-align: center; }
+  .answer .row .item .val { font-size: 1.5rem; font-weight: 700; color: var(--amber); font-family: 'Cascadia Code',monospace; }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.3rem; color: var(--accent); border-left: 4px solid var(--accent); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.05rem; color: var(--amber); margin: 1.5rem 0 0.8rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0; }
+
+  .tip { background: #1a1a2e; border: 1px solid #3a3a5e; border-left: 4px solid var(--amber); border-radius: 0 8px 8px 0; padding: 1rem 1.5rem; margin: 1rem 0; }
+  .danger { background: #2e1a1a; border: 1px solid #5e3a3a; border-left: 4px solid var(--red); border-radius: 0 8px 8px 0; padding: 1rem 1.5rem; margin: 1rem 0; }
+
+  .code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; font-family: 'Cascadia Code','Fira Code',monospace; font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0; }
+  .code .cmt { color: var(--muted); }
+  .code .kw { color: var(--red); }
+  .code .fn { color: var(--purple); }
+  .code .str { color: var(--green); }
+
+  /* 可视化表格 */
+  .viz-table { width: 100%; border-collapse: collapse; text-align: center; margin: 1rem 0; font-family: 'Cascadia Code',monospace; font-size: 0.9rem; }
+  .viz-table th { background: #21262d; padding: 8px; color: var(--muted); font-weight: 400; font-size: 0.8rem; }
+  .viz-table td { padding: 8px; border: 1px solid var(--border); }
+  .viz-table td.hl { background: #1a2a3a; color: var(--accent); font-weight: 700; }
+  .viz-table td.match { background: #0d2a1a; color: var(--green); }
+  .viz-table td.miss { background: #2a1a1a; color: var(--red); }
+
+  /* 匹配过程 */
+  .match-viz { font-family: 'Cascadia Code', monospace; font-size: 0.82rem; line-height: 2; white-space: pre; background: #0d1117; padding: 1.2rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge.b { background: #1a2a3a; color: var(--accent); }
+
+  code { background: #21262d; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--accent); }
+  .hl { background: #3a2a1a; border-bottom: 2px solid var(--amber); padding: 1px 3px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">测试题 · 填空题 · 第3题</div>
+  <h1>KMP 算法 — next 数组与匹配过程</h1>
+</div>
+
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px">正确答案</div>
+  <div class="row">
+    <div class="item">
+      <div style="font-size:0.75rem;color:var(--muted)">next数组（下标1开始）</div>
+      <div class="val">0 1 2 1 2</div>
+      <div style="font-size:0.7rem;color:var(--muted)">T="aabaa"</div>
+    </div>
+    <div class="item">
+      <div style="font-size:0.75rem;color:var(--muted)">匹配成功时比较次数</div>
+      <div class="val">15</div>
+      <div style="font-size:0.7rem;color:var(--muted)">S="acbacbaaabaab"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第1节：什么是KMP ========== -->
+<div class="section">
+  <h2>一、KMP 解决什么问题？</h2>
+  <div class="card">
+    <p>在主串 S 中找模式串 T。暴力匹配：S 和 T 逐字符比较，失配时 S 回退、T 回退到开头——<strong>回退太多导致 O(mn)</strong>。</p>
+    <p><span class="hl">KMP 的核心思想：失配时 S 不需要回退，T 也不需要回到开头</span>——利用已经匹配过的信息，让 T "智能地"跳到合适的位置继续比较。</p>
+  </div>
+</div>
+
+<!-- ========== 第2节：next数组 ========== -->
+<div class="section">
+  <h2>二、next 数组：T 的"失配跳转指南"</h2>
+  <div class="card">
+    <h3>next[j] 的含义</h3>
+    <p>当 T 的第 j 个字符失配时，<span class="hl">next[j] 告诉你 T 应该跳到哪个位置继续比较</span>。</p>
+    <p>本质上：<strong>next[j] = T[1..j-1] 的最长公共前后缀长度 + 1</strong></p>
+
+    <div class="danger">
+      <strong>⚠️ 版本差异说明：</strong>不同教材的 next 定义略有不同。本题采用的方式是 <strong>下标从1开始，next[1]=0</strong>。有些教材下标从0开始或使用-1。请以你的教材为准。
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第3节：手算next ========== -->
+<div class="section">
+  <h2>三、手算 T="aabaa" 的 next 数组</h2>
+  <div class="card">
+    <table class="viz-table">
+      <tr><th>j</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+      <tr><th>T[j]</th><td>a</td><td>a</td><td>b</td><td>a</td><td>a</td></tr>
+    </table>
+
+    <h3>逐个计算：</h3>
+
+    <div style="font-family:'Cascadia Code',monospace;font-size:0.9rem;line-height:2.2;">
+      <p><span class="badge b">j=1</span> <strong>next[1] = 0</strong>　<span style="color:var(--muted)">// 第一个字符就失配，T无法再跳，只能让S前进</span></p>
+
+      <p><span class="badge b">j=2</span> 看 T[1..1] = "a"，最长公共前后缀 = ""（空串），长度=0<br>
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>next[2] = 0 + 1 = 1</strong>　<span style="color:var(--muted)">// 失配时跳回第1个字符</span></p>
+
+      <p><span class="badge b">j=3</span> 看 T[1..2] = "aa"，前缀有 "a"，后缀有 "a" → 最长公共前后缀 = "a"，长度=1<br>
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>next[3] = 1 + 1 = 2</strong>　<span style="color:var(--muted)">// 失配时跳回第2个字符</span></p>
+
+      <p><span class="badge b">j=4</span> 看 T[1..3] = "aab"，前缀 {"a","aa"}，后缀 {"b","ab"} → 无公共前后缀，长度=0<br>
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>next[4] = 0 + 1 = 1</strong></p>
+
+      <p><span class="badge b">j=5</span> 看 T[1..4] = "aaba"，前缀 {"a","aa","aab"}，后缀 {"a","ba","aba"} → 最长公共="a"，长度=1<br>
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>next[5] = 1 + 1 = 2</strong></p>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;font-size:1.2rem;">
+      ✅ <strong>next = [ -, 0, 1, 2, 1, 2 ]</strong>（下标1起始）
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第4节：匹配过程 ========== -->
+<div class="section">
+  <h2>四、完整匹配过程：S="acbacbaaabaab" 找 T="aabaa"</h2>
+  <div class="card">
+    <p>格式：每次比较记为1次，✅匹配继续，❌失配则根据next跳转。</p>
+
+    <div class="match-viz">
+主串S：a  c  b  a  c  b  a  a  a  b  a  a  b
+位置： 0  1  2  3  4  5  6  7  8  9 10 11 12
+
+<b>第1趟</b> S[0]=a vs T[1]=a ✅
+    S[1]=c vs T[2]=a ❌  (比较2次)
+    → next[2]=1，T回到第1位，S不动（仍在位置1）
+
+<b>第2趟</b> S[1]=c vs T[1]=a ❌  (比较1次)
+    → next[1]=0，T不动，S前进到位置2
+
+<b>第3趟</b> S[2]=b vs T[1]=a ❌  (比较1次)
+    → next[1]=0，S前进到位置3
+
+<b>第4趟</b> S[3]=a vs T[1]=a ✅
+    S[4]=c vs T[2]=a ❌  (比较2次)
+    → next[2]=1，T回到第1位
+
+<b>第5趟</b> S[4]=c vs T[1]=a ❌  (比较1次)
+    → S前进到位置5
+
+<b>第6趟</b> S[5]=b vs T[1]=a ❌  (比较1次)
+    → S前进到位置6
+
+<b>第7趟</b> S[6]=a vs T[1]=a ✅
+    S[7]=a vs T[2]=a ✅
+    S[8]=a vs T[3]=b ❌  (比较3次)
+    → next[3]=2，T跳到第2位（S不动，仍在位置8）
+
+<b>第8趟</b> S[8]=a vs T[2]=a ✅
+    S[9]=b vs T[3]=b ✅
+    S[10]=a vs T[4]=a ✅
+    S[11]=a vs T[5]=a ✅  (比较4次)
+    ✅✅✅ <b style="color:var(--green)">匹配成功！</b>
+
+<b style="color:var(--amber)">总比较次数 = 2+1+1+2+1+1+3+4 = 15</b></div>
+  </div>
+</div>
+
+<!-- ========== 第5节：对比暴力 ========== -->
+<div class="section">
+  <h2>五、KMP vs 暴力匹配</h2>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;text-align:center;">
+      <div style="background:#2e1a1a;border:1px solid #5e3a3a;border-radius:8px;padding:1rem;">
+        <div style="color:var(--red);font-weight:700;font-size:1.1rem;">暴力匹配</div>
+        <div style="font-size:2rem;font-weight:900;color:var(--red);margin:0.5rem 0;">≈ 30+</div>
+        <div style="color:var(--muted);font-size:0.8rem;">每次失配S+1, T归0</div>
+        <div style="color:var(--muted);font-size:0.8rem;">O(mn) = 5×13 = 65次最坏</div>
+      </div>
+      <div style="background:#0d2a1a;border:1px solid #3a5e3a;border-radius:8px;padding:1rem;">
+        <div style="color:var(--green);font-weight:700;font-size:1.1rem;">KMP 匹配</div>
+        <div style="font-size:2rem;font-weight:900;color:var(--green);margin:0.5rem 0;">15</div>
+        <div style="color:var(--muted);font-size:0.8rem;">失配时T聪明跳转</div>
+        <div style="color:var(--muted);font-size:0.8rem;">O(m+n)，S从不回退</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第6节：口诀 ========== -->
+<div class="section">
+  <h2>六、KMP 学习要点</h2>
+  <div class="tip">
+    <p><strong>🎯 考试核心：</strong></p>
+    <ul>
+      <li><strong>手算 next 数组</strong>：写出前 j-1 个字符，找最长公共前后缀，长度+1 = next[j]</li>
+      <li><strong>追踪匹配过程</strong>：逐字符比较，记录比较次数，失配时查 next 表跳转</li>
+      <li><strong>next[1] 永远是 0</strong>（下标从1开始的情况下）</li>
+      <li>不要把 next 和 nextval 搞混（nextval 是改进版，本题不涉及）</li>
+    </ul>
+  </div>
+</div>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;margin-top:3rem;">
+  📖 KMP 是第4章（串）的核心难点，也是算法考试的高频考点。
+</div>
+
+</div>
+</body>
+</html>

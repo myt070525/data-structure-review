@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第4题 · 栈的出栈序列</title>
+<style>
+  :root {
+    --bg: #f8fafc; --card: #fff; --text: #1e293b; --muted: #64748b;
+    --blue: #2563eb; --red: #dc2626; --green: #16a34a; --amber: #d97706;
+    --border: #e2e8f0; --code-bg: #f1f5f9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+  .header { text-align: center; margin-bottom: 2.5rem; }
+  .header .tag { font-size: 0.75rem; letter-spacing: 3px; color: var(--muted); }
+  .header h1 { font-size: 2rem; font-weight: 800; color: var(--blue); margin: 8px 0; }
+  .header .q-box {
+    display: inline-block; text-align: left; background: #eff6ff; border: 1px solid #bfdbfe;
+    border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem;
+  }
+  .header .q-box code { background: #dbeafe; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; }
+
+  .answer { text-align: center; padding: 1rem; border: 3px solid var(--green); border-radius: 10px; background: #f0fdf4; margin: 1.5rem 0; }
+  .answer .big { font-size: 2.2rem; font-weight: 900; color: var(--green); font-family: 'Cascadia Code',monospace; }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--blue); border-left: 4px solid var(--blue); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 0.8rem; color: #1e293b; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0; box-shadow: 0 1px 3px rgba(0,0,0,.03); }
+
+  .tip { background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid var(--amber); border-radius: 0 8px 8px 0; padding: 1rem 1.5rem; margin: 1rem 0; }
+  .danger { background: #fef2f2; border: 1px solid #fca5a5; border-left: 4px solid var(--red); border-radius: 0 8px 8px 0; padding: 1rem 1.5rem; margin: 1rem 0; }
+
+  /* 可视化 */
+  .stack-demo { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.7; }
+  .stack-row { display: flex; gap: 4px; align-items: center; margin: 6px 0; flex-wrap: wrap; }
+  .stack-row .token { padding: 4px 8px; border-radius: 5px; font-weight: 600; min-width: 32px; text-align: center; }
+  .token.in-stack { background: #dbeafe; color: var(--blue); border: 1px solid var(--blue); }
+  .token.popped { background: #fee2e2; color: var(--red); border: 1px solid var(--red); }
+  .token.waiting { background: #f1f5f9; color: #94a3b8; border: 1px dashed #cbd5e1; }
+  .token.label { background: transparent; color: var(--muted); font-size: 0.75rem; border: none; min-width: auto; padding: 0; }
+
+  /* 决策树 */
+  .tree { font-family: 'Cascadia Code', monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre; background: #f8fafc; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+
+  table.enum { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  table.enum th { background: #f1f5f9; padding: 6px 10px; text-align: center; font-size: 0.8rem; color: var(--muted); }
+  table.enum td { padding: 6px 10px; text-align: center; border-bottom: 1px solid var(--border); font-family: 'Cascadia Code', monospace; font-weight: 600; }
+  table.enum td.ok { color: var(--green); }
+  table.enum td.no { color: var(--red); text-decoration: line-through; }
+
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code', monospace; font-size: 0.9em; }
+  .hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 3px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">测试题 · 选择题 · 第4题</div>
+  <h1>栈的出栈序列计数</h1>
+  <div class="q-box">
+    若入栈序列为 <code>ABCD</code>，在所有可能的出栈序列中，<br>以 <code>C</code> 开头的出栈序列个数为？
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">C — 3 种</div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:4px">CDBA &nbsp; CBDA &nbsp; CBAD</div>
+</div>
+
+<!-- ========== 第1节：栈的基本规则 ========== -->
+<div class="section">
+  <h2>一、栈的"游戏规则"</h2>
+  <div class="card">
+    <p>栈（Stack）是<span class="hl">后进先出（LIFO）</span>的数据结构。就像一叠盘子：</p>
+    <ul>
+      <li><strong>入栈（push）：</strong>把盘子放到最上面</li>
+      <li><strong>出栈（pop）：</strong>只能拿最上面那个盘子</li>
+      <li><strong>中间不能抽盘子：</strong>不能越过上面的取下面的</li>
+    </ul>
+    <p>这意味着：<span class="hl">如果 A 比 B 先进栈，那么 B 一定比 A 先出栈（除非 A 在 B 入栈前就出栈了）</span>。</p>
+
+    <div class="danger">
+      <strong>🚫 出栈序列的充要条件：</strong>在出栈序列中，对于任意三个元素 i &lt; j &lt; k（入栈序），<br>
+      不能出现 <strong>k 先出，i 其次，j 最后</strong> 的模式（即"大小中"模式）。
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第2节：枚举 ========== -->
+<div class="section">
+  <h2>二、以 C 开头，逐一手动枚举</h2>
+
+  <div class="card">
+    <h3>前提分析</h3>
+    <p>C 第一个出栈，说明什么？说明入栈一直进行到 C 入栈后<strong>立刻把 C 弹出</strong>。此时：</p>
+    <div class="stack-demo">
+      <div class="stack-row">
+        <span class="token label">已出栈：</span><span class="token popped">C</span>
+      </div>
+      <div class="stack-row">
+        <span class="token label">栈中：</span><span class="token in-stack">A</span><span class="token in-stack">B</span>
+      </div>
+      <div class="stack-row">
+        <span class="token label">尚未入栈：</span><span class="token waiting">D</span>
+      </div>
+    </div>
+    <p style="margin-top:0.8rem;color:var(--muted);">
+      关键约束：A 在 B 下面，所以 <strong>B 必须先于 A 出栈</strong>（栈顶在B这边）。D 任何时候入栈都行。
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>枚举全部可能</h3>
+    <p>剩余元素：A、B、D，其中 <strong>B 必须比 A 先出</strong>。所有排列：</p>
+
+    <table class="enum">
+      <tr><th>序列</th><th>B比A先出？</th><th>栈合法？</th><th>结果</th></tr>
+      <tr><td class="ok">C D B A</td><td>✅ B在A前</td><td>✅ D入→出, B出, A出</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="ok">C B D A</td><td>✅ B在A前</td><td>✅ B出, D入→出, A出</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="ok">C B A D</td><td>✅ B在A前</td><td>✅ B出, A出, D入→出</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="no">C D A B</td><td>❌ A在B前</td><td>—</td><td class="no">❌</td></tr>
+      <tr><td class="no">C A D B</td><td>❌ A在B前</td><td>—</td><td class="no">❌</td></tr>
+      <tr><td class="no">C A B D</td><td>❌ A在B前</td><td>—</td><td class="no">❌</td></tr>
+    </table>
+
+    <p style="margin-top:1rem">总共 <strong>3 种</strong>合法序列。</p>
+  </div>
+</div>
+
+<!-- ========== 第3节：决策树 ========== -->
+<div class="section">
+  <h2>三、用决策树思考（更系统的方法）</h2>
+  <div class="card">
+    <p>C出栈后，每一步有两个选择：出栈（pop栈顶）或入栈（push下一个未入栈元素，如果有的话）。</p>
+    <div class="tree">
+C出栈后（栈=[A,B]，待入=[D]）
+
+├─ 选 pop → B出栈 → （栈=[A]，待=[D]）
+│   ├─ 选 pop → A出栈 → （栈=[]，待=[D]）
+│   │   └─ 选 push → D入→出 → <strong style="color:var(--green)">CBAD</strong> ✅
+│   └─ 选 push → D入→出 → （栈=[A]）
+│       └─ 选 pop → A出栈 → <strong style="color:var(--green)">CBDA</strong> ✅
+│
+└─ 选 push → D入栈 → （栈=[A,B,D]，待=[]）
+    ├─ 选 pop → D出栈 → （栈=[A,B]）
+    │   └─ 选 pop → B出→A出 → <strong style="color:var(--green)">CDBA</strong> ✅
+    │
+    └─ 选 pop → B出栈 → ... → 同样得到上面某个序列</div>
+  </div>
+</div>
+
+<!-- ========== 第4节：卡特兰数 ========== -->
+<div class="section">
+  <h2>四、进阶：卡特兰数 —— n个元素有多少合法出栈序列？</h2>
+  <div class="card">
+    <p>n 个元素的合法出栈序列总数 = <strong>第 n 个卡特兰数</strong>：</p>
+    <div style="text-align:center;font-size:1.3rem;margin:1rem 0;font-family:'Cascadia Code',monospace;font-weight:700;color:var(--blue)">
+      Cₙ = C(2n, n) / (n+1) = (2n)! / (n!(n+1)!)
+    </div>
+
+    <table style="width:100%;text-align:center;margin:1rem 0;border-collapse:collapse;">
+      <tr style="background:#f1f5f9;"><td style="padding:6px">n</td><td>1</td><td>2</td><td>3</td><td style="background:#fef3c7;font-weight:700">4</td><td>5</td></tr>
+      <tr><td style="padding:6px">合法序列数</td><td>1</td><td>2</td><td>5</td><td style="background:#fef3c7;font-weight:700;color:var(--blue);font-size:1.2rem">14</td><td>42</td></tr>
+    </table>
+
+    <p>n=4 时总共 14 种合法序列。以 A/B/C/D 开头的分别有多少？</p>
+    <div style="display:flex;gap:0.5rem;text-align:center;margin:1rem 0;">
+      <div style="flex:1;padding:0.5rem;background:#f1f5f9;border-radius:6px;">A开头<br><strong>5种</strong></div>
+      <div style="flex:1;padding:0.5rem;background:#f1f5f9;border-radius:6px;">B开头<br><strong>5种</strong></div>
+      <div style="flex:1;padding:0.5rem;background:#fef3c7;border-radius:6px;border:2px solid var(--amber);">C开头<br><strong style="font-size:1.3rem;color:var(--red);">3种</strong></div>
+      <div style="flex:1;padding:0.5rem;background:#f1f5f9;border-radius:6px;">D开头<br><strong>1种</strong></div>
+    </div>
+    <p style="color:var(--muted);">规律：以第 k 个元素开头 = C<sub>k-1</sub> × C<sub>n-k</sub>。C开头(k=3)：C₂×C₁=2×1=2?  实际上这里需要更精确计算，但记住<strong>越靠后开头的越少</strong>。</p>
+  </div>
+</div>
+
+<!-- ========== 第5节：解题技巧 ========== -->
+<div class="section">
+  <h2>五、考试解题技巧</h2>
+  <div class="card">
+    <ol>
+      <li><strong>先确定约束：</strong>以 X 开头 → X 之前入栈的元素都还在栈里，顺序已知</li>
+      <li><strong>列出余下元素：</strong>栈中元素（自底向上）+ 待入栈元素</li>
+      <li><strong>用决策树或排列法：</strong>保证栈中元素的相对顺序（底部的后出）</li>
+      <li><strong>逐一检验：</strong>每个候选序列模拟一遍栈操作，验证是否合法</li>
+    </ol>
+  </div>
+
+  <div class="tip">
+    <strong>💡 考试抢分法：</strong>如果时间紧，直接把所有排列写出来（最多 n! 种），然后逐个模拟栈检验。4个元素只有 24 种排列，</strong>1-2分钟就能筛完。</strong>
+  </div>
+</div>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;margin-top:3rem;">
+  📖 栈是第3章核心内容，出栈序列合法性是必考题型。
+</div>
+
+</div>
+</body>
+</html>

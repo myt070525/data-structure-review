@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>填空第8题 · 冒泡排序时间复杂度</title>
+<style>:root{--bg:#fdf2f8;--card:#fff;--text:#831843;--muted:#9d174d;--pink:#db2777;--amber:#d97706;--border:#fce7f3}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:16px}.container{max-width:800px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--pink)}.answer{margin:1.5rem auto;width:200px;height:200px;border-radius:50%;background:linear-gradient(135deg,#db2777,#be185d);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(219,39,119,.25)}.answer .num{font-size:2.5rem;font-weight:900;line-height:1}.section{margin:2rem 0}.section h2{font-size:1.25rem;color:var(--pink);border-left:4px solid var(--pink);padding-left:12px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fce7f3;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}table{width:100%;border-collapse:collapse;margin:1rem 0;text-align:center;font-size:.9rem}td{padding:8px;border-bottom:1px solid var(--border)}th{background:#fdf2f8;padding:8px}</style></head>
+<body><div class="container">
+<div class="header"><h1>🫧 填空第8题 · 冒泡排序时间复杂度</h1><p style="color:var(--muted)">冒泡排序法的平均时间复杂度是？</p></div>
+<div class="answer"><div class="num">O(n²)</div><div style="font-size:.9rem;opacity:.85">平方阶</div></div>
+
+<div class="section"><h2>一、冒泡排序怎么算？</h2>
+<div class="card">
+<p>冒泡排序每一趟把最大的元素"浮"到最后面：</p>
+<ul><li>第1趟：比较 n-1 对相邻元素</li><li>第2趟：比较 n-2 对</li><li>...</li><li>第n-1趟：比较 1 对</li></ul>
+<p>总比较次数 = (n-1)+(n-2)+...+1 = <span class="hl">n(n-1)/2</span></p>
+<p>无论最好还是最坏，比较次数都是 O(n²)。交换次数最好O(1)，最坏O(n²)。</p></div></div>
+
+<div class="section"><h2>二、各种情况分析</h2>
+<div class="card">
+<table>
+<tr><th>情况</th><th>比较次数</th><th>交换次数</th><th>时间复杂度</th></tr>
+<tr><td>最好（已有序）</td><td>n-1</td><td>0</td><td>O(n)</td></tr>
+<tr><td>最坏（逆序）</td><td>n(n-1)/2</td><td>n(n-1)/2</td><td>O(n²)</td></tr>
+<tr><td>平均</td><td>n(n-1)/2</td><td>n(n-1)/4</td><td style="color:var(--pink);font-weight:700">O(n²)</td></tr>
+</table>
+<p style="color:var(--muted);margin-top:.5rem">注意：如果加优化标志（某一趟没发生交换就提前结束），最好情况才是O(n)。题目问的是平均时间复杂度。</p></div></div>
+
+<div class="tip"><strong>🎯 记忆：</strong>冒泡、插入、选择这三个基本排序，平均和最坏都是 O(n²)。只有快速、归并、堆排达到 O(nlogn)。</div>
+
+</div></body></html>

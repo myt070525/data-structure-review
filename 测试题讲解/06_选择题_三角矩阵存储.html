@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>第6题 · 三角矩阵压缩存储</title>
+<style>:root{--bg:#fffdf7;--card:#fff;--text:#1c1917;--muted:#6b5e4f;--purple:#7c3aed;--cyan:#06b6d4;--green:#166534;--red:#dc2626;--amber:#d97706;--border:#e5ddd0}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Georgia','PingFang SC','Microsoft YaHei',serif;background:var(--bg);color:var(--text);line-height:1.95;font-size:17px}.container{max-width:860px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:2px solid var(--border)}.header h1{font-size:2rem;color:var(--purple)}.answer{text-align:center;padding:1.2rem;border:3px solid var(--green);border-radius:10px;background:#f0fdf4;margin:1.5rem 0}.answer .big{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.3rem;color:var(--purple);border-left:4px solid var(--purple);padding-left:14px;margin-bottom:1rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#fdf6e8;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#fef3c7;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.matrix{display:grid;grid-template-columns:repeat(5,52px);gap:3px;justify-content:center;margin:1.5rem 0}.mc{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-weight:700;font-family:'Cascadia Code',monospace;font-size:.75rem}.mc.store{background:#ede9fe;border:2px solid var(--purple);color:var(--purple)}.mc.skip{background:transparent;color:#ccc}.formula{text-align:center;font-size:1.8rem;font-family:'Cascadia Code',monospace;font-weight:700;color:var(--purple);padding:1.5rem;background:#faf5ff;border-radius:10px;margin:1rem 0}table{width:100%;border-collapse:collapse}td{padding:10px 14px;border-bottom:1px solid var(--border)}tr.good td{background:#f0fdf4}tr.bad td{background:#fef2f2;color:var(--red)}</style></head>
+<body><div class="container">
+
+<div class="header"><h1>📐 三角矩阵的压缩存储</h1><p style="color:var(--muted)">用一维数组存储 n 阶三角矩阵，需要多大空间？</p></div>
+
+<div class="answer"><div style="font-size:.8rem;color:var(--muted)">正确答案</div><div class="big">C — n(n+1)/2</div></div>
+
+<div class="section"><h2>一、什么是三角矩阵？为什么能"压缩"？</h2>
+<div class="card">
+<p>三角矩阵中，对角线一侧的<strong>所有元素都是同一个常数</strong>（通常是0或∞）。既然都是同一个值，就不用每个都存——<span class="hl">只存有用的那些，常数只存1次</span>。</p>
+<div class="matrix">
+  <div class="mc store">a₁₁</div><div class="mc skip">c</div><div class="mc skip">c</div><div class="mc skip">c</div><div class="mc skip">c</div>
+  <div class="mc store">a₂₁</div><div class="mc store">a₂₂</div><div class="mc skip">c</div><div class="mc skip">c</div><div class="mc skip">c</div>
+  <div class="mc store">a₃₁</div><div class="mc store">a₃₂</div><div class="mc store">a₃₃</div><div class="mc skip">c</div><div class="mc skip">c</div>
+  <div class="mc store">a₄₁</div><div class="mc store">a₄₂</div><div class="mc store">a₄₃</div><div class="mc store">a₄₄</div><div class="mc skip">c</div>
+  <div class="mc store">a₅₁</div><div class="mc store">a₅₂</div><div class="mc store">a₅₃</div><div class="mc store">a₅₄</div><div class="mc store">a₅₅</div>
+</div>
+<p style="text-align:center;color:var(--muted)">紫色 = 需要存储的元素（下三角+对角线）。灰色 = 同一个常数c，存1次即可。</p></div></div>
+
+<div class="section"><h2>二、推导：到底需要多少个空间？</h2>
+<div class="card">
+<p>下三角（含对角线）的元素个数：</p>
+<div class="formula">1 + 2 + 3 + ... + n = n(n+1)/2</div>
+<p>第1行有1个（a₁₁），第2行有2个（a₂₁,a₂₂），...，第n行有n个。这是等差数列求和。</p>
+<p>加上存储那个常数 c 的 1 个空间，总共 <strong>n(n+1)/2 + 1</strong>。但选项里没有这个"+1"，说明题目考的是<strong>有效数据元素的数量</strong>本身。</p></div></div>
+
+<div class="section"><h2>三、逐项辨析</h2>
+<div class="card">
+<table>
+<tr class="bad"><td style="font-weight:700">A</td><td>n/2</td><td>❌ 太小了。就算只有对角线也要 n 个</td></tr>
+<tr class="bad"><td style="font-weight:700">B</td><td>n·n/2</td><td>❌ n²/2 = 全矩阵的一半。没算对角线被减半</td></tr>
+<tr class="good"><td style="font-weight:700">C</td><td>n(n+1)/2</td><td>✅ 等差数列求和，正确</td></tr>
+<tr class="bad"><td style="font-weight:700">D</td><td>n(n-1)/2</td><td>❌ 少了对角线上的 n 个元素</td></tr>
+</table></div></div>
+
+<div class="tip"><strong>🎯 同一个公式扩展：</strong><br>下三角矩阵 → n(n+1)/2<br>对称矩阵 → n(n+1)/2（因为只存一半+对角线）<br>三对角矩阵 → 3n-2（只有三条对角线有数据）</div>
+
+<div class="tip"><strong>💡 通俗理解：</strong>一个楼梯，第1级1个砖，第2级2个砖...第n级n个砖。总砖数 = n(n+1)/2。三角矩阵就是这样一个"数据楼梯"。</div>
+
+</div></body></html>

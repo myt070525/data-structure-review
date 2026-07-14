@@ -1,0 +1,74 @@
+《数据结构》2025-2026第二学期单元测验答案
+一、选择填空题（共40分,每空4分）
+1、O(mn)
+2、数据关系/关系/关系集
+3、B
+4、4
+5、((a,(c,d)))
+6、9
+7、011223/-100112、14
+8、C
+9、161
+
+
+二、简答题（共30分，每小题10分）
+1、错1个扣3分，错2个扣6分，错3个扣完
+先序：abdgcef
+中序：dgbaecf
+后序：gdbefca
+
+
+2、
+（1）7分，若未按左小右大合并扣2分
+
+（2）3分
+WPL=(3+7)*3+(15+16+22)*2=136
+
+
+3、各5分
+                                  （2）
+            
+
+三、编程题（共30分，每题10分）
+1、
+void Delete_head(struct DNode *L) {
+    struct DNode *q;
+    if (L->Next == NULL)        // 3分
+        return;
+    q =  L->Next;                 // 3分
+    L->Next = q->Next; 
+    if (q->Next != NULL) 
+        q->Next->Previous = L;	// 4分
+    free(q);
+}
+
+2、
+struct SqList * Merge(struct SqList *L1, struct SqList *L2) {
+    struct SqList *L3;
+    int i, j, k;
+    L3 = CreateList(L1->N + L2->N);        // 建新表2分
+    i = j = k = 0;
+    while (i < L1->N && j < L2->N)         // 合并4分
+        if (L1->Data[i] < L2->Data[j])
+            L3->Data[k ++] = L1->Data[i ++];
+        else
+            L3->Data[k ++] = L2->Data[j ++];
+    while (i < L1->N)                      // 复制L1剩余元素1分
+        L3->Data[k ++] = L1->Data[i ++];
+    while (j < L2->N)                      // 复制L2剩余元素1分 
+        L3->Data[k ++] = L2->Data[j ++];
+    L3->N = k;                              // 更新元素个数1分
+    return L3;                              // 返回1分
+}
+
+3、
+int DestroyTree(struct TreeNode *T) {
+    int n = 0;
+    if (T == NULL)
+        return 0;
+    n += DestroyTree(T->Left);
+    n += DestroyTree(T->Right);
+    free(T);
+    return n + 1;
+}
+

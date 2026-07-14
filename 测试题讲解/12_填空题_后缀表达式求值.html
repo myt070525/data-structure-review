@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>填空第2题 · 后缀表达式求值</title>
+<style>:root{--bg:#0f0f23;--card:#191935;--text:#ccc;--muted:#666;--green:#00cc88;--amber:#ffcc00;--red:#ff5577;--cyan:#00ddff;--pink:#ff6b9d;--white:#f0f0f0;--border:#2a2a4a}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI','PingFang SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.9;font-size:16px}.container{max-width:880px;margin:0 auto;padding:3rem 1.5rem}.header{text-align:center;margin-bottom:2rem}.header h1{font-size:2rem;color:var(--green)}.answer{text-align:center;padding:1.2rem;border:2px solid var(--green);border-radius:10px;background:#0a2a1a;margin:1.5rem 0}.answer .big{font-size:1.8rem;font-weight:900;color:var(--green);font-family:'Cascadia Code',monospace}.section{margin:2rem 0}.section h2{font-size:1.3rem;color:var(--amber);border-left:4px solid var(--amber);padding-left:14px;margin-bottom:1rem}.section h3{font-size:1.05rem;color:var(--cyan);margin:1.3rem 0 .6rem}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 1.8rem;margin:1rem 0}.tip{background:#1a1a0a;border:1px solid #3a3a1a;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}.danger{background:#2a0a0a;border:1px solid #5a1a1a;border-left:4px solid var(--red);border-radius:0 8px 8px 0;padding:1rem 1.5rem;margin:1rem 0}code{background:#1a1a3a;padding:2px 6px;border-radius:3px;font-family:'Cascadia Code',monospace;font-size:.9em;color:var(--cyan)}ul,ol{padding-left:1.8rem}li{margin-bottom:6px}.hl{background:#3a3a0a;border-bottom:2px solid var(--amber);padding:1px 3px;font-weight:600}.trace{font-family:'Cascadia Code',monospace;font-size:.85rem;line-height:2;white-space:pre;background:#0d0d1a;padding:1.2rem;border-radius:8px;overflow-x:auto;color:#ccc}.trace .hl2{color:var(--amber);font-weight:700}.trace .pop{color:var(--red)}.trace .push{color:var(--green)}table.precedence{width:100%;border-collapse:collapse;margin:1rem 0;text-align:center;font-size:.9rem}table.precedence th{background:#1a1a3a;padding:8px;color:var(--amber);border-bottom:2px solid var(--border)}table.precedence td{padding:8px 10px;border-bottom:1px solid var(--border)}table.precedence tr.group td{background:#0a1a1a;color:var(--cyan);font-weight:700;font-size:.8rem;letter-spacing:1px}.step-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem;font-family:'Cascadia Code',monospace}.step-table th{background:#1a1a3a;padding:6px 8px;color:var(--amber);text-align:left}.step-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}.step-table tr.important td{background:#1a2a0a}.rule-box{padding:.8rem 1.2rem;border-radius:6px;margin:.6rem 0}.rule-box.pop-rule{background:#2a0a0a;border:1px solid var(--red)}.rule-box.push-rule{background:#0a2a0a;border:1px solid var(--green)}.rule-box.paren-rule{background:#0a0a2a;border:1px solid var(--cyan)}</style></head>
+<body><div class="container">
+
+<div class="header"><h1>📝 填空第2题 · 后缀表达式</h1><p style="color:var(--muted)">8*(5-2)/(7+3) → 后缀 = ? 扫描到+时栈中元素数 = ?</p></div>
+
+<div class="answer">
+  <div class="big">后缀：8 5 2 - * 7 3 + /</div>
+  <div class="big" style="margin-top:10px;">扫描到+时栈中元素数：<span style="color:var(--amber)">3</span></div>
+  <div style="color:var(--muted);margin-top:4px;">（分别是 24, 7, 3）</div>
+</div>
+
+<!-- ==================== 第1节：基础概念 ==================== -->
+<div class="section"><h2>一、三种表达式</h2>
+<div class="card">
+  <p><strong>中缀（infix）：</strong>操作符在中间 → <code>3 + 5</code>。人来读写很自然，但计算机处理需要括号和优先级规则，很麻烦。</p>
+  <p><strong>后缀（postfix / 逆波兰式）：</strong>操作符在后面 → <code>3 5 +</code>。不需要括号！计算机只需一个栈就能轻松计算。</p>
+  <p style="color:var(--muted)">通俗类比：中缀是"3加5"（人话），后缀是"3, 5, 加起来"（机器指令的顺序）。</p></div></div>
+
+<!-- ==================== 第2节：操作符优先级 ==================== -->
+<div class="section"><h2>二、操作符优先级 &mdash; 核心规则</h2>
+<div class="card">
+  <p>中缀转后缀时，操作符不能直接输出——要先压入一个<strong>"操作符栈"</strong>。什么时候压？什么时候弹？<strong>看优先级。</strong></p>
+
+  <table class="precedence">
+    <tr><th>优先级</th><th>操作符</th><th>含义</th><th>结合性</th></tr>
+    <tr><td style="font-size:1.5rem;font-weight:900;color:var(--red)">3（最高）</td><td><code>^</code></td><td>乘方</td><td>右结合</td></tr>
+    <tr><td style="font-size:1.5rem;font-weight:900;color:var(--amber)">2</td><td><code>* &nbsp; / &nbsp; %</code></td><td>乘、除、取余</td><td>左结合</td></tr>
+    <tr><td style="font-size:1.5rem;font-weight:900;color:var(--green)">1（最低）</td><td><code>+ &nbsp; -</code></td><td>加、减</td><td>左结合</td></tr>
+    <tr class="group"><td colspan="4">括号 ( ) 不参与优先级比较——它们是"特权通道"</td></tr>
+  </table>
+
+  <p style="margin-top:1rem"><strong>什么叫"左结合"？</strong>同等优先级的操作符从左往右算。比如 <code>8/4*2</code> = (8/4)*2 = 4，不是 8/(4*2)=1。</p>
+  <p><strong>"右结合"呢？</strong>从右往左算。比如 <code>2^3^2</code> = 2^(3^2) = 2^9 = 512，不是 (2^3)^2 = 64。考试一般不考^。</p></div></div>
+
+<!-- ==================== 第3节：中缀→后缀 算法规则 ==================== -->
+<div class="section"><h2>三、中缀转后缀 &mdash; 三条铁律</h2>
+<div class="card">
+
+  <h3>📌 规则一：遇到操作数（数字）</h3>
+  <div class="rule-box push-rule">直接输出。数字永远是"先来先走"，不参与任何优先级争斗。</div>
+
+  <h3>📌 规则二：遇到操作符（+ - * /）</h3>
+  <div class="rule-box pop-rule">
+    <strong>先弹后压：</strong>把操作符栈中所有<strong>"优先级 ≥ 当前操作符"</strong>的操作符弹出来输出，<br>然后再把当前操作符压入栈。
+  </div>
+  <p style="color:var(--muted);font-size:.9rem">为什么"≥"呢？因为相同优先级时，先来的要先算（左结合）。所以栈顶那个*如果和我同级或更高，它应该比我先输出。</p>
+
+  <h3>📌 规则三：遇到括号</h3>
+  <div class="rule-box paren-rule">
+    <strong>( 左括号：</strong>无条件压栈，当作"优先级最低"。<br>
+    <strong>) 右括号：</strong>把栈中操作符逐个弹出输出，<strong>直到遇到 ( 为止</strong>。然后丢弃这对括号。
+  </div>
+  <p style="color:var(--muted);font-size:.9rem">括号的妙用：左括号把栈"封"住了，里面的操作符出不来。右括号一来，就把它们全放出来。括号本身不输出。</p>
+
+  <h3>📌 收尾：表达式扫描完后</h3>
+  <div class="rule-box push-rule">把操作符栈中剩余的符号全部弹出输出。</div></div></div>
+
+<!-- ==================== 第4节：详细追踪 ==================== -->
+<div class="section"><h2>四、本题完整追踪 &mdash; 每一步都解释为什么</h2>
+<div class="card">
+<p>中缀表达式：<code>8 * ( 5 - 2 ) / ( 7 + 3 )</code></p>
+
+<table class="step-table">
+<tr><th>步骤</th><th>扫描到</th><th>做什么</th><th>为什么？</th><th>输出</th><th style="color:var(--amber)">操作符栈</th></tr>
+
+<tr><td>1</td><td style="color:var(--cyan)">8</td><td>输出</td><td>操作数直接输出</td><td>8</td><td>[]</td></tr>
+
+<tr><td>2</td><td style="color:var(--red)">*</td><td>压栈</td><td>栈空，直接压入。*优先级=2</td><td>8</td><td style="color:var(--amber)">[*]</td></tr>
+
+<tr class="important"><td>3</td><td style="color:var(--pink)">(</td><td>压栈</td><td>左括号无条件压栈，当作"最低优先级"封门</td><td>8</td><td style="color:var(--amber)">[*, <span style="color:var(--pink)">(</span>]</td></tr>
+
+<tr><td>4</td><td style="color:var(--cyan)">5</td><td>输出</td><td>操作数直接输出</td><td>8 5</td><td>[*,(]</td></tr>
+
+<tr><td>5</td><td style="color:var(--red)">-</td><td>压栈</td><td>栈顶是( → 被"封印"了，不弹出任何东西。<br>-优先级=1，直接压入</td><td>8 5</td><td style="color:var(--amber)">[*, (, <span style="color:var(--red)">-</span>]</td></tr>
+
+<tr><td>6</td><td style="color:var(--cyan)">2</td><td>输出</td><td>操作数直接输出</td><td>8 5 2</td><td>[*, (,-]</td></tr>
+
+<tr class="important"><td>7</td><td style="color:var(--pink)">)</td><td>弹栈</td><td>右括号→弹出栈顶直到遇到(。<br>弹出-输出，弹出(丢弃</td><td>8 5 2 <span class="pop">-</span></td><td style="color:var(--amber)">[*]</td></tr>
+
+<tr class="important"><td>8</td><td style="color:var(--red)">/</td><td>弹*输出<br>然后/压栈</td><td>/优先级=2。栈顶*优先级=2。<br><strong>≥</strong>关系成立→弹出*输出。<br>栈空了→压入/</td><td>8 5 2 - <span class="pop">*</span></td><td style="color:var(--amber)">[/]</td></tr>
+
+<tr><td>9</td><td style="color:var(--pink)">(</td><td>压栈</td><td>左括号压栈，封门</td><td>8 5 2 - *</td><td>[/, (]</td></tr>
+
+<tr><td>10</td><td style="color:var(--cyan)">7</td><td>输出</td><td>操作数</td><td>8 5 2 - * 7</td><td>[/,(]</td></tr>
+
+<tr><td>11</td><td style="color:var(--red)">+</td><td>压栈</td><td>栈顶是( → 被封，直接压入。+优先级=1</td><td>8 5 2 - * 7</td><td>[/, (, <span style="color:var(--red)">+</span>]</td></tr>
+
+<tr><td>12</td><td style="color:var(--cyan)">3</td><td>输出</td><td>操作数</td><td>8 5 2 - * 7 3</td><td>[/,(,+]</td></tr>
+
+<tr class="important"><td>13</td><td style="color:var(--pink)">)</td><td>弹栈</td><td>弹出+输出，弹出(丢弃</td><td>8 5 2 - * 7 3 <span class="pop">+</span></td><td style="color:var(--amber)">[/]</td></tr>
+
+<tr class="important"><td>14</td><td style="color:var(--cyan)">EOF</td><td>全弹出</td><td>表达式结束，栈中剩余符号全弹出</td><td>8 5 2 - * 7 3 + <span class="pop">/</span></td><td style="color:var(--green)">[]</td></tr>
+</table>
+
+<p style="text-align:center;font-size:1.1rem;margin-top:1rem"><strong>结果：<span style="color:var(--green)">8 5 2 - * 7 3 + /</span> ✅</strong></p></div></div>
+
+<!-- ==================== 第5节：关键步骤详解 ==================== -->
+<div class="section"><h2>五、最容易搞混的两步 &mdash; 慢镜头回放</h2>
+<div class="card">
+  <h3>🔍 第8步：为什么 / 要把 * 弹出来？</h3>
+  <p><code>*</code> 和 <code>/</code> 的优先级都是 2。<strong>同优先级的判断口诀：先来的先走。</strong></p>
+  <p><code>*</code> 比 <code>/</code> 先入栈 → 当 <code>/</code> 来时，<code>*</code> 先被弹出 → 后缀中 <code>*</code> 出现在 <code>/</code> 前面 → 计算时先算乘后算除。</p>
+  <p style="color:var(--muted)">这就是"左结合"的体现：从左到右，先遇到的先算。如果允许 / 压在 * 上面，那后缀里 / 就会在 * 前面 → 变成先除后乘，结果就错了。</p>
+
+  <h3>🔍 第5步：为什么 - 不弹 ( ？</h3>
+  <p>栈顶是 <code>(</code>。它不是一个真正的操作符——它是"封印"。任何操作符遇到 <code>(</code> 都<strong>不能弹出它</strong>，只能乖乖排在它后面。</p>
+  <p style="color:var(--muted)">直到对应的 <code>)</code> 出现，才会把这对括号之间积压的操作符一次性释放。</p></div></div>
+
+<!-- ==================== 第6节：总结 ==================== -->
+<div class="section"><h2>六、优先级规则一句话总结</h2>
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;text-align:center;font-size:1.1rem">
+    <div style="background:#1a1a3a;padding:1rem;border-radius:8px">
+      <div style="color:var(--red);font-size:1.5rem">栈顶 ≥ 当前</div>
+      <div style="color:var(--muted);font-size:.85rem">→ 弹出栈顶<br>（先来的、高级的，先走）</div>
+    </div>
+    <div style="background:#1a1a3a;padding:1rem;border-radius:8px">
+      <div style="color:var(--green);font-size:1.5rem">栈顶 &lt; 当前</div>
+      <div style="color:var(--muted);font-size:.85rem">→ 当前压栈<br>（后来的、高级的，等一等）</div>
+    </div>
+    <div style="background:#1a1a3a;padding:1rem;border-radius:8px">
+      <div style="color:var(--pink);font-size:1.5rem">遇到 (</div>
+      <div style="color:var(--muted);font-size:.85rem">→ 无条件压栈<br>（封印，阻止弹出）</div>
+    </div>
+    <div style="background:#1a1a3a;padding:1rem;border-radius:8px">
+      <div style="color:var(--cyan);font-size:1.5rem">遇到 )</div>
+      <div style="color:var(--muted);font-size:.85rem">→ 弹到 ( 为止<br>（解除封印，释放操作符）</div>
+    </div>
+  </div></div></div>
+
+<div class="danger"><strong>⚠️ 常见错误：</strong>很多人把"栈顶≥当前→弹出"记反了！不是"当前优先级高就压栈"，是<strong>栈顶的优先级≥当前时弹出栈顶</strong>。想象栈顶是"先来的人"，当前是"新来的"——如果新来的不比先来的更高级，先来的就先出去办事。</div>
+
+<div class="tip"><strong>🎯 练习方法：</strong>找10个中缀表达式，手工转换后缀，再用后缀求值验证——做对3个，这题就彻底会了。</div>
+
+<!-- ==================== 第7节：求值 ==================== -->
+<div class="section"><h2>七、后缀求值（第二空）</h2>
+<div class="card">
+<div class="trace">扫描 8   → <span class="push">push</span> → 栈=[8]
+扫描 5   → <span class="push">push</span> → 栈=[8,5]
+扫描 2   → <span class="push">push</span> → 栈=[8,5,2]
+扫描 -   → <span class="pop">pop 2, pop 5</span> → 5-2=3 → <span class="push">push</span> → 栈=[8,3]
+扫描 *   → <span class="pop">pop 3, pop 8</span> → 8*3=24 → <span class="push">push</span> → 栈=[24]
+扫描 7   → <span class="push">push</span> → 栈=[24,7]
+扫描 3   → <span class="push">push</span> → <span class="hl2">栈=[24,7,3]  ← 3个元素！</span>
+扫描 +   → <span class="pop">pop 3, pop 7</span> → 7+3=10 → <span class="push">push</span> → 栈=[24,10]
+扫描 /   → <span class="pop">pop 10, pop 24</span> → 24/10=2.4 → <span class="push">push</span> → 栈=[2.4]</div>
+</div></div>
+
+</div></body></html>
