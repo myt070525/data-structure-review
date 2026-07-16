@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构 · 选择填空复习手册</title>
+<style>
+:root {
+  --bg: #faf8f5; --card: #fff; --text: #2c2416; --muted: #6b5e4f;
+  --ch1: #2563eb; --ch2: #059669; --ch3: #7c3aed; --ch4: #ea580c;
+  --ch5: #0891b2; --ch6: #be185d; --ch7: #ca8a04; --ch8: #4f46e5;
+  --gold: #c2943b; --red: #c0392b; --green: #166534;
+  --border: #e5ddd0; --shadow: 0 1px 3px rgba(0,0,0,.04);
+  --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif; background:var(--bg); color:var(--text); line-height:1.8; }
+/* ── Header ── */
+.hero { text-align:center; padding:3rem 1.5rem 2rem; background:linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f); color:#fff; }
+.hero h1 { font-size:2.2rem; letter-spacing:2px; }
+.hero .sub { color:#94a3b8; margin-top:0.5rem; font-size:1rem; }
+.hero .badges { margin-top:1rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; }
+.hero .badges span { background:rgba(255,255,255,.12); padding:3px 14px; border-radius:20px; font-size:.8rem; }
+/* ── Sticky TOC ── */
+.toc { position:sticky; top:0; z-index:100; background:#1e1b4b; border-bottom:1px solid #334155; padding:0; overflow-x:auto; white-space:nowrap; }
+.toc a { display:inline-block; color:#94a3b8; text-decoration:none; padding:10px 16px; font-size:.82rem; transition:.2s; border-bottom:2px solid transparent; }
+.toc a:hover,.toc a.active { color:#fff; border-bottom-color:#fbbf24; }
+/* ── Container ── */
+.container { max-width:900px; margin:0 auto; padding:1.5rem; }
+/* ── Chapter card ── */
+.chapter { background:var(--card); border-radius:var(--radius); margin:2rem 0; box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; }
+.chapter-header { padding:1.3rem 1.8rem; color:#fff; display:flex; align-items:center; gap:1rem; }
+.chapter-header .ch-num { font-size:2rem; font-weight:900; opacity:.4; }
+.chapter-header h2 { font-size:1.3rem; font-weight:700; }
+.chapter-body { padding:1.5rem 1.8rem; }
+/* per-chapter colors */
+.ch1 .chapter-header { background:linear-gradient(135deg,#1e40af,#2563eb); }
+.ch2 .chapter-header { background:linear-gradient(135deg,#065f46,#059669); }
+.ch3 .chapter-header { background:linear-gradient(135deg,#5b21b6,#7c3aed); }
+.ch4 .chapter-header { background:linear-gradient(135deg,#9a3412,#ea580c); }
+.ch5 .chapter-header { background:linear-gradient(135deg,#155e75,#0891b2); }
+.ch6 .chapter-header { background:linear-gradient(135deg,#9d174d,#be185d); }
+.ch7 .chapter-header { background:linear-gradient(135deg,#a16207,#ca8a04); }
+.ch8 .chapter-header { background:linear-gradient(135deg,#3730a3,#4f46e5); }
+/* ── Section ── */
+.sec { margin:1.2rem 0; }
+.sec-title { font-weight:700; font-size:1rem; margin-bottom:.5rem; padding-left:12px; border-left:3px solid var(--gold); color:#5d4037; }
+/* ── Cards inside chapter ── */
+.k-card { background:#fdfaf5; border:1px solid var(--border); border-radius:8px; padding:1rem 1.3rem; margin:.8rem 0; }
+.k-card .label { display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-right:6px; }
+.k-card .label.def { background:#dbeafe; color:#1e40af; }
+.k-card .label.key { background:#fef3c7; color:#92400e; }
+.k-card .label.pit { background:#fee2e2; color:#991b1b; }
+.k-card .label.formula { background:#d1fae5; color:#065f46; }
+.k-card code { background:#f0ede5; padding:1px 5px; border-radius:3px; font-family:'Cascadia Code',monospace; font-size:.88em; }
+/* ── Tables ── */
+table { width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.9rem; }
+th { background:#3e2723; color:#fff; padding:8px 12px; text-align:center; font-weight:600; }
+td { padding:7px 12px; border:1px solid #e5ddd0; text-align:center; }
+tr:nth-child(even) td { background:#fdfaf5; }
+tr.high td { background:#fef3c7; font-weight:600; }
+/* ── Two-col ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:.8rem 0; }
+@media(max-width:600px){ .two-col{grid-template-columns:1fr;} }
+/* ── Footer ── */
+.footer { text-align:center; padding:2rem; color:var(--muted); font-size:.85rem; border-top:1px solid var(--border); margin-top:2rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>📋 数据结构 · 选择填空复习手册</h1>
+  <p class="sub">覆盖第1~8章全部选择、填空考点 · 考前速查</p>
+  <div class="badges">
+    <span>选择题 20分</span><span>填空题 20分</span><span>8个章节</span><span>50+知识点</span>
+  </div>
+</div>
+
+<nav class="toc" id="toc">
+  <a href="#ch1">第1章 · 绪论</a>
+  <a href="#ch2">第2章 · 线性表</a>
+  <a href="#ch3">第3章 · 数组和广义表</a>
+  <a href="#ch4">第4章 · 栈和队列</a>
+  <a href="#ch5">第5章 · 树和二叉树</a>
+  <a href="#ch6">第6章 · 图</a>
+  <a href="#ch7">第7章 · 查找</a>
+  <a href="#ch8">第8章 · 排序</a>
+</nav>
+
+<div class="container">
+
+<!-- ==================== 第1章 ==================== -->
+<div class="chapter ch1" id="ch1">
+<div class="chapter-header"><span class="ch-num">01</span><h2>第一章 · 绪论</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 数据、数据元素、数据项</div>
+<div class="k-card"><span class="label def">定义</span> <strong>数据项</strong>（最小不可分单元）→ 组成 <strong>数据元素</strong>（基本单位）→ 组成 <strong>数据</strong>（集合）。</div>
+<div class="k-card"><span class="label pit">易错</span> 数据元素是<strong>数据的基本单位</strong>，数据项是<strong>最小标识单位</strong>。选择题常混淆二者！</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 四类逻辑结构 vs 两类物理结构</div>
+<div class="two-col">
+<div class="k-card">
+  <span class="label key">四类逻辑结构</span><br>
+  ① <strong>集合</strong> — 数据元素间无关系<br>
+  ② <strong>线性结构</strong> — 一对一（如线性表、栈、队列）<br>
+  ③ <strong>树形结构</strong> — 一对多<br>
+  ④ <strong>图形结构</strong> — 多对多
+</div>
+<div class="k-card">
+  <span class="label key">两类物理结构</span><br>
+  ① <strong>顺序存储</strong> — 连续内存，数组<br>
+  ② <strong>链式存储</strong> — 不连续，指针链接<br>
+  <span class="label pit">注意</span> 哈希结构是<strong>存储结构</strong>不是逻辑结构！选择题常考！
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 算法五大特性</div>
+<div class="k-card">
+  <span class="label key">必背</span>
+  ① <strong>有穷性</strong> — 有限步后结束（不是"死循环"）<br>
+  ② <strong>确定性</strong> — 每步明确无歧义<br>
+  ③ <strong>可行性</strong> — 可以执行<br>
+  ④ <strong>输入</strong> — 0个或多个<br>
+  ⑤ <strong>输出</strong> — 至少1个<br>
+  <span class="label pit">填空题高频</span> 常挖空"有穷性"！
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 时间复杂度</div>
+<div class="k-card">
+  <span class="label formula">核心公式</span><br>
+  • <strong>单层循环</strong>n次 → O(n)<br>
+  • <strong>双层嵌套</strong>n×m → O(nm)<br>
+  • <strong>并列循环</strong> → O(n+m)（不是相乘！）<br>
+  • <strong>x翻倍</strong>while(x&lt;n) x*=2 → O(log n)<br>
+  • <strong>常数次循环</strong>for(i=0;i&lt;1000) → O(1)（与n无关！）
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 ADT（抽象数据类型）三要素</div>
+<div class="k-card">
+  <span class="label key">必背</span> 数据对象 + 数据关系 + 基本操作集。<br>
+  <span class="label pit">陷阱</span> <strong>存储结构不属于ADT！</strong>ADT只关心"能做什么"，不关心"怎么存储"。选择题高频！
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第2章 ==================== -->
+<div class="chapter ch2" id="ch2">
+<div class="chapter-header"><span class="ch-num">02</span><h2>第二章 · 线性表</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 顺序表 vs 链表（必考对比）</div>
+<table>
+<tr><th>比较维度</th><th>顺序表（数组）</th><th>链表</th></tr>
+<tr><td>存储方式</td><td>连续内存</td><td>不连续，指针链接</td></tr>
+<tr class="high"><td>随机访问</td><td>O(1) ⚡</td><td>O(n) 🐢</td></tr>
+<tr class="high"><td>插入/删除</td><td>O(n) 🐢（移动元素）</td><td>O(1) ⚡（改指针）</td></tr>
+<tr><td>空间开销</td><td>0（纯数据）</td><td>每结点多一个指针</td></tr>
+<tr><td>缓存友好</td><td>✅ 连续好</td><td>❌ 跳跃差</td></tr>
+</table>
+<div class="k-card"><span class="label key">结论</span> 频繁<strong>查找/随机访问</strong>→顺序表；频繁<strong>插入/删除</strong>→链表。选择题必考！</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 顺序表关键公式</div>
+<div class="k-card">
+  <span class="label formula">公式</span>
+  • 第i个元素地址 = 基地址 + (i-1) × 元素大小（逻辑相邻=物理相邻）<br>
+  • 插入第i位需移动 <strong>n-i+1</strong> 个元素<br>
+  • 删除第i位需移动 <strong>n-i</strong> 个元素<br>
+  • i的合法范围：<strong>1 ≤ i ≤ n+1</strong>（插入可在队尾！）
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 头结点 & 循环链表判空</div>
+<div class="k-card">
+  <span class="label key">头结点作用</span> 统一空表和非空表的操作（避免特殊判断），不存数据。<br>
+  <span class="label formula">判空公式</span><br>
+  • 带头结点单链表空：<code>L->Next == NULL</code><br>
+  • 带头结点<strong>循环</strong>链表空：<code>L->Next == L</code>（自己指自己！）
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第3章 ==================== -->
+<div class="chapter ch3" id="ch3">
+<div class="chapter-header"><span class="ch-num">03</span><h2>第三章 · 数组和广义表</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 矩阵压缩存储</div>
+<div class="k-card">
+  <span class="label key">三种可压缩矩阵</span> <strong>对称矩阵</strong>（只存上/下三角）、<strong>三角矩阵</strong>（只存非零三角）、<strong>对角矩阵</strong>（带状存储）。<br>
+  <span class="label formula">公式</span> n阶三角矩阵需 <strong>n(n+1)/2</strong> 个存储单元。<br>
+  <span class="label pit">注意</span> 普通稀疏矩阵用<strong>三元组</strong>或<strong>十字链表</strong>存储，不是压缩成一维数组！
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 广义表</div>
+<div class="k-card">
+  <span class="label def">定义</span> 可以嵌套的表，元素可以是原子或子表。<br>
+  <span class="label key">Head/Tail规则</span><br>
+  • <strong>Head</strong> = 取第一个元素（可能是原子或表）<br>
+  • <strong>Tail</strong> = 去掉第一个元素后剩下的，<strong>一定加一层括号</strong>（即使只剩一个）<br>
+  <span class="label pit">陷阱</span> 表尾一定是表（有括号）！表头不一定。
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 串 & KMP</div>
+<div class="k-card">
+  <span class="label def">BF算法</span> 暴力匹配，O(nm)，每次失配主串回退。<br>
+  <span class="label key">KMP核心</span> 主串指针<strong>不回退</strong>，利用next数组跳转。O(n+m)。<br>
+  <span class="label formula">next数组</span> 表示"当前字符失配时，模式串应跳到哪里继续比较"。手算方法：找最长相等前后缀长度+1。
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第4章 ==================== -->
+<div class="chapter ch4" id="ch4">
+<div class="chapter-header"><span class="ch-num">04</span><h2>第四章 · 栈和队列</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 栈（Stack）— 后进先出 LIFO</div>
+<div class="two-col">
+<div class="k-card">
+  <span class="label key">核心规则</span><br>
+  • 只能在栈顶操作<br>
+  • push（入栈）/ pop（出栈）<br>
+  • 出栈序列计数：卡特兰数 C(2n,n)/(n+1)<br>
+  • 栈空：<code>top == -1</code>（顺序栈）
+</div>
+<div class="k-card">
+  <span class="label pit">出栈序列判定</span><br>
+  方法：用栈模拟！<br>
+  "d第一个出"→a,b,c已压在栈底，d出→再考虑后续。<br>
+  枚举法：必须满足"大不能压小"。
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 队列（Queue）— 先进先出 FIFO</div>
+<div class="two-col">
+<div class="k-card">
+  <span class="label key">循环队列</span><br>
+  • 目的：复用数组空间<br>
+  • 队空：<code>front == rear</code><br>
+  • 队满：<code>(rear+1)%size == front</code>（牺牲一个位置）<br>
+  • 元素个数 = <code>(rear-front+size)%size</code>
+</div>
+<div class="k-card">
+  <span class="label pit">重要</span><br>
+  • 空队时front和rear<strong>不一定</strong>在下标0<br>
+  • 它们可以在<strong>任意相同位置</strong>（取决于之前的操作历史）<br>
+  • BFS用队列，DFS用栈（或递归）
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 表达式转换（必考）</div>
+<div class="k-card">
+  <span class="label def">三种表达式</span><br>
+  • <strong>中缀</strong>：<code>a+b</code>（人读的）<br>
+  • <strong>前缀</strong>：<code>+ab</code>（运算符在前）<br>
+  • <strong>后缀</strong>：<code>ab+</code>（运算符在后，最常用）<br>
+  <span class="label formula">求值方法</span> 遇到数字→入栈；遇到运算符→弹两个→运算→结果入栈。<br>
+  <span class="label formula">转换方法</span> 中缀→后缀：数字直接输出，运算符比较优先级入栈/出栈。
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第5章 ==================== -->
+<div class="chapter ch5" id="ch5">
+<div class="chapter-header"><span class="ch-num">05</span><h2>第五章 · 树和二叉树</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 树的基本性质</div>
+<div class="k-card">
+  <span class="label formula">必背公式</span><br>
+  • 结点数 = 总度数 + 1<br>
+  • n个结点的树有 <strong>n-1</strong> 条边<br>
+  • 度为m的树：第i层最多 m<sup>i-1</sup> 个结点<br>
+  • 深度为k的二叉树最多 <strong>2<sup>k</sup>-1</strong> 个结点
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 二叉树性质（高频）</div>
+<div class="k-card">
+  <span class="label key">核心三公式</span><br>
+  ① <strong>n₀ = n₂ + 1</strong>（叶子数 = 度为2的结点数+1）<br>
+  ② 满二叉树：每层都满，深度k有2<sup>k</sup>-1个结点<br>
+  ③ 完全二叉树：从左上到右下填满，n₁只能是<strong>0或1</strong><br>
+  <span class="label pit">常见题</span> 已知叶子数求总结点数：n = n₀+n₂+n₁ = n₀+(n₀-1)+n₁ = <strong>2n₀-1+n₁</strong>（n₁=0或1）
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 三种遍历（必须会）</div>
+<table>
+<tr><th>遍历方式</th><th>顺序</th><th>口诀</th></tr>
+<tr class="high"><td>先序（Preorder）</td><td>根 → 左 → 右</td><td>"自己先来"</td></tr>
+<tr class="high"><td>中序（Inorder）</td><td>左 → 根 → 右</td><td>"自己在中间"</td></tr>
+<tr class="high"><td>后序（Postorder）</td><td>左 → 右 → 根</td><td>"自己最后"</td></tr>
+</table>
+<div class="k-card">
+  <span class="label key">重建二叉树</span> 已知<strong>先序+中序</strong>或<strong>后序+中序</strong>可唯一确定。先序/后序找根，中序分左右。<br>
+  <span class="label pit">注意</span> 仅先序+后序<strong>不能</strong>唯一确定二叉树！
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 存储结构 & 树与二叉树转换</div>
+<div class="two-col">
+<div class="k-card">
+  <span class="label def">三种存储</span><br>
+  ① <strong>双亲表示法</strong>：每个结点只记父结点下标（-1=根）<br>
+  ② <strong>孩子表示法</strong>：每个结点记所有孩子<br>
+  ③ <strong>孩子兄弟表示法</strong>：左孩子+右兄弟 = 二叉表示
+</div>
+<div class="k-card">
+  <span class="label key">树→二叉树</span><br>
+  "左孩子右兄弟"规则：<br>
+  • 每个结点的<strong>第一个孩子</strong>→左子树<br>
+  • 每个结点的<strong>下一个兄弟</strong>→右子树
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 哈夫曼树（Huffman）</div>
+<div class="k-card">
+  <span class="label key">构造</span> 每次选权值<strong>最小的两棵</strong>树合并，新树权值=两子之和。重复直到只剩一棵。<br>
+  <span class="label formula">WPL</span> = Σ(叶结点权值 × 从根到叶的路径长度)<br>
+  <span class="label formula">性质</span> 哈夫曼树只有度0和度2的结点：<strong>n = 2n₀ - 1</strong> → n₀ = (n+1)/2
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第6章 ==================== -->
+<div class="chapter ch6" id="ch6">
+<div class="chapter-header"><span class="ch-num">06</span><h2>第六章 · 图</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 图的存储方式</div>
+<div class="two-col">
+<div class="k-card">
+  <span class="label key">邻接矩阵</span><br>
+  • 判断边 O(1) ⚡<br>
+  • 空间 O(n²)，适合<strong>稠密图</strong><br>
+  • 加删顶点 O(n²) 🐢<br>
+  • 无向图矩阵对称
+</div>
+<div class="k-card">
+  <span class="label key">邻接表</span><br>
+  • 找邻接点 O(度) ⚡<br>
+  • 空间 O(n+e)，适合<strong>稀疏图</strong><br>
+  • 加删顶点灵活<br>
+  • 判断边需遍历链表 🐢
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 遍历 & 连通性</div>
+<div class="k-card">
+  <span class="label def">DFS</span> 深度优先 → 用<strong>栈</strong>（或递归）<br>
+  <span class="label def">BFS</span> 广度优先 → 用<strong>队列</strong><br>
+  <span class="label key">连通性判断</span>：DFS/BFS遍历后看是否所有顶点都被访问。<br>
+  <span class="label pit">注意</span> <strong>拓扑排序</strong>只适用于有向无环图(DAG)，不能用来判断无向图连通性！选择题陷阱！
+</div>
+</div>
+
+</div></div>
+
+<!-- ==================== 第7章 ==================== -->
+<div class="chapter ch7" id="ch7">
+<div class="chapter-header"><span class="ch-num">07</span><h2>第七章 · 查找</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 查找算法对比</div>
+<table>
+<tr><th>方法</th><th>适用</th><th>ASL成功</th><th>时间复杂度</th></tr>
+<tr class="high"><td>顺序查找</td><td>无序/有序均可</td><td>(n+1)/2</td><td>O(n)</td></tr>
+<tr class="high"><td>折半查找</td><td>仅有序顺序表</td><td>≈log₂(n+1)-1</td><td>O(log n)</td></tr>
+<tr><td>分块查找</td><td>块间有序</td><td>介于两者之间</td><td>O(√n)~O(log n)</td></tr>
+</table>
+<div class="k-card"><span class="label pit">注意</span> 折半查找<strong>只能用顺序存储</strong>（需要随机访问），链表不行！</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 折半查找判定树</div>
+<div class="k-card">
+  <span class="label key">构造</span> 每次取中间元素为根。n个元素→判定树深度 ≈ ⌊log₂n⌋+1。<br>
+  <span class="label formula">ASL</span> = Σ(每层结点数 × 该层查找次数) / n<br>
+  <span class="label pit">特点</span> 判定树是平衡二叉搜索树，但不一定是完全二叉树。
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 哈希表（Hash）</div>
+<div class="k-card">
+  <span class="label key">三要素</span> ①哈希函数 ②处理冲突方法 ③<strong>装填因子α</strong>（=记录数/表长）。α越大冲突越多。<br>
+  <span class="label def">冲突处理</span><br>
+  • <strong>开放地址法</strong>：线性探测(顺位找下一个)、二次探测(±1²,±2²...)<br>
+  • <strong>链地址法</strong>：每个槽位挂一个链表<br>
+  <span class="label formula">ASL</span> = Σ(每个记录的查找次数) / 记录总数<br>
+  <span class="label pit">填空题</span> 查找效率取决于：哈希函数、冲突处理方法、<strong>装填因子</strong>。
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 B-树 vs B+树</div>
+<table>
+<tr><th>对比</th><th>B-树</th><th>B+树</th></tr>
+<tr><td>数据存储</td><td>所有结点都存数据</td><td>仅叶子存数据</td></tr>
+<tr class="high"><td>叶子链接</td><td>不链接</td><td>叶子串成链表（范围查询快）</td></tr>
+<tr><td>关键字</td><td>每个关键字只出现一次</td><td>非叶关键字会重复出现在叶</td></tr>
+</table>
+</div>
+
+</div></div>
+
+<!-- ==================== 第8章 ==================== -->
+<div class="chapter ch8" id="ch8">
+<div class="chapter-header"><span class="ch-num">08</span><h2>第八章 · 排序</h2></div>
+<div class="chapter-body">
+
+<div class="sec">
+<div class="sec-title">📌 排序算法全对比（必考！）</div>
+<table>
+<tr><th>算法</th><th>最好</th><th>平均</th><th>最坏</th><th>空间</th><th>稳定？</th></tr>
+<tr><td>冒泡排序</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✅ 稳定</td></tr>
+<tr><td>插入排序</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✅ 稳定</td></tr>
+<tr><td>选择排序</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>❌ 不稳定</td></tr>
+<tr><td>希尔排序</td><td>O(n)</td><td>O(n<sup>1.3</sup>)</td><td>O(n²)</td><td>O(1)</td><td>❌ 不稳定</td></tr>
+<tr class="high"><td>快速排序</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(n²)</td><td>O(logn)</td><td>❌ 不稳定</td></tr>
+<tr class="high"><td>堆排序</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(1)</td><td>❌ 不稳定</td></tr>
+<tr class="high"><td>归并排序</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(n)</td><td>✅ 稳定</td></tr>
+<tr><td>基数排序</td><td>O(d(n+r))</td><td>O(d(n+r))</td><td>O(d(n+r))</td><td>O(n+r)</td><td>✅ 稳定</td></tr>
+</table>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 稳定性是什么？</div>
+<div class="k-card">
+  <span class="label def">定义</span> 相等关键字的记录，排序后<strong>相对顺序不变</strong>。<br>
+  <span class="label key">稳定</span> 冒泡、插入、归并、基数<br>
+  <span class="label pit">不稳定</span> 选择、希尔、快排、<strong>堆排序</strong>（难点！）<br>
+  <span class="label pit">原因</span> 堆排序在建堆和调整时可能<strong>跨距离交换</strong>，破坏相同值的相对顺序。
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 快排一趟判定（常考选择题）</div>
+<div class="k-card">
+  <span class="label key">判定方法</span> 一趟快排后，存在一个基准元素，<strong>左边全≤它，右边全≥它</strong>，且它在最终排序位置。<br>
+  <span class="label pit">解题</span> 逐个位置假设它是基准，检查条件。如果所有位置都不满足→这个序列不可能是一趟快排结果。
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">📌 堆 & 堆排序</div>
+<div class="k-card">
+  <span class="label def">大顶堆</span> 每个父结点 ≥ 所有孩子。堆顶=最大值。<br>
+  <span class="label def">小顶堆</span> 每个父结点 ≤ 所有孩子。堆顶=最小值。<br>
+  <span class="label formula">特点</span> 建堆O(n)，每次删除O(logn)。堆排序=建堆+反复删除堆顶。<br>
+  <span class="label pit">选择题</span> 堆排序<strong>不稳定</strong>！空间复杂度<strong>O(1)</strong>！平均时间<strong>O(nlogn)</strong>！
+</div>
+</div>
+
+</div></div>
+
+</div>
+
+<div class="footer">
+  📋 数据结构选择填空复习手册 · 覆盖第1~8章 · 祝你考试顺利 🎓
+</div>
+
+<script>
+// sticky toc highlight
+const tocLinks = document.querySelectorAll('.toc a');
+const chapters = document.querySelectorAll('.chapter');
+window.addEventListener('scroll', () => {
+  let current = '';
+  chapters.forEach(ch => { if(window.scrollY >= ch.offsetTop - 60) current = ch.id; });
+  tocLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#'+current); });
+});
+</script>
+</body>
+</html>
