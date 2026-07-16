@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构 · 期末复习</title>
+<style>
+:root {
+  --bg: #0b0f19; --card: #131a2b; --text: #e2e8f0; --muted: #8892b0;
+  --accent1: #38bdf8; --accent2: #f97316; --accent3: #e2b04a;
+  --border: #1e293b;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg); color:var(--text); min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:2rem;
+}
+.container { max-width:800px; width:100%; }
+h1 {
+  text-align:center; font-size:2.2rem; margin-bottom:0.5rem;
+  background:linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.subtitle { text-align:center; color:var(--muted); margin-bottom:3rem; font-size:1rem; }
+.cards { display:flex; flex-direction:column; gap:1.5rem; }
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:2rem 2.2rem; text-decoration:none; color:var(--text);
+  transition:all 0.3s; display:block; position:relative; overflow:hidden;
+}
+.card:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+.card::before {
+  content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+  border-radius:4px 0 0 4px;
+}
+.card:nth-child(1)::before { background:var(--accent1); }
+.card:nth-child(2)::before { background:var(--accent2); }
+.card:nth-child(3)::before { background:var(--accent3); }
+.card h2 { font-size:1.4rem; margin-bottom:0.5rem; }
+.card:nth-child(1) h2 { color:var(--accent1); }
+.card:nth-child(2) h2 { color:var(--accent2); }
+.card:nth-child(3) h2 { color:var(--accent3); }
+.card .desc { color:var(--muted); font-size:0.9rem; line-height:1.6; }
+.card .meta { margin-top:1rem; display:flex; gap:1.5rem; font-size:0.82rem; color:var(--muted); }
+.card .meta span { display:inline-flex; align-items:center; gap:4px; }
+.card .arrow { float:right; font-size:1.4rem; opacity:0.5; transition:opacity 0.3s; }
+.card:hover .arrow { opacity:1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌳 数据结构 · 期末复习</h1>
+  <p class="subtitle">三套试卷 · 74道题目 · 逐题详细讲解</p>
+
+  <div class="cards">
+    <a class="card" href="测试题讲解/index.html">
+      <span class="arrow">→</span>
+      <h2>📚 测试题</h2>
+      <p class="desc">28道题 · 选择 + 填空 + 简答 + 编程全覆盖。每道题独立页面，含ASCII图解、代码高亮、逐空推导。</p>
+      <div class="meta">
+        <span>🔵 28题</span><span>📝 含详细解析</span><span>🖥️ 侧栏+iframe导航</span>
+      </div>
+    </a>
+
+    <a class="card" href="测验2026春_讲解/index.html">
+      <span class="arrow">→</span>
+      <h2>📝 测验（2026春）</h2>
+      <p class="desc">15道题 · 选择填空 + 简答 + 编程。橙色系配色，ASCII艺术图，生活类比教学。</p>
+      <div class="meta">
+        <span>🟠 15题</span><span>📝 含详细解析</span><span>🖥️ 侧栏+iframe导航</span>
+      </div>
+    </a>
+
+    <a class="card" href="考试范围2026_讲解/index.html">
+      <span class="arrow">→</span>
+      <h2>📋 考试范围练习题（2026春）</h2>
+      <p class="desc">29道题 · 选择 + 填空 + 简答 + 编程。深蓝金色科技风，AVL旋转、AOE关键路径、Floyd矩阵均有图解。</p>
+      <div class="meta">
+        <span>🟡 29题</span><span>📝 含详细解析</span><span>🖥️ 侧栏+iframe导航</span>
+      </div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

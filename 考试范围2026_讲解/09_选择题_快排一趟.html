@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第9题 · 快速排序一趟结果判定</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(224,85,106,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+  .header .q-box code {
+    background: #0a1525; color: var(--cyan); padding: 2px 6px; border-radius: 3px;
+    font-family: 'Cascadia Code',monospace;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .success { background: rgba(60,184,120,.06); border: 1px solid rgba(60,184,120,.25); border-left: 4px solid var(--green); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #80d8a8; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  /* ARRAY VISUALIZATION */
+  .arr-row { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; margin: .8rem 0; justify-content: center; }
+  .arr-cell {
+    width: 48px; height: 48px; line-height: 48px; text-align: center;
+    border-radius: 8px; font-weight: 700; font-size: .9rem;
+    font-family: 'Cascadia Code',monospace; border: 2px solid;
+  }
+  .arr-cell.pv  { background: rgba(226,176,74,.15); border-color: var(--gold); color: var(--gold); }
+  .arr-cell.ok  { background: rgba(60,184,120,.12); border-color: var(--green); color: var(--green); }
+  .arr-cell.bad { background: rgba(224,85,106,.12); border-color: var(--red); color: var(--red); text-decoration: line-through; }
+  .arr-cell.neutral { border-color: var(--border); }
+  .arr-idx {
+    width: 48px; text-align: center; font-size: .72rem; color: var(--muted);
+    font-family: 'Cascadia Code',monospace;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.4rem; }
+    .arr-cell { width: 38px; height: 38px; line-height: 38px; font-size: .78rem; }
+    .arr-idx { width: 38px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第9题</div>
+  <h1>⚡ 快速排序——一趟之后的结果</h1>
+  <div class="q-box">
+    下列序列中，<strong>不可能</strong>是快速排序一趟之后结果的是（　）。<br><br>
+    <strong>A. 18, 10, 2, 88, 71</strong><br>
+    B. 10, 2, 18, 88, 71<br>
+    C. 2, 10, 18, 71, 88<br>
+    D. 10, 2, 18, 71, 88
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">A — 18, 10, 2, 88, 71</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">没有任何元素能满足"左小右大"的分界条件</div>
+</div>
+
+<!-- ==================== 1: CRITERION ==================== -->
+<div class="section">
+  <h2>一、快排一趟的核心特征（判定标准）</h2>
+  <div class="card">
+    <p>一趟快速排序结束后，至少存在<strong>一个元素</strong>满足：</p>
+
+    <div style="text-align:center;font-size:1.2rem;margin:1rem 0;font-weight:700;color:var(--gold)">
+      max(左边所有元素) ≤ 该元素 ≤ min(右边所有元素)
+    </div>
+
+    <p>通俗说法：存在一个"分界线"元素，它<strong>左边的都不大于它，右边的都不小于它</strong>。这个元素就是那一趟的<strong>基准（pivot）</strong>，它被放到了最终排序后的正确位置。</p>
+
+    <div class="info">
+      <strong>🔑 检验方法：</strong>从序列中<strong>逐个尝试每个位置</strong>作为候选 pivot，检查该位置左边的最大值是否 ≤ 该值，以及该值是否 ≤ 右边的最小值。如果某个位置满足 → 可能是一趟结果。全部位置都不满足 → 不可能！
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 2: OPTION A ==================== -->
+<div class="section">
+  <h2>二、选项A：18, 10, 2, 88, 71 —— ❌ 不可能！</h2>
+  <div class="card">
+    <div class="arr-row">
+      <span class="arr-idx">[0]</span><span class="arr-idx">[1]</span><span class="arr-idx">[2]</span><span class="arr-idx">[3]</span><span class="arr-idx">[4]</span>
+    </div>
+    <div class="arr-row">
+      <span class="arr-cell bad">18</span>
+      <span class="arr-cell bad">10</span>
+      <span class="arr-cell bad">2</span>
+      <span class="arr-cell bad">88</span>
+      <span class="arr-cell bad">71</span>
+    </div>
+
+    <p style="margin-top:1rem"><strong>逐个尝试每个位置作为pivot：</strong></p>
+
+    <div class="ascii-box">
+<span class="hl">候选1：位置[0]=18 作为pivot</span>
+  左边：[]（空） → max = -∞
+  右边：[10,2,88,71] → min = <span class="r">2</span>
+  检验：-∞ ≤ 18 ✅  |  18 ≤ <span class="r">2</span>? → <span class="r">❌ 18 > 2!</span>
+
+<span class="hl">候选2：位置[1]=10 作为pivot</span>
+  左边：[18] → max = <span class="r">18</span>
+  右边：[2,88,71] → min = 2
+  检验：<span class="r">18</span> ≤ 10? → <span class="r">❌ 18 > 10!</span>
+
+<span class="hl">候选3：位置[2]=2 作为pivot</span>
+  左边：[18,10] → max = <span class="r">18</span>
+  右边：[88,71] → min = 71
+  检验：<span class="r">18</span> ≤ 2? → <span class="r">❌ 18 > 2!</span>
+
+<span class="hl">候选4：位置[3]=88 作为pivot</span>
+  左边：[18,10,2] → max = 18
+  右边：[71] → min = <span class="r">71</span>
+  检验：18 ≤ 88 ✅  |  88 ≤ <span class="r">71</span>? → <span class="r">❌ 88 > 71!</span>
+
+<span class="hl">候选5：位置[4]=71 作为pivot</span>
+  左边：[18,10,2,88] → max = <span class="r">88</span>
+  右边：[]（空） → min = +∞
+  检验：<span class="r">88</span> ≤ 71? → <span class="r">❌ 88 > 71!</span>
+
+<span class="r">═══════════════════════════════════════</span>
+<span class="r">  结论：5个位置全部不满足！→ 不可能是快排一趟结果</span></div>
+
+    <p style="color:var(--red);font-weight:700;margin-top:.8rem">
+      关键失败点：88 比 71 大却在 71 的左边。这使得 88 不能当 pivot（右边有比它小的 71），71 也不能当 pivot（左边有比它大的 88）。
+    </p>
+  </div>
+</div>
+
+<!-- ==================== 3: OPTION B ==================== -->
+<div class="section">
+  <h2>三、选项B：10, 2, 18, 88, 71 —— ✅ 可能</h2>
+  <div class="card">
+    <div class="arr-row">
+      <span class="arr-cell neutral">10</span>
+      <span class="arr-cell neutral">2</span>
+      <span class="arr-cell pv">18</span>
+      <span class="arr-cell ok">88</span>
+      <span class="arr-cell ok">71</span>
+    </div>
+
+    <div class="ascii-box">
+<span class="hl">候选：位置[2]=18 作为pivot</span>
+  左边：[10,2] → max = <span class="g">10</span>
+  右边：[88,71] → min = <span class="g">71</span>
+  检验：<span class="g">10</span> ≤ <span class="g">18</span> ✅  |  <span class="g">18</span> ≤ <span class="g">71</span> ✅
+
+<span class="g">→ 18 是合格的pivot！序列B可能是快排一趟结果 ✅</span></div>
+  </div>
+</div>
+
+<!-- ==================== 4: OPTION C ==================== -->
+<div class="section">
+  <h2>四、选项C：2, 10, 18, 71, 88 —— ✅ 可能（已完全有序）</h2>
+  <div class="card">
+    <div class="arr-row">
+      <span class="arr-cell ok">2</span>
+      <span class="arr-cell ok">10</span>
+      <span class="arr-cell ok">18</span>
+      <span class="arr-cell ok">71</span>
+      <span class="arr-cell ok">88</span>
+    </div>
+
+    <div class="ascii-box">
+<span class="hl">这已经是完全排序好的序列！</span>
+  任何位置都可以作为pivot（因为完全有序时，每个元素都满足"左小右大"）
+
+  例如：位置[2]=18 作为pivot
+  左边：[2,10] → max=10 ≤ 18 ✅
+  右边：[71,88] → min=71 ≥ 18 ✅
+
+<span class="g">→ 序列C可能是快排一趟结果 ✅</span></div>
+  </div>
+</div>
+
+<!-- ==================== 5: OPTION D ==================== -->
+<div class="section">
+  <h2>五、选项D：10, 2, 18, 71, 88 —— ✅ 可能</h2>
+  <div class="card">
+    <div class="arr-row">
+      <span class="arr-cell neutral">10</span>
+      <span class="arr-cell neutral">2</span>
+      <span class="arr-cell pv">18</span>
+      <span class="arr-cell ok">71</span>
+      <span class="arr-cell ok">88</span>
+    </div>
+
+    <div class="ascii-box">
+<span class="hl">候选：位置[2]=18 作为pivot</span>
+  左边：[10,2] → max = <span class="g">10</span>
+  右边：[71,88] → min = <span class="g">71</span>
+  检验：<span class="g">10</span> ≤ <span class="g">18</span> ✅  |  <span class="g">18</span> ≤ <span class="g">71</span> ✅
+
+<span class="g">→ 18 是合格的pivot！序列D可能是快排一趟结果 ✅</span></div>
+  </div>
+</div>
+
+<!-- ==================== 6: SUMMARY ==================== -->
+<div class="section">
+  <h2>六、四个选项汇总对比</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>序列</th><th>是否有合格pivot</th><th>结果</th></tr>
+      <tr style="background:rgba(224,85,106,.08)">
+        <td style="font-weight:700;color:var(--red)">A</td>
+        <td style="font-family:monospace;color:var(--red)">18, 10, 2, 88, 71</td>
+        <td class="bad">❌ 无</td>
+        <td class="bad">不可能</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td style="font-family:monospace">10, 2, 18, 88, 71</td>
+        <td class="good">✅ 18(位置2)</td>
+        <td class="good">可能</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">C</td>
+        <td style="font-family:monospace">2, 10, 18, 71, 88</td>
+        <td class="good">✅ 任意位置</td>
+        <td class="good">可能</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">D</td>
+        <td style="font-family:monospace">10, 2, 18, 71, 88</td>
+        <td class="good">✅ 18(位置2)</td>
+        <td class="good">可能</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 7: TECHNIQUE ==================== -->
+<div class="section">
+  <h2>七、考试快速判断技巧</h2>
+  <div class="card">
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>从左到右扫描</strong>，维护"左边最大值" leftMax
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>从右到左扫描</strong>，维护"右边最小值" rightMin
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>对每个位置 i：</strong>若 leftMax[i] ≤ arr[i] ≤ rightMin[i]，则 arr[i] 是合格 pivot
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">4</span>
+      <div class="step-content">
+        <strong>若存在至少一个合格 pivot → 可能；否则 → 不可能</strong>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>🎯 一眼法：</strong>扫一眼选项A：88 在 71 左边，但 88 > 71。这意味着：88 不能当 pivot（右边有比它小的），71 也不能当 pivot（左边有比它大的），而且 18,10,2 前面也有更大值或后面有更小值 → 秒杀！
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 快排一趟结果判定是排序章节的经典题型。核心就是"左小右大"四个字。
+</div>
+
+</div>
+</body>
+</html>

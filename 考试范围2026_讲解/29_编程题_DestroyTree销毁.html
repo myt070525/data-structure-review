@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：DestroyTree销毁二叉树 - 后序遍历释放</title>
+<style>
+    :root {
+        --bg: #0d1b2a;
+        --fg: #c8d6e5;
+        --accent: #e2b04a;
+        --accent2: #4da6ff;
+        --green: #2ecc71;
+        --red: #e74c3c;
+        --cyan: #00cec9;
+        --card-bg: #112240;
+        --card-bg2: #152238;
+        --border: #1e3a5f;
+        --shadow: 0 2px 16px rgba(0,0,0,0.4);
+        --code-bg: #0a1628;
+        --ascii-bg: #0f1d30;
+        --table-stripe: #132238;
+        --tip-bg: #0d2b1a;
+        --warn-bg: #2b1f0d;
+        --danger-bg: #2b0d0d;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #0d1b2a 0%, #0f1f35 40%, #0a1525 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.8rem 1rem 1.8rem;
+        background: linear-gradient(135deg, #1a2744, #0d1b2a);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 28px rgba(226,176,74,0.15);
+        border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; color: var(--accent); }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: var(--accent); color: #0d1b2a;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.blue   { border-left-color: var(--accent2); }
+    .card.red    { border-left-color: var(--red); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #1e3a5f;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #d4af6a; }
+    .code-block {
+        background: var(--code-bg); color: #e2e8f0; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre; border: 1px solid #1e3a5f;
+    }
+    .code-block .kw { color: #38bdf8; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #64748b; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .blank { background: var(--accent); color: #0d1b2a; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.88rem; line-height: 1.4;
+        background: var(--ascii-bg); padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #1e3a5f;
+        margin: 1rem 0; color: #c8d6e5;
+    }
+    .ascii-art .hl { color: var(--accent); font-weight: 700; }
+    .ascii-art .del { color: var(--red); text-decoration: line-through; }
+    .ascii-art .keep { color: var(--green); }
+    .ascii-art .ptr { color: var(--accent2); }
+    .ascii-art .num-step { color: var(--accent); font-weight: 700; }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #1e3a5f; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #0d1b2a; font-weight: 600; }
+    tr:nth-child(even) td { background: var(--table-stripe); }
+    .highlight { background: #2b1f0d !important; font-weight: 700; color: var(--accent); }
+    .danger-row { background: #2b0d0d !important; }
+    .tip-box {
+        background: var(--tip-bg); border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: var(--warn-bg); border-left: 4px solid var(--accent);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .danger-box {
+        background: var(--danger-bg); border-left: 4px solid var(--red);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #0d1b2a;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .post-badge {
+        display: inline-block; background: var(--accent2); color: #fff;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    .pre-badge {
+        display: inline-block; background: var(--red); color: #fff;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    footer {
+        text-align: center; color: #4a5568; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #1e3a5f;
+    }
+    ul, ol { color: #c8d6e5; }
+    p { color: #c8d6e5; }
+    code { 
+        background: #1a2744; color: var(--accent); 
+        padding: 1px 6px; border-radius: 4px; font-family: "Fira Code","Consolas",monospace;
+        font-size: 0.9em;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.75rem; padding: 0.8rem; }
+        .ascii-art { font-size: 0.6rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🌲 编程题：DestroyTree销毁二叉树</h1>
+    <div class="subtitle">第29题 · 后序遍历释放所有结点并返回总数</div>
+    <div class="answer-badge">
+        ✅ 完整代码 · 后序遍历 · 返回结点个数
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目理解：我们要做什么？</h2>
+
+<h3>1.1 问题描述</h3>
+<p>
+给定一棵<b>链式存储的二叉树</b>（每个结点有Data、Left指针、Right指针），编写函数 <code>DestroyTree</code>，
+<b>递归地销毁整棵树</b>——释放每一个结点的内存，并<b>返回被销毁的结点总数</b>。
+</p>
+
+<h3>1.2 核心任务</h3>
+<ol style="margin-left:1.5rem; line-height:2.2;">
+    <li><b>遍历所有结点</b>：不能遗漏任何一个结点。</li>
+    <li><b>释放内存</b>：对每个结点调用 <code>free()</code>。</li>
+    <li><b>保证安全</b>：在释放父结点之前，必须先释放其孩子结点。否则丢失孩子地址 → 内存泄漏。</li>
+    <li><b>统计个数</b>：返回总共释放了多少个结点。</li>
+</ol>
+
+<h3>1.3 二叉树结点结构</h3>
+<div class="code-block">
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">TreeNode</span> {
+    <span class="type">int</span> Data;
+    <span class="kw">struct</span> <span class="type">TreeNode</span> *Left;   <span class="cmt">// 左孩子指针</span>
+    <span class="kw">struct</span> <span class="type">TreeNode</span> *Right;  <span class="cmt">// 右孩子指针</span>
+} <span class="type">TreeNode</span>;
+</div>
+</div>
+
+<!-- ============ WHY POST-ORDER ============ -->
+<div class="card green">
+<h2>二、为什么必须用后序遍历？——这是本题最核心的考点</h2>
+
+<h3>2.1 三种遍历顺序对比</h3>
+
+<table>
+    <tr><th>遍历方式</th><th>访问顺序</th><th>根结点何时free？</th><th>能否安全销毁整棵树？</th></tr>
+    <tr>
+        <td><span class="pre-badge">先序</span></td>
+        <td><b>根</b> → 左子树 → 右子树</td>
+        <td>第一步就free根</td>
+        <td class="danger-row">❌ 不行！根被释放后，Left和Right指针丢失，孩子结点地址再也找不到了 → <b>内存泄漏</b></td>
+    </tr>
+    <tr>
+        <td>中序</td>
+        <td>左子树 → <b>根</b> → 右子树</td>
+        <td>处理完左子树后free根</td>
+        <td class="danger-row">❌ 不行！free根之后Right指针丢失，右子树全部泄漏</td>
+    </tr>
+    <tr>
+        <td><span class="post-badge">后序 ✅</span></td>
+        <td>左子树 → 右子树 → <b>根</b></td>
+        <td><b>最后</b>才free根</td>
+        <td>✅ 完美！释放根时左右孩子早已释放完毕，没有任何指针丢失</td>
+    </tr>
+</table>
+
+<h3>2.2 形象类比：拆楼</h3>
+<p>
+想象你要拆除一栋三层楼房（二叉树）：
+</p>
+<ol style="margin-left:1.5rem; line-height:2.2;">
+    <li><span class="pre-badge">先序拆法</span>：先炸掉一楼（根）→ 整栋楼塌了，二楼三楼砸在废墟里，你再也找不到它们在哪 → <b>内存泄漏</b>。</li>
+    <li>中序拆法：先拆左边的二楼 → 再炸一楼（根）→ 右边的二楼三楼随着倒塌也找不到了 → <b>部分泄漏</b>。</li>
+    <li><span class="post-badge">后序拆法 ✅</span>：先拆完所有上层（左子树+右子树），最后拆一楼（根）→ 每一层都妥善处理，<b>零泄漏</b>。</li>
+</ol>
+
+<h3>2.3 代码层面的解释</h3>
+<div class="code-block">
+<span class="cmt">// 错误示例：先序销毁（会内存泄漏！）</span>
+<span class="type">int</span> <span class="fn">BadDestroy</span>(<span class="type">TreeNode</span> *T) {
+    <span class="kw">if</span> (T == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="type">TreeNode</span> *left  = T-&gt;Left;   <span class="cmt">// 赶在free前保存孩子地址</span>
+    <span class="type">TreeNode</span> *right = T-&gt;Right;
+    free(T);                        <span class="cmt">// ❌ 先释放根</span>
+    <span class="kw">return</span> <span class="num">1</span> + BadDestroy(left) + BadDestroy(right);
+}
+<span class="cmt">// 这种写法虽然预先保存了left/right，但破坏了递归的优雅性。
+// 标准答案直接用后序遍历，无需额外变量。</span>
+</div>
+
+<div class="tip-box">
+    💡 <b>核心结论：</b>后序遍历是销毁树状结构的<b>唯一安全方式</b>。先释放孩子，再释放父结点——这是树结构内存管理的基本原则。
+</div>
+</div>
+
+<!-- ============ FULL CODE ============ -->
+<div class="card blue">
+<h2>三、完整代码 &amp; 逐行解析</h2>
+
+<h3>3.1 DestroyTree函数</h3>
+<div class="code-block">
+<span class="type">int</span> <span class="fn">DestroyTree</span>(<span class="kw">struct</span> <span class="type">TreeNode</span> *T) {
+    <span class="type">int</span> n = <span class="num">0</span>;                              <span class="cmt">// 局部计数器，初始为0</span>
+
+    <span class="kw">if</span> (T == <span class="kw">NULL</span>)                           <span class="cmt">// 递归终止条件：空树/空子树</span>
+        <span class="kw">return</span> <span class="num">0</span>;                            <span class="cmt">// 空树没有结点可释放，返回0</span>
+
+    <span class="cmt">// ─── 后序遍历核心：左 → 右 → 根 ───</span>
+
+    n += <span class="fn">DestroyTree</span>(T-&gt;Left);              <span class="cmt">// ① 先递归销毁左子树，累加左子树结点数</span>
+    n += <span class="fn">DestroyTree</span>(T-&gt;Right);             <span class="cmt">// ② 再递归销毁右子树，累加右子树结点数</span>
+
+    free(T);                                 <span class="cmt">// ③ 最后释放当前根结点</span>
+    <span class="kw">return</span> n + <span class="num">1</span>;                           <span class="cmt">// ④ 返回：左右子树结点数 + 当前结点(1)</span>
+}
+</div>
+
+<h3>3.2 逐行详解</h3>
+
+<table>
+    <tr><th>代码</th><th>作用</th><th>关键理解</th></tr>
+    <tr>
+        <td><code>int n = 0;</code></td>
+        <td>初始化局部计数器。每次递归调用都有自己独立的n。</td>
+        <td>每个结点的栈帧中n都从0开始，最终通过return层层累加。</td>
+    </tr>
+    <tr>
+        <td><code>if (T == NULL) return 0;</code></td>
+        <td>
+            <b>递归基</b>（终止条件）。当走到叶子结点的孩子（NULL）时停止。<br>
+            返回0表示"空子树有0个结点需要释放"。
+        </td>
+        <td>这是递归函数的"触底"条件。没有它递归就会无限调用直到栈溢出。</td>
+    </tr>
+    <tr>
+        <td><code>n += DestroyTree(T-&gt;Left);</code></td>
+        <td>
+            递归处理<b>左子树</b>。函数返回左子树中被销毁的结点总数。<br>
+            这一步结束后，T-&gt;Left指向的整棵左子树已经全部被free。
+        </td>
+        <td>此后T-&gt;Left虽然还保留着地址值，但指向的内存已经无效（悬空指针）。不过我们马上也要free(T)了，不影响。</td>
+    </tr>
+    <tr>
+        <td><code>n += DestroyTree(T-&gt;Right);</code></td>
+        <td>递归处理<b>右子树</b>。同理返回右子树结点总数。</td>
+        <td>此时左右子树都已销毁，只剩下根结点T还未释放。</td>
+    </tr>
+    <tr>
+        <td><code>free(T);</code></td>
+        <td>释放根结点T。此时T的孩子早已释放完毕，没有任何依赖。</td>
+        <td><b>这就是后序的关键！</b>free(T)在所有递归调用之后执行。</td>
+    </tr>
+    <tr>
+        <td><code>return n + 1;</code></td>
+        <td>
+            返回本层销毁的结点总数 = 左子树结点数 + 右子树结点数 + 当前根(1)。<br>
+            这个值被上层调用者累加到它的n中。
+        </td>
+        <td>+1非常关键——不能只返回n，否则所有结点的计数都会丢失。</td>
+    </tr>
+</table>
+</div>
+
+<!-- ============ VISUAL ============ -->
+<div class="card">
+<h2>四、可视化演示：一棵二叉树的完整销毁过程</h2>
+
+<h3>4.1 示例二叉树</h3>
+<div class="ascii-art">
+                     <span class="hl">A</span>                        层级：
+                   /   \                        A (根)
+                  <span class="hl">B</span>     <span class="hl">C</span>                      B C (第二层)
+                 / \   / \                      D E F G (叶子层)
+                <span class="hl">D</span>   <span class="hl">E</span> <span class="hl">F</span>   <span class="hl">G</span>
+
+    结点总数 = 7
+    后序销毁顺序：D → E → B → F → G → C → A
+    （叶子先于分支结点，分支结点先于根）
+</div>
+
+<h3>4.2 递归调用树与销毁顺序</h3>
+<div class="ascii-art">
+    调用 DestroyTree(A)
+    │
+    ├─ n=0
+    ├─ ① n += DestroyTree(B) ──────── 返回 3（B,D,E三结点）
+    │      │
+    │      ├─ n=0
+    │      ├─ ① n += DestroyTree(D) ── 返回 1（D结点）
+    │      │      ├─ n=0
+    │      │      ├─ ① DestroyTree(NULL) → 0  (D无左孩子)
+    │      │      ├─ ② DestroyTree(NULL) → 0  (D无右孩子)
+    │      │      ├─ ③ free(D)
+    │      │      └─ ④ return 0+1 = <span class="hl">1</span>
+    │      │
+    │      ├─ ② n += DestroyTree(E) ── 返回 1（E结点）
+    │      │      └─ ... (同D，叶子结点)
+    │      │
+    │      ├─ ③ free(B)   ← B的两个孩子D和E已经释放完毕！
+    │      └─ ④ return 1+1+1 = <span class="hl">3</span>
+    │
+    ├─ ② n += DestroyTree(C) ──────── 返回 3（C,F,G三结点）
+    │      │
+    │      ├─ n=0
+    │      ├─ ① n += DestroyTree(F) ── 返回 1（F结点，叶子）
+    │      ├─ ② n += DestroyTree(G) ── 返回 1（G结点，叶子）
+    │      ├─ ③ free(C)   ← C的两个孩子F和G已经释放完毕！
+    │      └─ ④ return 1+1+1 = <span class="hl">3</span>
+    │
+    ├─ ③ free(A)   ← A的两个孩子B和C已经释放完毕！
+    └─ ④ return 3+3+1 = <span class="hl">7</span>（整棵树7个结点全部销毁）
+</div>
+
+<h3>4.3 销毁顺序的ASCII动画</h3>
+<div class="ascii-art">
+    <span class="num-step">步骤1:</span> 递归深入D（叶子）    <span class="num-step">步骤2:</span> free(D)
+        <span class="hl">A</span>                              <span class="hl">A</span>
+       / \                             / \
+      B   C                           B   C
+     / \ / \                         / \ / \
+    <span class="del">D</span>  E F G                       <span class="del">D</span>  E F G   ← D被释放
+                                          (实际D已不存在)
+
+    <span class="num-step">步骤3:</span> free(E)              <span class="num-step">步骤4:</span> free(B)
+        <span class="hl">A</span>                              <span class="hl">A</span>
+       / \                             / \
+      B   C                          <span class="del">B</span>  C
+     / \ / \                              / \
+    <span class="del">D</span> <span class="del">E</span> F G                            F   G
+
+    <span class="num-step">步骤5:</span> free(F)              <span class="num-step">步骤6:</span> free(G)
+        <span class="hl">A</span>                              <span class="hl">A</span>
+         \                               \
+          C                               C
+         / \                             / \
+        <span class="del">F</span>  G                            <span class="del">F</span> <span class="del">G</span>
+
+    <span class="num-step">步骤7:</span> free(C)              <span class="num-step">步骤8:</span> free(A)  → 整棵树已销毁！
+
+    <span class="del">销毁完成，7个结点全部释放，无内存泄漏！</span>
+</div>
+</div>
+
+<!-- ============ STEP TABLE ============ -->
+<div class="card cyan">
+<h2>五、逐步执行追踪表</h2>
+
+<table>
+    <tr><th>步骤</th><th>当前调用栈</th><th>正在处理</th><th>动作</th><th>返回值</th><th>累计销毁数</th></tr>
+    <tr><td>1</td><td>DestroyTree(A)</td><td>进入A</td><td>n=0，调用DestroyTree(B)</td><td>-</td><td>0</td></tr>
+    <tr><td>2</td><td>A → DestroyTree(B)</td><td>进入B</td><td>n=0，调用DestroyTree(D)</td><td>-</td><td>0</td></tr>
+    <tr><td>3</td><td>A→B → DestroyTree(D)</td><td>进入D</td><td>n=0，调Left(NULL)→0，调Right(NULL)→0</td><td>-</td><td>0</td></tr>
+    <tr class="highlight"><td>4</td><td>A→B → DestroyTree(D)</td><td><b>free(D)</b></td><td>释放叶子D</td><td>1</td><td>1</td></tr>
+    <tr><td>5</td><td>A → DestroyTree(B)</td><td>回到B</td><td>n=1，调用DestroyTree(E)</td><td>-</td><td>1</td></tr>
+    <tr class="highlight"><td>6</td><td>A→B → DestroyTree(E)</td><td><b>free(E)</b></td><td>释放叶子E</td><td>1</td><td>2</td></tr>
+    <tr><td>7</td><td>A → DestroyTree(B)</td><td>回到B</td><td>n=1+1=2</td><td>-</td><td>2</td></tr>
+    <tr class="highlight"><td>8</td><td>A → DestroyTree(B)</td><td><b>free(B)</b></td><td>释放分支结点B（孩子已释放）</td><td>2+1=3</td><td>3</td></tr>
+    <tr><td>9</td><td>DestroyTree(A)</td><td>回到A</td><td>n=3，调用DestroyTree(C)</td><td>-</td><td>3</td></tr>
+    <tr class="highlight"><td>10</td><td>A → DestroyTree(C)→F</td><td><b>free(F)</b></td><td>释放叶子F</td><td>1</td><td>4</td></tr>
+    <tr class="highlight"><td>11</td><td>A → DestroyTree(C)→G</td><td><b>free(G)</b></td><td>释放叶子G</td><td>1</td><td>5</td></tr>
+    <tr class="highlight"><td>12</td><td>A → DestroyTree(C)</td><td><b>free(C)</b></td><td>释放分支结点C</td><td>2+1=3</td><td>6</td></tr>
+    <tr><td>13</td><td>DestroyTree(A)</td><td>回到A</td><td>n=3+3=6</td><td>-</td><td>6</td></tr>
+    <tr class="highlight"><td>14</td><td>DestroyTree(A)</td><td><b>free(A)</b></td><td><b>释放根结点A！整棵树销毁完成</b></td><td>6+1=<b>7</b></td><td><b>7</b></td></tr>
+</table>
+
+<div class="tip-box">
+    💡 <b>观察：</b>销毁顺序严格遵循<b>后序</b>：D→E→B→F→G→C→A。叶子结点先被释放，分支结点后被释放，根结点最后被释放。
+</div>
+</div>
+
+<!-- ============ WRONG ORDER CONSEQUENCES ============ -->
+<div class="card red">
+<h2>六、错误遍历顺序的后果演示</h2>
+
+<h3>6.1 先序销毁：free根 → 丢失孩子 → 内存泄漏</h3>
+<div class="ascii-art">
+    <span class="cmt">// 错误代码：先序销毁</span>
+    <span class="type">int</span> <span class="fn">BadDestroy_PreOrder</span>(<span class="type">TreeNode</span> *T) {
+        <span class="kw">if</span> (T == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+        free(T);    <span class="cmt">// ❌ 先释放根！</span>
+        <span class="cmt">// 下面两行试图访问T-&gt;Left和T-&gt;Right → 但T已被释放！</span>
+        <span class="cmt">// 这是"use-after-free"——未定义行为（UB）</span>
+        <span class="kw">return</span> <span class="num">1</span> + BadDestroy_PreOrder(T-&gt;Left)   <span class="cmt">// 💥 崩溃或读到垃圾</span>
+                 + BadDestroy_PreOrder(T-&gt;Right);
+    }
+</div>
+
+<div class="ascii-art">
+    执行过程：
+    DestroyTree(A)
+    ├─ free(A)           ← A的内存被标记为"可用"，但A-&gt;Left/A-&gt;Right可能已被覆盖
+    ├─ 访问 T-&gt;Left      ← 💥 T已经free了！T-&gt;Left现在是垃圾值
+    └─ 结果：要么崩溃，要么递归到随机地址，B和C的整棵子树永远丢失
+
+    内存泄漏数量：B,C,D,E,F,G共<b>6个结点</b>无法释放！
+</div>
+
+<h3>6.2 中序销毁：free根后右子树丢失</h3>
+<div class="ascii-art">
+    <span class="cmt">// 错误代码：中序销毁</span>
+    <span class="type">int</span> <span class="fn">BadDestroy_InOrder</span>(<span class="type">TreeNode</span> *T) {
+        <span class="kw">if</span> (T == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+        <span class="type">int</span> n = BadDestroy_InOrder(T-&gt;Left);  <span class="cmt">// ① 左子树OK</span>
+        free(T);                              <span class="cmt">// ② ❌ 释放根</span>
+        n += BadDestroy_InOrder(T-&gt;Right);    <span class="cmt">// ③ 💥 T已free！</span>
+        <span class="kw">return</span> n + <span class="num">1</span>;
+    }
+</div>
+
+<div class="ascii-art">
+    执行过程（以结点B为例）：
+    DestroyTree(B)
+    ├─ ① 递归销毁D（OK）→ 返回1
+    ├─ ② free(B)        ← B被释放
+    ├─ ③ 访问T-&gt;Right   ← 💥 B已free，B-&gt;Right（指向E）可能已丢失
+    └─ 结果：E以及E的所有后代永远泄漏
+
+    对A来说：左子树B被部分泄漏（E泄漏），右子树C全部泄漏（因为free(A)后C丢失）
+</div>
+
+<h3>6.3 对比总结</h3>
+<table>
+    <tr><th>遍历方式</th><th>泄漏的结点</th><th>根本原因</th></tr>
+    <tr>
+        <td><span class="pre-badge">先序</span></td>
+        <td>几乎整棵树（除了根）</td>
+        <td>第一步就free根，Left和Right指针立即失效</td>
+    </tr>
+    <tr>
+        <td>中序</td>
+        <td>每个结点的右子树</td>
+        <td>free根后再访问Right，指针已失效</td>
+    </tr>
+    <tr>
+        <td><span class="post-badge">后序 ✅</span></td>
+        <td><b>0个！</b></td>
+        <td>free根时左右孩子早已安全释放完毕</td>
+    </tr>
+</table>
+
+<div class="danger-box">
+    🔴 <b>核心教训：</b>在C语言中，一旦对指针执行了 <code>free()</code>，该指针指向的内存就不再属于你。之后任何通过该指针访问成员（如T-&gt;Left、T-&gt;Right）的行为都是<b>未定义行为</b>。因此，<b>在free一个结点之前，必须确保它的所有孩子结点都已经被释放</b>——而这正是后序遍历保证的。
+</div>
+</div>
+
+<!-- ============ BOUNDARY ============ -->
+<div class="card cyan">
+<h2>七、边界情况分析</h2>
+
+<h3>情况1：空树（T == NULL）</h3>
+<div class="code-block">
+<span class="fn">DestroyTree</span>(<span class="kw">NULL</span>);
+<span class="cmt">→ if (T == NULL) return 0;  直接返回0，无任何操作。✅</span>
+</div>
+
+<h3>情况2：只有一个结点（只有根）</h3>
+<div class="ascii-art">
+    调用 DestroyTree(根)
+    ├─ n += DestroyTree(NULL) → 0   (无左孩子)
+    ├─ n += DestroyTree(NULL) → 0   (无右孩子)
+    ├─ free(根)
+    └─ return 0 + 1 = <span class="hl">1</span>  ✅
+</div>
+
+<h3>情况3：单链树（每个结点只有一个孩子，退化成链表）</h3>
+<div class="ascii-art">
+    A → B → C → NULL  （每个结点只有Right孩子）
+
+    后序销毁：C → B → A
+    ├─ DestroyTree(A) → 调用DestroyTree(B)
+    │  └─ DestroyTree(B) → 调用DestroyTree(C)
+    │     └─ DestroyTree(C) → no children → free(C) → return 1
+    │     └─ free(B) → return 2
+    └─ free(A) → return 3  ✅
+
+    即使退化成链表，后序遍历依然正确工作。
+    注意：这里每个结点只有Right孩子，但代码会先检查Left（NULL返回0），再Right。
+</div>
+
+<h3>情况4：完全二叉树</h3>
+<div class="ascii-art">
+    深度为3的满二叉树（共15个结点）
+    后序销毁从最底层叶子开始，逐层向上。
+    每一层都在其上层被释放之前完全释放。✅
+</div>
+
+<div class="tip-box">
+    💡 <b>总结：</b>无论树的形态如何（空树、单结点、链表状、完全树），后序遍历销毁策略都天然正确，无需任何特殊处理。这是递归算法的优雅之处。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>八、常见错误 &amp; 考点总结</h2>
+
+<div class="danger-box">
+    🔴 <b>致命错误1：先free(T)再递归子树（先序/中序错误）。</b><br>
+    这是本题<b>最核心的考点</b>。free(T)后T-&gt;Left和T-&gt;Right是未定义行为，会导致崩溃或内存泄漏。<br>
+    <b>正确做法：</b>free(T)必须是递归调用之后的最后一步操作。<br>
+    <b>记忆口诀："先孩子，后自己；先递归，后free。"</b>
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：return n 而忘记 +1。</b><br>
+    如果return n而不是return n+1，每个结点都不会被计入总数，最终返回0。<br>
+    n累积的是子树结点数，+1是把当前结点自己算进去。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：忘了递归基（T==NULL的判断）。</b><br>
+    没有终止条件，递归会一直调用到栈溢出（Stack Overflow）。<br>
+    叶结点的孩子是NULL → 必须return 0作为递归的"触底"。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：写成void函数不返回个数。</b><br>
+    题目明确要求返回删除个数。虽然销毁本身不需要返回值，但统计结点数是考试要求。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误5：混淆"后序遍历"和"后序销毁"。</b><br>
+    后序遍历的一般模式是"左→右→根"，本题的销毁操作放在"根"的位置（即递归调用之后）。<br>
+    不要把free(T)放在递归调用之前。
+</div>
+
+<div class="tip-box">
+    💡 <b>考试心法：</b><br>
+    这道题的本质是考察三个知识点的融合——<br>
+    ① <b>二叉树的后序遍历</b>（左→右→根的递归框架）<br>
+    ② <b>C语言内存管理</b>（malloc/free的配对，防止内存泄漏）<br>
+    ③ <b>递归计数</b>（通过return值层层累加结点总数）<br>
+    理解"为什么必须是后序"比记住代码更重要——因为这是所有树形结构内存管理的基础原则。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"递归先判空返回零，左子右子依次行。子树数目累加到n，释放当前根结点。返回n加一不能忘，后序销毁最安全。"
+</div>
+</div>
+
+<!-- ============ EXTENSION ============ -->
+<div class="card blue">
+<h2>九、拓展思考：如果不用递归呢？</h2>
+
+<p>也可以使用<b>迭代 + 栈</b>来模拟后序遍历销毁，但代码会复杂很多：</p>
+
+<div class="code-block">
+<span class="cmt">// 迭代版本（仅供参考，考试不要求）</span>
+<span class="type">int</span> <span class="fn">DestroyTree_Iterative</span>(<span class="type">TreeNode</span> *root) {
+    <span class="kw">if</span> (root == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="type">TreeNode</span> *stack[<span class="num">1000</span>];  <span class="cmt">// 假设深度不超过1000</span>
+    <span class="type">int</span> top = -<span class="num">1</span>, count = <span class="num">0</span>;
+    <span class="type">TreeNode</span> *cur = root, *last = <span class="kw">NULL</span>;
+    <span class="kw">while</span> (cur || top >= <span class="num">0</span>) {
+        <span class="kw">while</span> (cur) { stack[++top] = cur; cur = cur-&gt;Left; }
+        cur = stack[top];
+        <span class="kw">if</span> (cur-&gt;Right == <span class="kw">NULL</span> || cur-&gt;Right == last) {
+            last = cur;
+            free(cur); count++;
+            top--; cur = <span class="kw">NULL</span>;
+        } <span class="kw">else</span> cur = cur-&gt;Right;
+    }
+    <span class="kw">return</span> count;
+}
+</div>
+
+<div class="tip-box">
+    💡 递归版本简洁优雅，是考试的标准答案。迭代版本虽然避免了递归栈开销，但代码量大了3倍以上。在考试中，<b>递归后序遍历就是最优解</b>。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构考试范围2026 · DestroyTree销毁二叉树 · 第29题详解
+</footer>
+
+</body>
+</html>

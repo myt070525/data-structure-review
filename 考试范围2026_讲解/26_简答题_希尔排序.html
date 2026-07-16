@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答26 · 希尔排序</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 960px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 1.9rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+  line-height: 2;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+tr.changed td { background: rgba(46,204,113,0.1); }
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.swap { color: #e74c3c; font-weight: 700; }
+.group-a { background: rgba(77,201,246,0.12); }
+.group-b { background: rgba(253,121,168,0.12); }
+.group-c { background: rgba(46,204,113,0.12); }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📐 简答第8题 · 希尔排序</h1>
+  <p class="subtitle">序列 24,13,9,64,37,86,32,41,72 | 增量 7,3,1</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">
+    增量序列：<span style="color:var(--gold-light)">7 → 3 → 1</span><br>
+    第一趟（d=7）：无交换 | 第二趟（d=3）：有交换
+  </div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、希尔排序基本思想</h2>
+  <div class="card">
+    <p>希尔排序（Shell Sort）是插入排序的改进版。核心思想：</p>
+    <ul>
+      <li>先将序列按<strong>增量d</strong>分成若干个子序列，对每个子序列进行<strong>直接插入排序</strong></li>
+      <li>然后缩小增量（d = d/2 或其他递减序列），重复上述过程</li>
+      <li>当增量d=1时，就是一次完整的直接插入排序，但此时序列已经<strong>"基本有序"</strong>，插入排序效率很高</li>
+    </ul>
+    <p><strong>为什么希尔排序比直接插入排序快？</strong>因为它在早期"大步"移动元素，让小数快速"跳"到前面，避免了插入排序中元素一步步挪动的低效。</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、初始序列</h2>
+  <div class="card">
+    <p>9个元素：<strong>24, 13, 9, 64, 37, 86, 32, 41, 72</strong></p>
+    <p>增量序列：d₁=7, d₂=3, d₃=1</p>
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、第一趟排序：增量 d = 7</h2>
+
+  <div class="card">
+    <h3>分组情况</h3>
+    <p>间隔为7的元素归入同一组（下标从1开始）：</p>
+    <div class="ascii">
+  数组: [24, 13, 9, 64, 37, 86, 32, 41, 72]
+  索引:   1   2  3   4   5   6   7   8   9
+
+  d=7时的分组：
+  组1: 索引1→8: 24 和 41 → 24<41，无需交换 ✓
+  组2: 索引2→9: 13 和 72 → 13<72，无需交换 ✓
+  组3: 索引3: 9（只有一个元素） → 无需处理
+
+  其他索引超出范围（1+7=8, 2+7=9, 3+7=10>9)
+    </div>
+
+    <table>
+      <tr><th>组号</th><th>元素（索引）</th><th>比较</th><th>结果</th></tr>
+      <tr><td>组1</td><td>24(1), 41(8)</td><td>24 < 41</td><td>不变</td></tr>
+      <tr><td>组2</td><td>13(2), 72(9)</td><td>13 < 72</td><td>不变</td></tr>
+      <tr><td>组3</td><td>9(3)</td><td>—</td><td>不变</td></tr>
+      <tr><td>组4</td><td>64(4)</td><td>—</td><td>不变</td></tr>
+      <tr><td>组5</td><td>37(5)</td><td>—</td><td>不变</td></tr>
+      <tr><td>组6</td><td>86(6)</td><td>—</td><td>不变</td></tr>
+      <tr><td>组7</td><td>32(7)</td><td>—</td><td>不变</td></tr>
+    </table>
+
+    <div style="text-align:center;padding:1rem;color:var(--muted);">
+      <strong>第一趟结果（d=7）：</strong>24, 13, 9, 64, 37, 86, 32, 41, 72 —— <strong>无交换 ✅</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、第二趟排序：增量 d = 3</h2>
+
+  <div class="card">
+    <h3>分组情况（d=3）</h3>
+    <div class="ascii">
+  当前序列: [24, 13, 9, 64, 37, 86, 32, 41, 72]
+  索引:       1   2  3   4   5   6   7   8   9
+
+  d=3，分成3组（每组内元素间隔为3）：
+  组1: 索引 1,4,7: [<span class="hl-cyan">24</span>, <span class="hl-cyan">64</span>, <span class="hl-cyan">32</span>]
+  组2: 索引 2,5,8: [<span class="hl-pink">13</span>, <span class="hl-pink">37</span>, <span class="hl-pink">41</span>]
+  组3: 索引 3,6,9: [<span class="hl-green">9</span>, <span class="hl-green">86</span>, <span class="hl-green">72</span>]
+    </div>
+
+    <h3>组1排序： [24, 64, 32]</h3>
+    <div class="ascii">
+  对组1做插入排序：
+  第1个元素24：已有序 [24]
+  第2个元素64：64>24 → 不动，[24, 64]
+  第3个元素32：32<64 → 64后移，32插到24之后 → [24, <span class="swap">32</span>, 64]
+
+  数组更新（仅组1位置变化）：
+  索引1=24, 索引4=<span class="swap">32</span>（原64→32）, 索引7=64（原32→64）
+    </div>
+
+    <h3>组2排序： [13, 37, 41]</h3>
+    <div class="ascii">
+  对组2做插入排序：
+  [13, 37, 41] 已经有序 → 无需交换
+    </div>
+
+    <h3>组3排序： [9, 86, 72]</h3>
+    <div class="ascii">
+  对组3做插入排序：
+  第1个元素9：已有序 [9]
+  第2个元素86：86>9 → 不动，[9, 86]
+  第3个元素72：72<86 → 86后移，72插到9之后 → [9, <span class="swap">72</span>, 86]
+
+  数组更新（仅组3位置变化）：
+  索引3=9, 索引6=<span class="swap">72</span>（原86→72）, 索引9=86（原72→86）
+    </div>
+
+    <div style="text-align:center;padding:1rem;background:rgba(46,204,113,0.08);border-radius:8px;">
+      <strong>第二趟结果（d=3）：</strong><br>
+      <span style="font-family:monospace;font-size:1.1rem;">
+      24, 13, 9, <span style="color:#2ecc71;">32</span>, 37, <span style="color:#2ecc71;">72</span>, 64, 41, <span style="color:#2ecc71;">86</span>
+      </span><br>
+      <span style="color:var(--red);">有交换！</span> 组1中32和64交换，组3中72和86交换
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第5节 ============ -->
+<div class="section">
+  <h2>五、第三趟排序：增量 d = 1（最终插入排序）</h2>
+
+  <div class="card">
+    <h3>当前序列（d=3排序后）：[24, 13, 9, 32, 37, 72, 64, 41, 86]</h3>
+    <p>d=1时就是普通的直接插入排序，但由于序列已经"基本有序"，移动次数大大减少。</p>
+
+    <div class="ascii">
+  插入排序过程（d=1）：
+  [24] → 已有序
+  插入13: 13<24 → 24后移 → [<span class="swap">13</span>, 24]
+  插入9:  9<24, 9<13 → [<span class="swap">9</span>, 13, 24]
+  插入32: 32>24 → [9, 13, 24, 32]
+  插入37: 37>32 → [9, 13, 24, 32, 37]
+  插入72: 72>37 → [9, 13, 24, 32, 37, 72]
+  插入64: 64<72 → 72后移, 64>37 → [9,13,24,32,37,<span class="swap">64</span>,72]
+  插入41: 41<72,41<64,41>37 → [9,13,24,32,37,<span class="swap">41</span>,64,72]
+  插入86: 86>72 → [9,13,24,32,37,41,64,72,86]
+
+  <span class="hl-green">最终结果: [9, 13, 24, 32, 37, 41, 64, 72, 86] ✅ 完全有序</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第6节 ============ -->
+<div class="section">
+  <h2>六、全过程总结表</h2>
+
+  <table>
+    <tr><th>趟次</th><th>增量d</th><th>分组数</th><th>排序前</th><th>排序后</th><th>是否交换</th></tr>
+    <tr>
+      <td>初始</td><td>—</td><td>—</td>
+      <td style="font-family:monospace;font-size:0.8rem;">24,13,9,64,37,86,32,41,72</td>
+      <td>—</td><td>—</td>
+    </tr>
+    <tr>
+      <td>第1趟</td><td><strong>7</strong></td><td>7组</td>
+      <td style="font-family:monospace;font-size:0.8rem;">同上</td>
+      <td style="font-family:monospace;font-size:0.8rem;">24,13,9,64,37,86,32,41,72</td>
+      <td><strong>无交换</strong></td>
+    </tr>
+    <tr class="changed">
+      <td>第2趟</td><td><strong>3</strong></td><td>3组</td>
+      <td style="font-family:monospace;font-size:0.8rem;">24,13,9,64,37,86,32,41,72</td>
+      <td style="font-family:monospace;font-size:0.8rem;">24,13,9,<span style="color:#2ecc71;">32</span>,37,<span style="color:#2ecc71;">72</span>,64,41,<span style="color:#2ecc71;">86</span></td>
+      <td><strong>有交换！</strong></td>
+    </tr>
+    <tr>
+      <td>第3趟</td><td><strong>1</strong></td><td>1组</td>
+      <td style="font-family:monospace;font-size:0.8rem;">24,13,9,32,37,72,64,41,86</td>
+      <td style="font-family:monospace;font-size:0.8rem;color:#2ecc71;">9,13,24,32,37,41,64,72,86</td>
+      <td>有交换</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <strong>🧠 希尔排序核心记忆：</strong><br>
+    • 本质 = <strong>分组插入排序</strong>，每一趟对一个增量d的所有子序列做插入排序<br>
+    • 增量序列的选择至关重要：常见的为<strong>希尔增量</strong>（d=n/2, n/4, …, 1）或<strong>Hibbard增量</strong><br>
+    • 时间复杂度：大约<strong>O(n^1.3)</strong> ~ <strong>O(n²)</strong>，取决于增量序列<br>
+    • <strong>不稳定排序</strong>（等值元素可能在不同组中被交换到不同位置）
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 考试注意：</strong>希尔排序的增量序列可能不同（d=7,3,1 只是其中一种）。务必按照题目给出的增量序列来计算。第一趟d=7时，由于9个元素中只有2对元素相距为7（索引1-8和2-9），它们恰好都是"小前大后"，所以无交换。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

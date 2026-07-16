@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第10题 · 排序算法的稳定性</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 25% 25%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(139,111,192,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1rem 0;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .88rem; line-height: 1.75; overflow-x: auto;
+    white-space: pre; color: #c8d6e5;
+  }
+  .code-block .kw { color: #c084fc; font-weight: 700; }
+  .code-block .fn { color: #6ee7b7; }
+  .code-block .cmt { color: #6b7280; font-style: italic; }
+  .code-block .num { color: #fbbf24; }
+  .code-block .blank { color: #e0556a; text-decoration: underline; text-underline-offset: 4px; }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第10题</div>
+  <h1>📊 排序算法的稳定性</h1>
+  <div class="q-box">
+    下列排序算法中，<strong>不稳定</strong>的是（　）。<br><br>
+    A. 冒泡排序 &nbsp;&nbsp; B. 插入排序 &nbsp;&nbsp; C. 归并排序 &nbsp;&nbsp; <strong>D. 堆排序</strong>
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">D — 堆排序</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">堆排序在交换堆顶和堆尾时，会打乱相同元素的相对顺序</div>
+</div>
+
+<!-- ==================== 1: WHAT IS STABILITY ==================== -->
+<div class="section">
+  <h2>一、什么是排序的稳定性？</h2>
+  <div class="card">
+    <p><strong>稳定排序：</strong>如果待排序序列中有两个<strong>关键字相等</strong>的元素 R<sub>i</sub> 和 R<sub>j</sub>（i &lt; j），排序后 R<sub>i</sub> 仍然在 R<sub>j</sub> 前面——相对次序不变。</p>
+
+    <div class="ascii-box">
+<span class="hl">稳定排序示意（注意两个"5"的相对位置）</span>
+
+  排序前： [<span class="b">5₁</span>, 3, <span class="c">5₂</span>, 8, 2]
+                ↑       ↑
+              第一个5   第二个5
+
+<span class="g">稳定排序后：</span> [2, 3, <span class="b">5₁</span>, <span class="c">5₂</span>, 8]  ← <span class="b">5₁</span>仍在<span class="c">5₂</span>前面 ✅
+
+<span class="r">不稳定排序后：</span> [2, 3, <span class="c">5₂</span>, <span class="b">5₁</span>, 8]  ← 两个5的相对位置颠倒了 ❌</div>
+
+    <p>稳定性很重要吗？是的！例如：学生成绩表先按姓名排序，再按成绩排序——如果排序稳定，成绩相同的学生姓名仍然有序。这在<strong>多关键字排序</strong>中非常关键。</p>
+  </div>
+</div>
+
+<!-- ==================== 2: WHY HEAP SORT UNSTABLE ==================== -->
+<div class="section">
+  <h2>二、堆排序为什么不稳定？</h2>
+  <div class="card">
+    <p>堆排序的核心操作是<strong>交换堆顶（最大值）和堆尾元素</strong>，这种"跳来跳去"的交换会破坏稳定性。</p>
+
+    <div class="ascii-box">
+<span class="hl">实例：堆排序破坏稳定性的过程</span>
+
+  初始序列（注意两个"5"）：[<span class="b">5₁</span>, 3, <span class="c">5₂</span>, 2]
+
+<span class="hl">建大根堆后：</span>
+        <span class="b">5₁</span>
+       /   \
+      3    <span class="c">5₂</span>
+     /
+    2
+
+<span class="hl">第一次交换（堆顶5₁与堆尾2交换）：</span>
+  交换前堆顶=<span class="b">5₁</span>，堆尾=2
+  → [2, 3, <span class="c">5₂</span>, <span class="b">5₁</span>]    ← <span class="r">注意！5₁跑到了5₂后面！</span>
+
+<span class="r">两个 5 的相对顺序被颠倒了 → 不稳定！</span></div>
+
+    <p style="margin-top:1rem"><strong>根本原因：</strong>堆排序的交换是<strong>长距离跳跃式</strong>的（堆顶 ↔ 堆尾，可能隔了很远的距离），而不是像冒泡排序那样只在相邻元素间交换。长距离跳跃无法保证相同元素的相对顺序。</p>
+  </div>
+</div>
+
+<!-- ==================== 3: ALL SORTING ALGORITHMS COMPARISON ==================== -->
+<div class="section">
+  <h2>三、常见排序算法稳定性大全</h2>
+  <div class="card">
+    <table>
+      <tr><th>排序算法</th><th>稳定性</th><th>平均时间</th><th>最坏时间</th><th>空间</th><th>不稳定原因</th></tr>
+      <tr>
+        <td style="color:var(--green)">冒泡排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>O(n²)</td><td>O(n²)</td><td>O(1)</td>
+        <td>—（仅相邻交换）</td>
+      </tr>
+      <tr>
+        <td style="color:var(--green)">插入排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>O(n²)</td><td>O(n²)</td><td>O(1)</td>
+        <td>—（仅在找到位置后插入）</td>
+      </tr>
+      <tr>
+        <td style="color:var(--green)">归并排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td>
+        <td>—（合并时相等取左边）</td>
+      </tr>
+      <tr style="background:rgba(224,85,106,.06)">
+        <td style="color:var(--red)">堆排序</td>
+        <td class="bad">❌ 不稳定</td>
+        <td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td>
+        <td style="color:var(--red)">长距离交换打乱顺序</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red)">快速排序</td>
+        <td class="bad">❌ 不稳定</td>
+        <td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td>
+        <td style="color:var(--red)">partition时跳跃交换</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red)">希尔排序</td>
+        <td class="bad">❌ 不稳定</td>
+        <td>O(n<sup>1.3</sup>)</td><td>O(n²)</td><td>O(1)</td>
+        <td style="color:var(--red)">跳跃式分组插入</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red)">选择排序</td>
+        <td class="bad">❌ 不稳定</td>
+        <td>O(n²)</td><td>O(n²)</td><td>O(1)</td>
+        <td style="color:var(--red)">最小元素交换到前面</td>
+      </tr>
+      <tr>
+        <td style="color:var(--green)">基数排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>O(d(n+r))</td><td>O(d(n+r))</td><td>O(r)</td>
+        <td>—（按位收集保持顺序）</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 4: OPTIONS ==================== -->
+<div class="section">
+  <h2>四、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>算法</th><th>稳定性</th><th>判断</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">A</td>
+        <td>冒泡排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>相邻两两比较交换，相等不交换</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td>插入排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>找到位置后插入，相等时不越过</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">C</td>
+        <td>归并排序</td>
+        <td class="good">✅ 稳定</td>
+        <td>合并时相等取左半部分的元素</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">D</td>
+        <td>堆排序</td>
+        <td class="bad">❌ 不稳定</td>
+        <td>堆顶堆尾长距离交换，打乱相对顺序</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 5: MEMORY ==================== -->
+<div class="section">
+  <h2>五、记忆口诀与分类</h2>
+  <div class="card">
+    <div class="ascii-box">
+<span class="hl">╔════════════════════════════════════════╗
+║         排序算法稳定性分类               ║
+╠════════════════════════════════════════╣
+║                                        ║
+║  <span class="g">✅ 稳定排序</span>（相等不换位）            ║
+║    冒泡 · 插入 · 归并 · 基数            ║
+║    记忆："<span class="g">冒插归基</span>" — 冒泡插入归并基数 ║
+║                                        ║
+║  <span class="r">❌ 不稳定排序</span>（跳来跳去交换）          ║
+║    选择 · 希尔 · 快速 · 堆              ║
+║    记忆："<span class="r">选希快堆</span>" — 选择希尔快速堆     ║
+║                                        ║
+╚════════════════════════════════════════╝</span></div>
+
+    <div class="tip">
+      <strong>🎯 规律总结：</strong>
+      <ul>
+        <li><strong>仅相邻交换/移动 → 稳定</strong>（冒泡、插入：只在相邻位置操作）</li>
+        <li><strong>长距离跳跃交换 → 不稳定</strong>（选择、希尔、快排、堆：会跨越多个元素交换）</li>
+        <li><strong>归并排序特殊：</strong>虽然也用额外空间，但合并时相等取左边 → 稳定</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: WHY STABLE MATTERS ==================== -->
+<div class="section">
+  <h2>六、稳定性有什么用？—— 多关键字排序</h2>
+  <div class="card">
+    <p><strong>场景：</strong>学生成绩表，先按总分排序，总分相同的按语文成绩排序。</p>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>先按次要关键字排序：</strong>按语文成绩排序（使用<strong>稳定</strong>排序）
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>再按主要关键字排序：</strong>按总分排序（使用<strong>稳定</strong>排序）
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>结果：</strong>总分相同时，语文成绩高的在前——因为第一步的相对顺序被稳定排序保留了！
+      </div>
+    </div>
+
+    <div class="danger">
+      <strong>⚠️ 关键：</strong>如果第二步用了<strong>不稳定</strong>排序（如堆排序），那么第一步的努力就白费了——总分相同时，语文成绩的顺序会被打乱。所以在多关键字排序场景下，<strong>必须使用稳定排序算法</strong>。
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 排序稳定性是第7章排序部分的重要概念。"冒插归基稳，选希快堆不稳"——背熟这十个字就够了。
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答25 · 大顶堆</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 1.9rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+  line-height: 2;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.sift { color: #f39c12; font-weight: 700; }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📐 简答第7题 · 大顶堆的建立与删除</h1>
+  <p class="subtitle">序列 8,22,17,10,5,34,9,26 → 建堆 → 删除2次</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">
+    建堆 + 两次删除操作<br>
+    每次删除后重新调整为<strong>大顶堆</strong>
+  </div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、大顶堆定义与存储</h2>
+  <div class="card">
+    <p><strong>大顶堆（Max-Heap）：</strong>每个结点的值都<strong>大于或等于</strong>其左右孩子结点的值。即：A[parent] ≥ A[child]。</p>
+    <p>用<strong>完全二叉树</strong>形式存储，数组下标从1开始（或0开始）。</p>
+    <p>初始序列：<strong>[8, 22, 17, 10, 5, 34, 9, 26]</strong>（8个元素）</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、建堆过程（从最后一个非叶结点开始sift-down）</h2>
+  <div class="card">
+    <p>n=8，最后一个非叶结点位置 = ⌊n/2⌋ = 4。从第4个结点开始向上调整。</p>
+  </div>
+
+  <div class="ascii">
+  初始完全二叉树（数组索引，值在结点中）：
+
+                 ┌────┐
+                 │ 8  │  (索引1)
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 22  │ (2)      │ 17  │ (3)
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 10  │(4) │  5  ││ 34  │  │  9  │
+  └──┬──┘    └─────┘└─────┘  └─────┘
+  ┌──┴──┐      (5)   (6)    (7)
+  │ 26  │(8)
+  └─────┘
+
+  ═══════════════════════════════════════════
+  Step 1: 调整索引4（值为10）
+    孩子是索引8(26)，10<26 → 交换！
+    26上升到位置4，10下沉到位置8。
+
+                 ┌────┐
+                 │ 8  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 22  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 26  │    │  5  ││ 34  │  │  9  │
+  └──┬──┘    └─────┘└─────┘  └─────┘
+  ┌──┴──┐
+  │ 10  │
+  └─────┘
+
+  ═══════════════════════════════════════════
+  Step 2: 调整索引3（值为17）
+    孩子是索引6(34)和索引7(9)，max=34 > 17 → 交换！
+
+                 ┌────┐
+                 │ 8  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 22  │          │ 34  │  ← 34上升
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 26  │    │  5  ││ 17  │  │  9  │  ← 17下沉
+  └──┬──┘    └─────┘└─────┘  └─────┘
+  ┌──┴──┐
+  │ 10  │
+  └─────┘
+
+  ═══════════════════════════════════════════
+  Step 3: 调整索引2（值为22）
+    孩子是索引4(26)和索引5(5)，max=26 > 22 → 交换！
+    26上升到2，22下沉到4。继续检查22的新位置（索引4）：
+    孩子是索引8(10)，22>10 → 停止。
+
+                 ┌────┐
+                 │ 8  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 26  │          │ 34  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 22  │    │  5  ││ 17  │  │  9  │
+  └──┬──┘    └─────┘└─────┘  └─────┘
+  ┌──┴──┐
+  │ 10  │
+  └─────┘
+
+  ═══════════════════════════════════════════
+  Step 4: 调整索引1（值为8）
+    孩子是索引2(26)和索引3(34)，max=34 > 8 → 交换！
+    34上升到1，8下沉到3。继续检查8的新位置（索引3）：
+    孩子是索引6(17)和索引7(9)，max=17 > 8 → 交换！
+    17上升到3，8下沉到6。索引6是叶子 → 停止。
+
+  ┌──────────────────────────────────────────┐
+  │             ★ 建堆完成！大顶堆 ★           │
+  └──────────────────────────────────────────┘
+
+                 ┌────┐
+                 │ 34 │  (根，最大值)
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 26  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 22  │    │  5  ││  8  │  │  9  │
+  └──┬──┘    └─────┘└─────┘  └─────┘
+  ┌──┴──┐
+  │ 10  │
+  └─────┘
+
+  数组形式: [34, 26, 17, 22, 5, 8, 9, 10]
+    </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、第1次删除（删除最大值34）</h2>
+
+  <div class="card">
+    <h3>删除流程</h3>
+    <div class="step"><span class="step-num">1</span> 弹出堆顶元素34（输出）</div>
+    <div class="step"><span class="step-num">2</span> 将最后一个元素10放到堆顶</div>
+    <div class="step"><span class="step-num">3</span> 对新的堆顶10执行sift-down</div>
+  </div>
+
+  <div class="ascii">
+  10放到堆顶后，sift-down过程：
+                 ┌────┐
+                 │ 10 │  ← 10<孩子max(26,17)=26
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 26  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 22  │    │  5  ││  8  │  │  9  │
+  └─────┘    └─────┘└─────┘  └─────┘
+
+  10<26 → 交换10和26，10下沉到2：
+                 ┌────┐
+                 │ 26  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 10  │  ← 10<孩子max(22,5)=22   │ 17  │
+       └──┬──┘          └─────┘
+     ┌─────┴─────┐
+  ┌──┴──┐    ┌──┴──┐
+  │ 22  │    │  5  │
+  └─────┘    └─────┘
+
+  10<22 → 交换10和22，10下沉到4（叶子）→ 停止。
+
+  ┌──────────────────────────────────────────┐
+  │        ★ 第1次删除后的堆 ★                │
+  └──────────────────────────────────────────┘
+
+                 ┌────┐
+                 │ 26  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 22  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐  ┌──┴──┐
+  │ 10  │    │  5  ││  8  │  │  9  │
+  └─────┘    └─────┘└─────┘  └─────┘
+
+  数组: [26, 22, 17, 10, 5, 8, 9] (7个元素)
+    </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、第2次删除（删除最大值26）</h2>
+
+  <div class="card">
+    <div class="step"><span class="step-num">1</span> 弹出堆顶26</div>
+    <div class="step"><span class="step-num">2</span> 将最后一个元素9放到堆顶</div>
+    <div class="step"><span class="step-num">3</span> 对9执行sift-down</div>
+  </div>
+
+  <div class="ascii">
+  9放到堆顶后：
+                 ┌────┐
+                 │ 9  │  ← 9<max(22,17)=22
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 22  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐
+  │ 10  │    │  5  ││  8  │
+  └─────┘    └─────┘└─────┘
+
+  9<22 → 交换9和22，9下沉到2。继续检查9的新位置：
+  孩子是10和5，max=10 > 9 → 交换9和10，9下沉到4（叶子）。
+
+  ┌──────────────────────────────────────────┐
+  │        ★ 第2次删除后的堆 ★                │
+  └──────────────────────────────────────────┘
+
+                 ┌────┐
+                 │ 22  │
+                 └─┬──┘
+          ┌────────┴────────┐
+       ┌──┴──┐          ┌──┴──┐
+       │ 10  │          │ 17  │
+       └──┬──┘          └──┬──┘
+     ┌─────┴─────┐    ┌────┴────┐
+  ┌──┴──┐    ┌──┴──┐┌──┴──┐
+  │  9  │    │  5  ││  8  │
+  └─────┘    └─────┘└─────┘
+
+  数组: [22, 10, 17, 9, 5, 8] (6个元素)
+    </div>
+</div>
+
+<!-- ============ 第5节 ============ -->
+<div class="section">
+  <h2>五、堆操作复杂度总结</h2>
+  <table>
+    <tr><th>操作</th><th>时间复杂度</th><th>说明</th></tr>
+    <tr><td>建堆</td><td>O(n)</td><td>自底向上sift-down，看似O(n·logn)实为O(n)</td></tr>
+    <tr><td>插入</td><td>O(log n)</td><td>插入末尾后sift-up</td></tr>
+    <tr><td>删除堆顶</td><td>O(log n)</td><td>末尾替换堆顶后sift-down</td></tr>
+    <tr><td>取堆顶</td><td>O(1)</td><td>直接读取根结点</td></tr>
+  </table>
+
+  <div class="tip">
+    <strong>🧠 sift-down核心口诀：</strong><br>
+    "父与两子比大小，谁大谁就往上跑"<br>
+    "一路下沉到叶止，堆的性质恢复了"
+  </div>
+</div>
+
+</div>
+</body>
+</html>

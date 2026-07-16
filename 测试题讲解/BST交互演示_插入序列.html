@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二叉排序树插入可视化与题目精解</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+        h1, h2, h3 { color: #2c3e50; }
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        
+        /* 树结构 CSS */
+        .tree-container {
+            display: flex;
+            justify-content: center;
+            padding: 30px 0;
+            min-height: 250px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            margin: 20px 0;
+        }
+        .tree ul {
+            padding-top: 20px; 
+            position: relative;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+        }
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 10px 0 10px;
+            transition: all 0.5s;
+        }
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #3498db;
+            width: 50%; height: 20px;
+        }
+        .tree li::after {
+            right: auto; left: 50%;
+            border-left: 2px solid #3498db;
+        }
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child{ padding-top: 0;}
+        .tree li:first-child::before, .tree li:last-child::after{
+            border: 0 none;
+        }
+        .tree li:last-child::before{
+            border-right: 2px solid #3498db;
+            border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after{
+            border-radius: 5px 0 0 0;
+        }
+        .tree ul ul::before{
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #3498db;
+            width: 0; height: 20px;
+        }
+        
+        .node {
+            border: 2px solid #3498db;
+            background: #e0f2fe;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            line-height: 36px;
+            display: inline-block;
+            font-weight: bold;
+            color: #1e3a8a;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .node.root-node { background: #fde047; border-color: #d97706; color: #78350f; }
+
+        .controls {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .controls input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 250px;
+        }
+        .controls button {
+            padding: 8px 16px;
+            border: none;
+            background: #3498db;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .controls button:hover { background: #2980b9; }
+        .controls button:disabled { background: #95a5a6; cursor: not-allowed; }
+
+        .steps-box {
+            background: #f8fafc;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .solution-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+        }
+        .solution-list li {
+            background: #ecfdf5;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #d1fae5;
+            text-align: center;
+            font-weight: bold;
+            color: #065f46;
+        }
+        .highlight { color: #dc2626; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📚 二叉排序树（BST）插入原理 & 题目解析</h1>
+    <p style="font-size: 1.1em; color: #555;">
+        【核心口诀】比根小向左，比根大向右，空位就是家。
+    </p>
+</div>
+
+<h2>🖱️ 动手试试：交互式插入演示</h2>
+<p>你可以输入一串数字（用逗号隔开，比如 <code>3,1,2,4,5</code>），点击 <b>播放</b> 看看它是怎么一步步长成一棵树的。</p>
+
+<div class="controls">
+    <input type="text" id="inputSeq" value="3,1,2,4,5" placeholder="输入序列，如 3,1,4,2,5">
+    <button onclick="playInsertion()" id="playBtn">▶ 播放插入过程</button>
+    <button onclick="resetTree()" id="resetBtn">🔄 重置</button>
+    <div class="steps-box" id="statusMsg">等待开始...</div>
+</div>
+
+<div class="tree-container" id="treeDisplay">
+    <div class="tree" id="treeDiv">
+        <ul><li><div class="node">空树</div></li></ul>
+    </div>
+</div>
+
+<hr>
+
+<h2>🧮 题目原题解析：究竟有多少种序列？</h2>
+<div style="background: #f3f8ff; padding: 15px; border-radius: 8px; border: 1px solid #bfdbfe; margin: 15px 0;">
+    <h3>1. 分析树的结构</h3>
+    <ul>
+        <li><b>根节点：</b> 必须是 <span class="highlight">3</span>（因为它是老大哥，必须先来）。</li>
+        <li><b>左子树：</b> 节点 1 和 2。要形成 "1 是左孩子，2 是 1 的右孩子" 的结构，<b><span class="highlight">1 必须先于 2 插入</span></b>。</li>
+        <li><b>右子树：</b> 节点 4 和 5。要形成 "4 是右孩子，5 是 4 的右孩子" 的结构，<b><span class="highlight">4 必须先于 5 插入</span></b>。</li>
+    </ul>
+    <h3>2. 数学计算原理</h3>
+    <p>排完 3 之后，剩下 4 个位置排 <code>1, 2, 4, 5</code>。<br>
+    相当于在 4 个位置里选 2 个位置给 <code>1, 2</code>（此时 1必须在2前面，所以顺序固定），剩下的2个自动给 <code>4, 5</code>（顺序固定）。</p>
+    <p style="font-size: 1.2em; background: #fef08a; display: inline-block; padding: 5px 15px; border-radius: 5px;">
+        <b>组合数 C(4, 2) = (4&times;3) / (2&times;1) = <span style="color:red; font-size: 1.5em;">6</span> 种。</b>
+    </p>
+</div>
+
+<h3>📜 6种可能的输入序列展示</h3>
+<ul class="solution-list" id="seqList">
+    <li>3, 1, 2, 4, 5</li>
+    <li>3, 1, 4, 2, 5</li>
+    <li>3, 1, 4, 5, 2</li>
+    <li>3, 4, 1, 2, 5</li>
+    <li>3, 4, 1, 5, 2</li>
+    <li>3, 4, 5, 1, 2</li>
+</ul>
+
+<p style="margin-top: 30px; font-size: 0.9em; color: #777; text-align: center;">你可以用上方的交互工具，手动输入这6种序列测试，发现都能得到相同的树结构！</p>
+
+<script>
+    class BSTNode {
+        constructor(val) {
+            this.val = val;
+            this.left = null;
+            this.right = null;
+        }
+    }
+
+    function insertBST(root, val) {
+        if (root === null) return new BSTNode(val);
+        if (val < root.val) root.left = insertBST(root.left, val);
+        else if (val > root.val) root.right = insertBST(root.right, val);
+        return root;
+    }
+
+    let currentRoot = null;
+    let sequence = [];
+    let stepIndex = 0;
+    let timer = null;
+
+    function buildNodeHTML(node) {
+        if (!node) return '';
+        let html = '<li>';
+        html += '<div class="node">' + node.val + '</div>';
+        if (node.left || node.right) {
+            html += '<ul>';
+            html += node.left ? buildNodeHTML(node.left) : '<li></li>';
+            html += node.right ? buildNodeHTML(node.right) : '<li></li>';
+            html += '</ul>';
+        }
+        html += '</li>';
+        return html;
+    }
+
+    function renderTree(root) {
+        if (!root) return '<div class="node" style="margin:auto">空树</div>';
+        return '<ul>' + buildNodeHTML(root) + '</ul>';
+    }
+
+    function updateUI() {
+        var html = renderTree(currentRoot);
+        document.getElementById('treeDiv').innerHTML = html;
+    }
+
+    function resetTree() {
+        if (timer) { clearInterval(timer); timer = null; }
+        currentRoot = null;
+        stepIndex = 0;
+        updateUI();
+        document.getElementById('statusMsg').innerText = '已重置，等待新的输入序列...';
+        document.getElementById('playBtn').disabled = false;
+    }
+
+    function playInsertion() {
+        if (timer) { clearInterval(timer); timer = null; }
+
+        var input = document.getElementById('inputSeq').value;
+        var arr = input.split(',').map(function(s) { return parseInt(s.trim()); }).filter(function(n) { return !isNaN(n); });
+
+        if (arr.length === 0) {
+            document.getElementById('statusMsg').innerText = '请输入合法的数字序列！';
+            return;
+        }
+
+        // !!! 先清树，再设置 sequence（修复 bug）
+        currentRoot = null;
+        stepIndex = 0;
+        sequence = arr;
+        updateUI();
+        document.getElementById('playBtn').disabled = true;
+
+        timer = setInterval(function() {
+            if (stepIndex < sequence.length) {
+                var val = sequence[stepIndex];
+                currentRoot = insertBST(currentRoot, val);
+                updateUI();
+                document.getElementById('statusMsg').innerText = '第 ' + (stepIndex + 1) + ' 步：插入节点 ' + val + '  ✓';
+                stepIndex++;
+            } else {
+                clearInterval(timer);
+                timer = null;
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('statusMsg').innerText = '✅ 插入结束！最终树的结构如上图。';
+            }
+        }, 800);
+    }
+</script>
+</body>
+</html>

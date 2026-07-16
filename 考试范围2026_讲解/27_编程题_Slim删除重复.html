@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：Slim删除重复 - 删除有序链表重复结点</title>
+<style>
+    :root {
+        --bg: #0d1b2a;
+        --fg: #c8d6e5;
+        --accent: #e2b04a;
+        --accent2: #4da6ff;
+        --green: #2ecc71;
+        --red: #e74c3c;
+        --cyan: #00cec9;
+        --card-bg: #112240;
+        --card-bg2: #152238;
+        --border: #1e3a5f;
+        --shadow: 0 2px 16px rgba(0,0,0,0.4);
+        --code-bg: #0a1628;
+        --ascii-bg: #0f1d30;
+        --table-stripe: #132238;
+        --tip-bg: #0d2b1a;
+        --warn-bg: #2b1f0d;
+        --danger-bg: #2b0d0d;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #0d1b2a 0%, #0f1f35 40%, #0a1525 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.8rem 1rem 1.8rem;
+        background: linear-gradient(135deg, #1a2744, #0d1b2a);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 28px rgba(226,176,74,0.15);
+        border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; color: var(--accent); }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: var(--accent); color: #0d1b2a;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.blue   { border-left-color: var(--accent2); }
+    .card.red    { border-left-color: var(--red); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #1e3a5f;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #d4af6a; }
+    .code-block {
+        background: var(--code-bg); color: #e2e8f0; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre; border: 1px solid #1e3a5f;
+    }
+    .code-block .kw { color: #38bdf8; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #64748b; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .blank { background: var(--accent); color: #0d1b2a; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.88rem; line-height: 1.45;
+        background: var(--ascii-bg); padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #1e3a5f;
+        margin: 1rem 0; color: #c8d6e5;
+    }
+    .ascii-art .hl { color: var(--accent); font-weight: 700; }
+    .ascii-art .del { color: var(--red); }
+    .ascii-art .new { color: var(--green); }
+    .ascii-art .ptr { color: var(--accent2); }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #1e3a5f; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #0d1b2a; font-weight: 600; }
+    tr:nth-child(even) td { background: var(--table-stripe); }
+    .highlight { background: #2b1f0d !important; font-weight: 700; color: var(--accent); }
+    .tip-box {
+        background: var(--tip-bg); border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: var(--warn-bg); border-left: 4px solid var(--accent);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .danger-box {
+        background: var(--danger-bg); border-left: 4px solid var(--red);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #0d1b2a;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .key-badge {
+        display: inline-block; background: var(--accent); color: #0d1b2a;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    .del-badge {
+        display: inline-block; background: var(--red); color: #fff;
+        font-weight: 700; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.85rem;
+    }
+    footer {
+        text-align: center; color: #4a5568; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #1e3a5f;
+    }
+    ul, ol { color: #c8d6e5; }
+    p { color: #c8d6e5; }
+    code { 
+        background: #1a2744; color: var(--accent); 
+        padding: 1px 6px; border-radius: 4px; font-family: "Fira Code","Consolas",monospace;
+        font-size: 0.9em;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.75rem; padding: 0.8rem; }
+        .ascii-art { font-size: 0.65rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🗑️ 编程题：Slim删除重复结点</h1>
+    <div class="subtitle">第27题 · 删除带头结点非递减单链表中的重复元素</div>
+    <div class="answer-badge">
+        ✅ 完整代码 · 遍历一次 O(n) · 返回删除个数
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目理解：我们要做什么？</h2>
+
+<h3>1.1 问题描述</h3>
+<p>
+给定一个<b>带头结点的单链表</b>，链表中的元素按<b>非递减</b>（即升序，允许相等）排列。
+编写函数 <code>Slim</code>，<b>删除所有值重复的结点</b>（保留第一个出现的值，删除后续重复的），
+返回被删除的结点个数。
+</p>
+
+<h3>1.2 核心任务</h3>
+<ol style="margin-left:1.5rem; line-height:2.2;">
+    <li><b>遍历链表</b>：从头到尾扫描一遍。</li>
+    <li><b>识别重复</b>：如果当前结点和下一个结点的值相等，则下一个结点是重复的。</li>
+    <li><b>删除结点</b>：跳过重复结点，释放其内存，计数器+1。</li>
+    <li><b>返回结果</b>：返回总共删除了多少个重复结点。</li>
+</ol>
+
+<h3>1.3 链表结构定义</h3>
+<div class="code-block">
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">Node</span> {
+    <span class="type">int</span> Data;
+    <span class="kw">struct</span> <span class="type">Node</span> *Next;
+} <span class="type">Node</span>;
+<span class="cmt">// 带头结点：头结点L的Data无效，L->Next指向第一个数据结点</span>
+</div>
+</div>
+
+<!-- ============ KEY INSIGHT ============ -->
+<div class="card green">
+<h2>二、核心原理：为什么"非递减 = 重复元素必定相邻"？</h2>
+
+<h3>2.1 什么是"非递减排列"？</h3>
+<p>
+<b>非递减</b>（non-decreasing）的意思是：随着下标增加，元素值<b>不会变小</b>，即：
+</p>
+<div class="ascii-art">
+    对于任意相邻结点 A 和 B（A在前，B在后），满足：A.Data ≤ B.Data
+
+    简单理解：非递减 ≈ 升序（允许相等）
+              即 "从小到大排列，但允许相邻元素相等"
+</div>
+
+<h3>2.2 为什么重复元素一定相邻？——反证法</h3>
+<p>
+假设链表非递减排列：<code>a₁ ≤ a₂ ≤ a₃ ≤ ... ≤ aₙ</code>。
+</p>
+<p>
+如果值为 <code>X</code> 的元素出现了多次，设它们出现在位置 <code>i</code> 和 <code>j</code>（i &lt; j），即 a<sub>i</sub> = a<sub>j</sub> = X。
+</p>
+<p>
+由于序列非递减：<code>a<sub>i</sub> ≤ a<sub>i+1</sub> ≤ ... ≤ a<sub>j</sub></code>
+</p>
+<p>
+又因为 a<sub>i</sub> = a<sub>j</sub> = X，中间的传递性强制：<b>a<sub>i+1</sub> = a<sub>i+2</sub> = ... = a<sub>j-1</sub> = X</b>。
+</p>
+<p>
+也就是说，<b>所有值为X的元素必然连续排列在一起</b>，中间不可能插入其他值。
+</p>
+
+<h3>2.3 直观对比</h3>
+<table>
+    <tr><th>排列类型</th><th>示例链表</th><th>重复元素是否相邻？</th></tr>
+    <tr>
+        <td><b>非递减（本题）</b></td>
+        <td>[1, <b>2, 2, 2</b>, 3, <b>5, 5</b>, 8]</td>
+        <td>✅ 是！所有重复都紧挨着</td>
+    </tr>
+    <tr>
+        <td>无序</td>
+        <td>[2, 5, 2, 3, 5, 1]</td>
+        <td>❌ 否！2和5分散在各处</td>
+    </tr>
+</table>
+
+<div class="tip-box">
+    💡 <b>关键结论：</b>正因为非递减保证重复元素相邻，我们只需比较相邻结点（p和p-&gt;Next），一次遍历就能删除所有重复。如果链表无序，则需要O(n²)或哈希表辅助。
+</div>
+</div>
+
+<!-- ============ FULL CODE ============ -->
+<div class="card blue">
+<h2>三、完整代码 &amp; 逐行解析</h2>
+
+<h3>3.1 Slim函数完整实现</h3>
+<div class="code-block">
+<span class="type">int</span> <span class="fn">Slim</span>(<span class="kw">struct</span> <span class="type">Node</span> *L) {
+    <span class="type">int</span> n = <span class="num">0</span>;                          <span class="cmt">// 计数器：已删除的重复结点数</span>
+    <span class="kw">struct</span> <span class="type">Node</span> *p, *q;                  <span class="cmt">// p: 当前扫描指针  q: 临时保存待删除结点</span>
+
+    p = L-&gt;Next;                        <span class="cmt">// p从第一个数据结点开始（跳过头结点）</span>
+
+    <span class="kw">while</span> (p != <span class="kw">NULL</span> && p-&gt;Next != <span class="kw">NULL</span>) {  <span class="cmt">// 条件：p和p的下一个都存在</span>
+        <span class="kw">if</span> (p-&gt;Data == p-&gt;Next-&gt;Data) {  <span class="cmt">// 发现重复！p和后继值相等</span>
+            q = p-&gt;Next;                <span class="cmt">// ① q指向待删除的重复结点</span>
+            p-&gt;Next = q-&gt;Next;          <span class="cmt">// ② 跳过q：p直接连到q的后继</span>
+            free(q);                    <span class="cmt">// ③ 释放重复结点的内存</span>
+            n++;                        <span class="cmt">// ④ 计数器+1</span>
+        } <span class="kw">else</span> {
+            p = p-&gt;Next;                <span class="cmt">// 不重复：p正常后移</span>
+        }
+    }
+    <span class="kw">return</span> n;                            <span class="cmt">// 返回删除总数</span>
+}
+</div>
+
+<h3>3.2 逐行详细解释</h3>
+
+<table>
+    <tr><th>代码行</th><th>解释</th><th>易错点</th></tr>
+    <tr>
+        <td><code>int n = 0;</code></td>
+        <td>初始化计数器为0。每删除一个重复结点就n++。</td>
+        <td>别忘了初始化，否则返回的是垃圾值。</td>
+    </tr>
+    <tr>
+        <td><code>p = L-&gt;Next;</code></td>
+        <td>p从第一个<b>数据结点</b>开始，跳过头结点L。</td>
+        <td>不要写成 <code>p = L</code>，头结点不存数据，不需要参与比较。</td>
+    </tr>
+    <tr>
+        <td><code>while (p != NULL && p-&gt;Next != NULL)</code></td>
+        <td>
+            循环继续条件：①p存在 且 ②p有后继。<br>
+            两个条件<b>缺一不可</b>。如果只剩最后一个结点（p-&gt;Next==NULL），它不可能有重复，循环结束。
+        </td>
+        <td>
+            ⚠️ <b>短路求值！</b>必须先判断p!=NULL，再判断p-&gt;Next。如果反过来写，p==NULL时p-&gt;Next会空指针崩溃。
+        </td>
+    </tr>
+    <tr>
+        <td><code>if (p-&gt;Data == p-&gt;Next-&gt;Data)</code></td>
+        <td>比较相邻两个结点：当前p和下一个。由于非递减，这是判断重复的唯一条件。</td>
+        <td>不需要考虑"隔一个"的情况——非递减保证重复一定相邻。</td>
+    </tr>
+    <tr>
+        <td><code>q = p-&gt;Next;</code></td>
+        <td>用q暂存待删除结点的地址，以便后续free。</td>
+        <td>不暂存的话，p-&gt;Next被改后就丢失了待删除结点的地址→内存泄漏。</td>
+    </tr>
+    <tr>
+        <td><code>p-&gt;Next = q-&gt;Next;</code></td>
+        <td>"跳过"重复结点：p的Next直接指向q的后继。</td>
+        <td>这是链表删除的核心一步。</td>
+    </tr>
+    <tr>
+        <td><code>free(q);</code></td>
+        <td>释放被删除结点的内存。</td>
+        <td>不要忘记free，否则内存泄漏。</td>
+    </tr>
+    <tr>
+        <td><code>n++;</code></td>
+        <td>每成功删除一个，计数器加1。</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><code>else p = p-&gt;Next;</code></td>
+        <td>
+            <b>关键：</b>只有当p和p-&gt;Next<b>不相等</b>时，p才后移。<br>
+            如果相等并删除了p-&gt;Next，p<b>不动</b>——因为新的p-&gt;Next可能还是重复的！
+        </td>
+        <td>
+            ⚠️ <b>易错！</b>删除后不要立即p=p-&gt;Next。比如 [2,2,2,3]，p指向第一个2，删除第二个2后，p-&gt;Next变成了第三个2（值也是2），需要继续比较。如果p后移就漏删了。
+        </td>
+    </tr>
+</table>
+</div>
+
+<!-- ============ VISUAL DEMO ============ -->
+<div class="card">
+<h2>四、可视化演示：链表 [1, 2, 2, 2, 3, 5, 5, 8] 的Slim过程</h2>
+
+<h3>4.1 初始状态</h3>
+<div class="ascii-art">
+    L ──→ <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="del">2</span> ──→ <span class="del">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+          ↑
+          p (初始指向第一个数据结点1)
+          n = 0
+</div>
+
+<h3>4.2 第一轮：p=结点1，p-&gt;Data=1，p-&gt;Next-&gt;Data=2</h3>
+<div class="ascii-art">
+    <span class="ptr">p</span>
+    ↓
+    <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="del">2</span> ──→ <span class="del">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+
+    1 ≠ 2  →  不重复！p后移。
+    n = 0
+</div>
+
+<h3>4.3 第二轮：p=结点2(第一个)，p-&gt;Data=2，p-&gt;Next-&gt;Data=2</h3>
+<div class="ascii-art">
+              <span class="ptr">p</span>
+              ↓
+    <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="del">2</span> ──→ <span class="del">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+                      ↑
+                      q = p-&gt;Next（q指向第二个2）
+
+    2 == 2  →  重复！执行删除：
+    ① q = p-&gt;Next          （q指向第二个2）
+    ② p-&gt;Next = q-&gt;Next    （p跳过q，指向第三个2）
+    ③ free(q)              （释放第二个2）
+    ④ n++                  （n = 1）
+
+    ⚠️ p不动！因为新的p-&gt;Next（第三个2）值也是2，还需继续检查。
+</div>
+
+<h3>4.4 第三轮：p仍在结点2(第一个)，p-&gt;Data=2，p-&gt;Next-&gt;Data=2</h3>
+<div class="ascii-art">
+              <span class="ptr">p</span>
+              ↓
+    <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="del">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+                      ↑
+                      q = p-&gt;Next（q指向第三个2，即原来的第三个2）
+
+    2 == 2  →  重复！再次执行删除：
+    ① q = p-&gt;Next
+    ② p-&gt;Next = q-&gt;Next    （p跳过q，指向3）
+    ③ free(q)              （释放第三个2）
+    ④ n++                  （n = 2）
+
+    ⚠️ p仍不动！
+</div>
+
+<h3>4.5 第四轮：p仍在结点2(第一个)，p-&gt;Data=2，p-&gt;Next-&gt;Data=3</h3>
+<div class="ascii-art">
+              <span class="ptr">p</span>
+              ↓
+    <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+
+    2 ≠ 3  →  不重复！p后移。
+    n = 2
+</div>
+
+<h3>4.6 第五轮～第六轮：继续扫描剩余部分</h3>
+<div class="ascii-art">
+    <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="del">5</span> ──→ <span class="hl">8</span> ──→ NULL
+                          ↑              ↑
+                          p (3≠5,p后移)   p (5==5,删除第二个5,n=3)
+
+    最后：p指向8，p-&gt;Next==NULL → 循环结束！
+</div>
+
+<h3>4.7 最终结果</h3>
+<div class="ascii-art">
+    <span class="new">最终链表：</span>
+    L ──→ <span class="hl">1</span> ──→ <span class="hl">2</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="hl">8</span> ──→ NULL
+
+    删除总数 n = <span class="hl">3</span>（删除了两个多余的2和一个多余的5）
+    每个值只保留第一次出现的那一个！
+</div>
+</div>
+
+<!-- ============ STEP BY STEP TABLE ============ -->
+<div class="card cyan">
+<h2>五、逐步执行追踪表</h2>
+
+<table>
+    <tr><th>轮次</th><th>p指向的值</th><th>p-&gt;Next的值</th><th>比较</th><th>动作</th><th>删除的结点</th><th>n</th><th>p是否后移？</th></tr>
+    <tr><td>1</td><td>1</td><td>2</td><td>1 ≠ 2</td><td>-</td><td>-</td><td>0</td><td>✅ 后移</td></tr>
+    <tr class="highlight"><td>2</td><td>2</td><td>2</td><td>2 = 2 ✓</td><td>删除p-&gt;Next</td><td>第2个2</td><td>1</td><td>❌ 不动</td></tr>
+    <tr class="highlight"><td>3</td><td>2</td><td>2</td><td>2 = 2 ✓</td><td>删除p-&gt;Next</td><td>第3个2</td><td>2</td><td>❌ 不动</td></tr>
+    <tr><td>4</td><td>2</td><td>3</td><td>2 ≠ 3</td><td>-</td><td>-</td><td>2</td><td>✅ 后移</td></tr>
+    <tr><td>5</td><td>3</td><td>5</td><td>3 ≠ 5</td><td>-</td><td>-</td><td>2</td><td>✅ 后移</td></tr>
+    <tr class="highlight"><td>6</td><td>5</td><td>5</td><td>5 = 5 ✓</td><td>删除p-&gt;Next</td><td>第2个5</td><td>3</td><td>❌ 不动</td></tr>
+    <tr><td>7</td><td>5</td><td>8</td><td>5 ≠ 8</td><td>-</td><td>-</td><td>3</td><td>✅ 后移</td></tr>
+    <tr><td>结束</td><td>8</td><td>NULL</td><td>-</td><td>循环退出</td><td>-</td><td><b>3</b></td><td>-</td></tr>
+</table>
+
+<div class="tip-box">
+    💡 <b>核心规律：</b>p只在"不相等"时才后移。删除时p不动——这是为了处理连续多个重复（如三个2连在一起）。
+</div>
+</div>
+
+<!-- ============ BOUNDARY CASES ============ -->
+<div class="card red">
+<h2>六、边界情况分析</h2>
+
+<h3>情况1：空链表（只有头结点，L-&gt;Next == NULL）</h3>
+<div class="ascii-art">
+    L ──→ NULL
+    p = L-&gt;Next = NULL → while(p != NULL) 直接不满足 → 返回 0。✅
+</div>
+
+<h3>情况2：只有一个数据结点</h3>
+<div class="ascii-art">
+    L ──→ <span class="hl">5</span> ──→ NULL
+    p = 结点5，p-&gt;Next == NULL → while(p-&gt;Next != NULL) 不满足 → 返回 0。✅
+    （单个结点不可能有重复）
+</div>
+
+<h3>情况3：所有元素都不重复</h3>
+<div class="ascii-art">
+    L ──→ <span class="hl">1</span> ──→ <span class="hl">3</span> ──→ <span class="hl">5</span> ──→ <span class="hl">8</span> ──→ NULL
+    p一路后移，每次if都不成立，最终返回 0。✅ 链表不变。
+</div>
+
+<h3>情况4：所有元素都相同</h3>
+<div class="ascii-art">
+    初始：L ──→ <span class="del">5</span> ──→ <span class="del">5</span> ──→ <span class="del">5</span> ──→ <span class="del">5</span> ──→ NULL
+                    ↑p
+    第1轮：删除第2个5，n=1，p不动
+    第2轮：删除第3个5，n=2，p不动
+    第3轮：删除第4个5，n=3，p不动
+    第4轮：p-&gt;Next==NULL → 退出
+
+    最终：L ──→ <span class="hl">5</span> ──→ NULL  返回 3。✅ 只保留第一个。
+</div>
+
+<h3>情况5：重复出现在链表末尾</h3>
+<div class="ascii-art">
+    初始：L ──→ <span class="hl">3</span> ──→ <span class="del">8</span> ──→ <span class="del">8</span> ──→ NULL
+                                    ↑p
+    第1轮：删除第2个8，n=1，p不动
+    第2轮：p-&gt;Next==NULL → 退出
+
+    最终：L ──→ <span class="hl">3</span> ──→ <span class="hl">8</span> ──→ NULL  返回 1。✅
+</div>
+
+<div class="tip-box">
+    💡 <b>总结：</b>所有边界情况都无需特殊处理——代码逻辑已自然覆盖。这是算法设计良好的标志。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>七、常见错误 &amp; 考点总结</h2>
+
+<div class="danger-box">
+    🔴 <b>致命错误1：删除后p立即后移！</b><br>
+    如果删除p-&gt;Next后写 <code>p = p-&gt;Next</code>（或把p=p-&gt;Next放在if外面），会导致连续多个重复时只删除了第一个重复。<br>
+    例如 [2,2,2]：删除第二个2后p移到了第三个2的位置，但第三个2之前是第二个2的后继——它现在是p（值=2），而p前面是第一个2（值=2），算法应该继续删除p（第三个2），但p已经移走了，第三个2被保留。<br>
+    <b>正确做法：只有else分支才能p=p-&gt;Next。</b>
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：while条件只写 p != NULL。</b><br>
+    如果只检查p != NULL，当p指向最后一个结点时，p-&gt;Next == NULL，访问p-&gt;Next-&gt;Data会空指针崩溃。<br>
+    <b>必须两个条件：</b><code>p != NULL && p-&gt;Next != NULL</code>。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：忘了free(q)。</b><br>
+    只修改指针（p-&gt;Next = q-&gt;Next）但不free(q)，被删除的结点仍在堆内存中——造成<b>内存泄漏</b>。<br>
+    删除链表结点三步不可少：保存(q) → 跳过(p-&gt;Next=q-&gt;Next) → 释放(free(q))。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：忘记先q=p-&gt;Next再修改p-&gt;Next。</b><br>
+    如果直接写 <code>p-&gt;Next = p-&gt;Next-&gt;Next</code> 然后 <code>free(p-&gt;Next)</code>，此时p-&gt;Next已经变了，free的是错误结点。<br>
+    <b>必须先用q暂存待删结点地址。</b>
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误5：没理解"非递减"和"严格递增"的区别。</b><br>
+    非递减允许相等 → 有重复。严格递增不允许相等 → 不需要去重。<br>
+    本题考的就是"非递减"这个条件——利用它来简化算法。
+</div>
+
+<div class="tip-box">
+    💡 <b>考试心法：</b><br>
+    这道题的核心考点只有三个——<br>
+    ① <b>非递减 = 重复相邻</b>（为什么？用传递性解释）<br>
+    ② <b>链表删除的标准三步</b>（保存→跳过→释放）<br>
+    ③ <b>删除后p不后移</b>（处理连续重复的关键！）<br>
+    理解这三点，代码自然就写出来了。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"非递减来重复连，相邻比较一遍完。相等就删p不动，不等才把p后搬。先存q来再跳链，最后free才算完。"
+</div>
+</div>
+
+<!-- ============ EXTENSION ============ -->
+<div class="card blue">
+<h2>八、拓展思考：如果链表是"非递增"（降序）呢？</h2>
+<table>
+    <tr><th>排列方式</th><th>示例</th><th>重复是否相邻？</th><th>算法需要改吗？</th></tr>
+    <tr>
+        <td>非递减（升序，本题）</td><td>[1, 2, 2, 3, 5, 5]</td>
+        <td>✅ 相邻</td>
+        <td>不需要改</td>
+    </tr>
+    <tr>
+        <td>非递增（降序）</td><td>[5, 5, 3, 2, 2, 1]</td>
+        <td>✅ 相邻</td>
+        <td><b>不需要改！</b></td>
+    </tr>
+    <tr>
+        <td>无序</td><td>[2, 5, 2, 3, 5]</td>
+        <td>❌ 不相邻</td>
+        <td>需要哈希表或O(n²)</td>
+    </tr>
+</table>
+
+<div class="tip-box">
+    💡 无论升序还是降序，只要是有序的（单调的），重复元素必然相邻。Slim算法完全适用，一行都不需要改！
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构考试范围2026 · Slim删除重复结点 · 第27题详解
+</footer>
+
+</body>
+</html>

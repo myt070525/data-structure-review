@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第1题 · 时间复杂度 O(mn)</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+/* Header */
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 2rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+.header .q-box code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; color: var(--orange-dark); }
+
+/* Answer */
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 2rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 3em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 4px;
+}
+
+/* Sections */
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+/* Step circles */
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+/* Code blocks */
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .fn { color: #e2e8f0; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .num { color: #fb923c; }
+.code-block .str { color: #a3e635; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+/* ASCII art */
+.ascii-box {
+  background: #faf8f5; border: 1px dashed #d4c8b0; border-radius: 10px;
+  padding: 1.2rem 1.5rem; margin: 1rem 0; text-align: center;
+  font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85rem;
+  line-height: 1.65; white-space: pre; overflow-x: auto;
+}
+
+/* Tables */
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;
+}
+table.data th {
+  background: #fff7ed; padding: 10px 12px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center;
+}
+table.data tr.hl-row { background: #fffbeb; }
+table.data td.left { text-align: left; }
+
+/* Tips */
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+/* Inline */
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1rem 0; }
+.compare-card {
+  padding: 1.2rem; border-radius: 10px; text-align: center;
+}
+.compare-card.good { background: #f0fdf4; border: 2px solid #86efac; }
+.compare-card.bad { background: #fef2f2; border: 2px solid #fca5a5; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第1题</div>
+  <h1>📐 时间复杂度 — 嵌套 vs 并列循环</h1>
+  <div class="q-box">
+    代码如下，求时间复杂度：<br>
+    <code>for (i = 0; i &lt; m; i++)</code><br>
+    <code>&nbsp;&nbsp;for (j = 0; j &lt; n; j++)</code><br>
+    <code>&nbsp;&nbsp;&nbsp;&nbsp;a[i][j] = 0;</code>
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big">T(n) = <span class="blank">O(m × n)</span></div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    若 m ≈ n，可简写为 <strong style="color:var(--orange-dark)">O(n²)</strong>
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、什么是时间复杂度？</h2>
+  <div class="card">
+    <p>时间复杂度衡量的是<span class="hl">算法执行时间随输入规模增长的趋势</span>，而不是精确的秒数。我们用<strong>大O记号</strong>来表示：</p>
+    <ul>
+      <li><strong>O(1)：</strong>常数时间 — 不管输入多大，执行时间不变</li>
+      <li><strong>O(n)：</strong>线性时间 — 输入翻倍，时间也翻倍</li>
+      <li><strong>O(n²)：</strong>平方时间 — 输入翻倍，时间翻四倍</li>
+      <li><strong>O(log n)：</strong>对数时间 — 非常快，二分查找就是</li>
+    </ul>
+    <p style="margin-top:0.8rem;color:var(--muted);">通俗类比：O(1)是"看一眼"，O(n)是"翻一遍"，O(n²)是"每个人都和其他人握一次手"。</p>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、嵌套循环 vs 并列循环 — 关键区别</h2>
+  <div class="card">
+    <h3>🔗 嵌套循环（乘法关系）</h3>
+    <div class="code-block">
+<span class="cmt">// 嵌套：外层每执行1次，内层执行n次</span>
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; m; i++)        <span class="cmt">// m 次</span>
+    <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; n; j++)    <span class="cmt">// 每次 n 次</span>
+        a[i][j] = <span class="num">0</span>;            <span class="cmt">// 总共 m×n 次</span>
+    </div>
+    <p>总执行次数 = <strong>m × n</strong> → <span class="hl">O(m × n)</span></p>
+
+    <h3 style="margin-top:1.5rem;">📏 并列循环（加法关系）</h3>
+    <div class="code-block">
+<span class="cmt">// 并列：两个循环依次执行</span>
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; m; i++)        <span class="cmt">// m 次</span>
+    a[i] = <span class="num">0</span>;
+<span class="kw">for</span> (j = <span class="num">0</span>; j &lt; n; j++)        <span class="cmt">// n 次</span>
+    b[j] = <span class="num">0</span>;
+    </div>
+    <p>总执行次数 = <strong>m + n</strong> → <span class="hl">O(m + n)</span>（不是 O(m×n)！）</p>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card bad">
+      <div style="font-size:1.5rem;color:var(--red);">❌ 嵌套</div>
+      <div style="font-size:2rem;font-weight:900;color:var(--red);">O(m×n)</div>
+      <div style="color:var(--muted);font-size:0.85rem;">内层重复执行<br>→ 乘法</div>
+    </div>
+    <div class="compare-card good">
+      <div style="font-size:1.5rem;color:var(--green);">✅ 并列</div>
+      <div style="font-size:2rem;font-weight:900;color:var(--green);">O(m+n)</div>
+      <div style="color:var(--muted);font-size:0.85rem;">各自执行一遍<br>→ 加法</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、本题详细分析流程图</h2>
+  <div class="card">
+    <p>本题是典型的<strong>双层嵌套循环</strong>，内层循环完全包含在外层循环中：</p>
+
+    <div class="ascii-box">
+┌──────────────────────────────────────────────────┐
+│                程序执行流程图                        │
+├──────────────────────────────────────────────────┤
+│                                                    │
+│   ┌──────┐                                        │
+│   │ START │                                        │
+│   └──┬───┘                                        │
+│      │                                             │
+│      ▼                                             │
+│   ┌──────────────────────┐                        │
+│   │  i = 0               │  ← 外层循环初始化       │
+│   └─────────┬────────────┘                        │
+│             │                                      │
+│      ┌──────▼──────┐                               │
+│      │  i < m ?     │─── NO ──→ END               │
+│      └──────┬──────┘                               │
+│             │ YES                                  │
+│             ▼                                      │
+│   ┌──────────────────────┐                        │
+│   │  j = 0               │  ← 内层循环初始化       │
+│   └─────────┬────────────┘                        │
+│             │                                      │
+│      ┌──────▼──────┐                               │
+│      │  j < n ?     │─── NO ──→ i++ ──→ 回外层   │
+│      └──────┬──────┘                               │
+│             │ YES                                  │
+│             ▼                                      │
+│   ┌──────────────────────┐                        │
+│   │  a[i][j] = 0         │  ← 核心操作（1次）     │
+│   └─────────┬────────────┘                        │
+│             │                                      │
+│             ▼ j++  ──→ 回内层判断                  │
+│                                                    │
+├──────────────────────────────────────────────────┤
+│  分析：                                            │
+│  · 外层循环：i 从 0 到 m-1，共 m 次              │
+│  · 每次外层：内层 j 从 0 到 n-1，共 n 次         │
+│  · 核心语句被执行：m × n 次                       │
+│  · 时间复杂度：O(m × n)                           │
+└──────────────────────────────────────────────────┘
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、逐行分析法</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>代码行</th><th>语句</th><th>执行次数</th><th>说明</th></tr>
+      <tr>
+        <td style="font-family:monospace;">1</td>
+        <td class="left"><code>for (i=0; i&lt;m; i++)</code></td>
+        <td>m + 1</td>
+        <td class="left">条件判断执行 m+1 次（最后一次判断为假）</td>
+      </tr>
+      <tr class="hl-row">
+        <td style="font-family:monospace;">2</td>
+        <td class="left"><code>for (j=0; j&lt;n; j++)</code></td>
+        <td>m × (n+1)</td>
+        <td class="left">外层每循环一次，内层判断执行 n+1 次</td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace;">3</td>
+        <td class="left"><code>a[i][j] = 0;</code></td>
+        <td><strong style="color:var(--orange-dark)">m × n</strong></td>
+        <td class="left">核心赋值语句，主导时间复杂度</td>
+      </tr>
+    </table>
+    <p style="margin-top:1rem;">核心语句执行 <strong>m × n</strong> 次，因此 <span class="hl">T(n) = O(m × n)</span>。</p>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、常见循环模式对比一览</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>模式</th><th>代码结构</th><th>时间复杂度</th><th>例子</th></tr>
+      <tr>
+        <td>单层循环</td>
+        <td class="left" style="font-family:monospace;">for(i=0;i&lt;n;i++)</td>
+        <td><strong>O(n)</strong></td>
+        <td>遍历数组</td>
+      </tr>
+      <tr class="hl-row">
+        <td>双层嵌套</td>
+        <td class="left" style="font-family:monospace;">for(i) for(j)</td>
+        <td><strong>O(n²)</strong></td>
+        <td>矩阵赋值、冒泡排序</td>
+      </tr>
+      <tr>
+        <td>三层嵌套</td>
+        <td class="left" style="font-family:monospace;">for(i) for(j) for(k)</td>
+        <td><strong>O(n³)</strong></td>
+        <td>矩阵乘法（朴素）</td>
+      </tr>
+      <tr>
+        <td>独立并列</td>
+        <td class="left" style="font-family:monospace;">for(i) ... for(j) ...</td>
+        <td><strong>O(n+m)</strong></td>
+        <td>两个独立遍历</td>
+      </tr>
+      <tr>
+        <td>指数缩减</td>
+        <td class="left" style="font-family:monospace;">for(i=1;i&lt;=n;i*=2)</td>
+        <td><strong>O(log n)</strong></td>
+        <td>二分查找</td>
+      </tr>
+      <tr>
+        <td>嵌套缩减</td>
+        <td class="left" style="font-family:monospace;">for(i) while(j/=2)</td>
+        <td><strong>O(n log n)</strong></td>
+        <td>归并排序、堆排序</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、三步判断法（考试技巧）</h2>
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>找最内层核心语句</strong> — 通常是执行次数最多的那句。忽略声明、忽略条件判断。本题核心语句是 <code>a[i][j]=0</code>。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>数嵌套层数</strong> — 每层循环给核心语句的执行次数乘以该层变量范围。i 循环 m 次，j 循环 n 次 → m×n。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>取最高阶，去系数</strong> — 如果 m≈n，O(m×n) 就是 O(n²)。常数系数如 2n² → O(n²)。</div>
+    </div>
+  </div>
+
+  <div class="danger-box">
+    <strong>⚠️ 常见错误：</strong>把两个<strong>并列</strong>的循环当成嵌套来算！<br>
+    并列循环：<code>for(i) ... </code> 完了再 <code>for(j) ...</code> → 结果是 <strong>O(m+n)</strong>，不是 O(m×n)！<br>
+    <span style="color:var(--muted);">记住口诀：<strong>"套着走→乘法，顺着走→加法"</strong></span>
+  </div>
+
+  <div class="tip-box">
+    <strong>🎯 考试抓分技巧：</strong>看到两个 <code>for</code> 关键字，先看大括号的位置——如果第二个 <code>for</code> 在第一个的 <strong>大括号里面</strong>，那就是嵌套（乘法）；如果在第一个的 <strong>大括号外面</strong>，那就是并列（加法）。
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、典型变式练习</h2>
+  <div class="card">
+    <h3>变式①：内层次数依赖外层</h3>
+    <div class="code-block">
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; n; i++)
+    <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; <span class="blank">i</span>; j++)    <span class="cmt">// 注意：j &lt; i，不是 j &lt; n！</span>
+        sum++;
+    </div>
+    <p>此时总次数 = 0 + 1 + 2 + ... + (n-1) = <strong>n(n-1)/2 → O(n²)</strong></p>
+
+    <h3>变式②：两层并列</h3>
+    <div class="code-block">
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; n; i++)  a[i] = <span class="num">0</span>;   <span class="cmt">// n 次</span>
+<span class="kw">for</span> (j = <span class="num">0</span>; j &lt; m; j++)  b[j] = <span class="num">0</span>;   <span class="cmt">// m 次</span>
+    </div>
+    <p>总次数 = n + m → <strong>O(n + m)</strong>，不是 O(n×m)！</p>
+
+    <h3>变式③：循环内调用函数</h3>
+    <div class="code-block">
+<span class="kw">for</span> (i = <span class="num">0</span>; i &lt; n; i++)
+    binary_search(arr, target);   <span class="cmt">// 每次 O(log n)</span>
+    </div>
+    <p>总时间 = n × O(log n) → <strong>O(n log n)</strong></p>
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 时间复杂度是第1章和第2章的基础内容，贯穿整个数据结构课程。掌握"嵌套=乘法，并列=加法"原则即可应对大部分题目。
+</div>
+
+</div>
+</body>
+</html>

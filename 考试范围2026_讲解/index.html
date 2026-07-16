@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构考试范围练习题 · 复习导航</title>
+<style>
+:root {
+  --bg: #0d1b2a; --sidebar-bg: #152238; --text: #dde4f0; --muted: #a0afc4;
+  --accent: #e2b04a; --accent2: #f0d78c; --green: #4ade80; --red: #f87171;
+  --amber: #fbbf24; --border: #1e3a5f; --hover: #1a3050; --active: #1a2a10;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; overflow:hidden; }
+.sidebar { width:290px; min-width:290px; background:var(--sidebar-bg); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+.sidebar-header { padding:1.2rem 1.2rem 0.8rem; border-bottom:1px solid var(--border); flex-shrink:0; }
+.sidebar-header h1 { font-size:1.1rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.sidebar-header .info { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+.nav-list { flex:1; overflow-y:auto; padding:0.6rem 0; scroll-behavior:smooth; }
+.nav-list::-webkit-scrollbar { width:4px; }
+.nav-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.nav-group { margin-bottom:4px; }
+.nav-group-title { font-size:0.68rem; text-transform:uppercase; letter-spacing:2px; color:var(--accent); padding:0.8rem 1.2rem 0.4rem; font-weight:700; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:0.5rem 1.2rem; cursor:pointer; font-size:0.82rem; color:var(--muted); border-left:2px solid transparent; transition:all 0.15s; text-decoration:none; }
+.nav-item:hover { background:var(--hover); color:var(--text); }
+.nav-item.active { background:var(--active); color:var(--accent); border-left-color:var(--accent); font-weight:600; }
+.nav-item .num { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:6px; font-size:0.68rem; font-weight:700; background:var(--border); color:var(--muted); flex-shrink:0; }
+.nav-item.active .num { background:var(--accent); color:#0d1b2a; }
+.nav-item .tag { font-size:0.58rem; padding:1px 5px; border-radius:4px; margin-left:auto; flex-shrink:0; }
+.nav-item .tag.choice { background:#1e3a1a; color:var(--green); }
+.nav-item .tag.fill { background:#2a1a3a; color:#c084fc; }
+.nav-item .tag.short { background:#1a2a3a; color:#60a5fa; }
+.nav-item .tag.code { background:#3a1a1a; color:var(--red); }
+.search-box { padding:0 1.2rem 0.8rem; flex-shrink:0; }
+.search-box input { width:100%; padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.8rem; outline:none; }
+.search-box input:focus { border-color:var(--accent); }
+.search-box input::placeholder { color:#475569; }
+.main { flex:1; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+.topbar { padding:0.7rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-shrink:0; background:var(--sidebar-bg); }
+.topbar .current-title { font-weight:600; font-size:0.95rem; }
+.topbar .current-subtitle { font-size:0.75rem; color:var(--muted); }
+.topbar .nav-arrows { margin-left:auto; display:flex; gap:6px; }
+.topbar .nav-arrows button { background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.85rem; transition:all 0.15s; }
+.topbar .nav-arrows button:hover { background:var(--hover); border-color:var(--accent); }
+.iframe-container { flex:1; background:#fff; overflow:hidden; }
+.iframe-container iframe { width:100%; height:100%; border:none; display:block; }
+@media (max-width:700px) {
+  .sidebar { width:60px; min-width:60px; }
+  .sidebar-header h1 { font-size:0.7rem; }
+  .sidebar-header .info { display:none; }
+  .nav-item .tag, .nav-item span:not(.num) { display:none; }
+  .nav-item { justify-content:center; padding:0.7rem; }
+  .nav-group-title { display:none; }
+  .search-box { display:none; }
+  .topbar { padding:0.5rem 0.8rem; }
+  .topbar .current-title { font-size:0.8rem; }
+  .topbar .current-subtitle { display:none; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>📋 考试范围练习题</h1>
+    <div class="info">2026春 · 29 道题 · 含详细解析</div>
+  </div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 搜索题目..." oninput="filterNav()">
+  </div>
+  <nav class="nav-list" id="navList"></nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="current-title" id="currentTitle">选择题第1题</div>
+      <div class="current-subtitle" id="currentSubtitle">时间复杂度 O(log n)</div>
+    </div>
+    <div class="nav-arrows">
+      <button onclick="prevQuestion()">◀ 上一题</button>
+      <button onclick="nextQuestion()">下一题 ▶</button>
+    </div>
+  </div>
+  <div class="iframe-container">
+    <iframe id="viewer" src="" title="题目内容"></iframe>
+  </div>
+</main>
+
+<script>
+const questions = [
+  { id:'01',file:'01_选择题_时间复杂度logn.html',title:'选择题第1题',sub:'时间复杂度 O(log n)',group:'一、选择题（10题）',tag:'choice' },
+  { id:'02',file:'02_选择题_逻辑结构.html',title:'选择题第2题',sub:'基本逻辑结构',group:'一、选择题（10题）',tag:'choice' },
+  { id:'03',file:'03_选择题_链表适用场景.html',title:'选择题第3题',sub:'链表 vs 顺序表',group:'一、选择题（10题）',tag:'choice' },
+  { id:'04',file:'04_选择题_出栈序列.html',title:'选择题第4题',sub:'不可能的出栈序列',group:'一、选择题（10题）',tag:'choice' },
+  { id:'05',file:'05_选择题_循环队列判空.html',title:'选择题第5题',sub:'循环队列判空条件',group:'一、选择题（10题）',tag:'choice' },
+  { id:'06',file:'06_选择题_压缩存储矩阵.html',title:'选择题第6题',sub:'矩阵压缩存储',group:'一、选择题（10题）',tag:'choice' },
+  { id:'07',file:'07_选择题_双亲表示法树高.html',title:'选择题第7题',sub:'双亲表示法树高',group:'一、选择题（10题）',tag:'choice' },
+  { id:'08',file:'08_选择题_图连通性判断.html',title:'选择题第8题',sub:'图连通性判断',group:'一、选择题（10题）',tag:'choice' },
+  { id:'09',file:'09_选择题_快排一趟.html',title:'选择题第9题',sub:'快排一趟判定',group:'一、选择题（10题）',tag:'choice' },
+  { id:'10',file:'10_选择题_排序稳定性.html',title:'选择题第10题',sub:'排序算法稳定性',group:'一、选择题（10题）',tag:'choice' },
+  { id:'11',file:'11_填空题_算法特性.html',title:'填空题第1题',sub:'算法五大特性',group:'二、填空题（8题）',tag:'fill' },
+  { id:'12',file:'12_填空题_顺序表删除.html',title:'填空题第2题',sub:'顺序表删除移动元素',group:'二、填空题（8题）',tag:'fill' },
+  { id:'13',file:'13_填空题_后缀表达式.html',title:'填空题第3题',sub:'后缀表达式求值',group:'二、填空题（8题）',tag:'fill' },
+  { id:'14',file:'14_填空题_KMP算法.html',title:'填空题第4题',sub:'KMP next数组',group:'二、填空题（8题）',tag:'fill' },
+  { id:'15',file:'15_填空题_完全二叉树.html',title:'填空题第5题',sub:'完全二叉树结点数',group:'二、填空题（8题）',tag:'fill' },
+  { id:'16',file:'16_填空题_哈希查找效率.html',title:'填空题第6题',sub:'哈希表查找效率因素',group:'二、填空题（8题）',tag:'fill' },
+  { id:'17',file:'17_填空题_最小生成树算法.html',title:'填空题第7题',sub:'最小生成树算法',group:'二、填空题（8题）',tag:'fill' },
+  { id:'18',file:'18_填空题_选择排序.html',title:'填空题第8题',sub:'选择排序第二趟',group:'二、填空题（8题）',tag:'fill' },
+  { id:'19',file:'19_简答题_二叉树重建.html',title:'简答题第1题',sub:'二叉树重建 & 后序',group:'三、简答题（8题）',tag:'short' },
+  { id:'20',file:'20_简答题_AVL树插入.html',title:'简答题第2题',sub:'AVL树插入旋转',group:'三、简答题（8题）',tag:'short' },
+  { id:'21',file:'21_简答题_折半查找ASL.html',title:'简答题第3题',sub:'折半查找判定树 & ASL',group:'三、简答题（8题）',tag:'short' },
+  { id:'22',file:'22_简答题_哈希表线性探测.html',title:'简答题第4题',sub:'哈希表线性探测',group:'三、简答题（8题）',tag:'short' },
+  { id:'23',file:'23_简答题_AOE关键路径.html',title:'简答题第5题',sub:'AOE网关键路径',group:'三、简答题（8题）',tag:'short' },
+  { id:'24',file:'24_简答题_Floyd算法.html',title:'简答题第6题',sub:'Floyd最短路径',group:'三、简答题（8题）',tag:'short' },
+  { id:'25',file:'25_简答题_大顶堆.html',title:'简答题第7题',sub:'建堆 & 堆排序',group:'三、简答题（8题）',tag:'short' },
+  { id:'26',file:'26_简答题_希尔排序.html',title:'简答题第8题',sub:'希尔排序',group:'三、简答题（8题）',tag:'short' },
+  { id:'27',file:'27_编程题_Slim删除重复.html',title:'编程题第1题',sub:'删除链表重复结点',group:'四、编程题（3题）',tag:'code' },
+  { id:'28',file:'28_编程题_Merge合并顺序表.html',title:'编程题第2题',sub:'合并有序顺序表',group:'四、编程题（3题）',tag:'code' },
+  { id:'29',file:'29_编程题_DestroyTree销毁.html',title:'编程题第3题',sub:'后序销毁二叉树',group:'四、编程题（3题）',tag:'code' },
+];
+const tagLabels = { choice:'选', fill:'填', short:'简', code:'码' };
+let currentIndex = 0;
+const navList = document.getElementById('navList');
+let lastGroup = '';
+questions.forEach((q,i) => {
+  if(q.group!==lastGroup){ const t=document.createElement('div'); t.className='nav-group-title'; t.textContent=q.group; navList.appendChild(t); lastGroup=q.group; }
+  const item=document.createElement('div'); item.className='nav-item'; item.id='nav-'+q.id;
+  item.innerHTML=`<span class="num">${q.id}</span><span>${q.sub}</span><span class="tag ${q.tag}">${tagLabels[q.tag]}</span>`;
+  item.onclick=()=>loadQuestion(i); navList.appendChild(item);
+});
+function loadQuestion(index){
+  currentIndex=index; const q=questions[index];
+  document.getElementById('viewer').src=q.file;
+  document.getElementById('currentTitle').textContent=q.title;
+  document.getElementById('currentSubtitle').textContent=q.sub;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const navItem=document.getElementById('nav-'+q.id);
+  if(navItem){ navItem.classList.add('active'); navItem.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+  localStorage.setItem('ds_exam_current',index);
+}
+function nextQuestion(){ if(currentIndex<questions.length-1) loadQuestion(currentIndex+1); }
+function prevQuestion(){ if(currentIndex>0) loadQuestion(currentIndex-1); }
+function filterNav(){
+  const query=document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(item=>{ item.style.display=item.textContent.toLowerCase().includes(query)?'flex':'none'; });
+}
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); nextQuestion(); }
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); prevQuestion(); }
+});
+const saved=localStorage.getItem('ds_exam_current');
+if(saved!==null&&saved<questions.length){ loadQuestion(parseInt(saved)); } else { loadQuestion(0); }
+</script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空17 · 最小生成树算法</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm { color: #546e7a; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+tr.hl td { background: rgba(226,176,74,0.08); }
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.prim { color: #82aaff; }
+.kruskal { color: #ffcb6b; }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第7题 · 最小生成树算法</h1>
+  <p class="subtitle">Prim算法 与 Kruskal算法 —— 两种MST经典算法的全面对比</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">
+    <span class="prim">Prim算法</span> &nbsp;和&nbsp; <span class="kruskal">Kruskal算法</span>
+  </div>
+  <div class="note" style="color:var(--muted);margin-top:8px;">两者都是求最小生成树（MST）的经典贪心算法</div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、什么是最小生成树（MST）？</h2>
+  <div class="card">
+    <p>给定一个带权无向连通图 G=(V,E)，最小生成树是满足以下条件的<strong>生成树</strong>：</p>
+    <ul>
+      <li>包含图中<strong>所有 n 个顶点</strong></li>
+      <li>恰好有 <strong>n−1 条边</strong>（构成树）</li>
+      <li>边的<strong>权值之和最小</strong></li>
+    </ul>
+    <p style="color:var(--muted);">通俗类比：要在 n 个城市之间铺设光纤，每两个城市之间铺设的成本不同（边的权值）。问怎样铺设才能使总成本最低、且所有城市连通？这就是MST问题。</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、两种算法全方位对比</h2>
+
+  <table>
+    <tr><th style="width:18%">对比维度</th><th style="width:41%"><span class="prim">Prim算法</span></th><th style="width:41%"><span class="kruskal">Kruskal算法</span></th></tr>
+    <tr>
+      <td><strong>出发点</strong></td>
+      <td>从<strong>顶点</strong>出发，逐步扩展生成树</td>
+      <td>从<strong>边</strong>出发，逐步合并连通分量</td>
+    </tr>
+    <tr>
+      <td><strong>核心策略</strong></td>
+      <td>每次从<strong>已选顶点集</strong>到<strong>未选顶点集</strong>的横切边中，选择一条<strong>权值最小</strong>的边加入MST</td>
+      <td>每次从<strong>所有未选边</strong>中，选择一条<strong>权值最小</strong>且<strong>不形成环</strong>的边加入MST</td>
+    </tr>
+    <tr>
+      <td><strong>数据结构</strong></td>
+      <td>邻接矩阵/邻接表 + 优先队列（最小堆）</td>
+      <td>边集数组 + 并查集（Union-Find）</td>
+    </tr>
+    <tr class="hl">
+      <td><strong>时间复杂度</strong></td>
+      <td>
+        朴素：<strong>O(|V|²)</strong><br>
+        堆优化：<strong>O(|E|·log|V|)</strong>
+      </td>
+      <td>排序 + 并查集：<strong>O(|E|·log|E|)</strong><br>
+      实质 = <strong>O(|E|·log|V|)</strong>（因为E≤V²）
+      </td>
+    </tr>
+    <tr>
+      <td><strong>适用场景</strong></td>
+      <td><strong>稠密图</strong>（边多，|E|≈|V|²）<br>朴素Prim O(V²)更优</td>
+      <td><strong>稀疏图</strong>（边少，|E|≈|V|）<br>Kruskal对边排序主导</td>
+    </tr>
+    <tr>
+      <td><strong>选边方式</strong></td>
+      <td>始终维护<strong>一棵树</strong>，树逐渐长大</td>
+      <td>维护<strong>森林</strong>，逐步合并成树</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、ASCII图解：两种算法的区别</h2>
+  <div class="card">
+    <h3>📌 示例图（6个顶点，10条边）</h3>
+  </div>
+
+  <div class="ascii">
+           (1)─────2─────(2)
+          / | \         / | \
+         3  1  4      5  6  7
+        /   |   \   /   |   \
+      (3)──8──(4) (5)──9──(6)
+        \         |         /
+         5        3        4
+          \       |       /
+           └─────(5)─────┘
+
+  边权值标注在边上。目标是找一棵包含所有6个顶点、边权最小的树。
+  </div>
+
+  <div class="card">
+    <h3><span class="prim">🔵 Prim算法思路（从顶点出发）</span></h3>
+    <div class="ascii">
+  初始：任选顶点(1)作为起点，MST = {1}，候选边集 = {(1,2)=2, (1,3)=3, (1,4)=1, (1,5)=4}
+
+  第1步：候选边中最小为(1,4)=1 → 加入MST，顶点集={1,4}
+         新增候选边：(4,3)=8, (4,6)=3
+         候选边={(1,2)=2, (1,3)=3, (1,5)=4, (4,3)=8, (4,6)=3}
+
+  第2步：最小为(1,2)=2 → 加入MST，顶点集={1,4,2}
+         新增候选边：(2,3)=5, (2,5)=6, (2,6)=7
+         候选边={(1,3)=3, (1,5)=4, (4,3)=8, (4,6)=3, (2,3)=5, (2,5)=6, (2,6)=7}
+
+  第3步：最小(1,3)和(4,6)都是3，任选(1,3)=3 → 顶点集={1,4,2,3}
+         继续...直到所有6个顶点都加入
+
+  ★ 核心：Prim是在"已选顶点"和"未选顶点"之间的横切边中找最小值。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="kruskal">🟡 Kruskal算法思路（从边出发）</span></h3>
+    <div class="ascii">
+  初始：每个顶点自成一个连通分量，所有边按权值排序：
+  (1,4)=1, (1,2)=2, (1,3)=3, (4,6)=3, (1,5)=4, (5,6)=4,
+  (2,3)=5, (3,5)=5, (2,5)=6, (2,6)=7, (4,3)=8, (5,6)=9... (有重复)
+
+  第1步：取最小边(1,4)=1，1和4不在同一分量 → 加入，合并{1}和{4}
+  第2步：取(1,2)=2，1和2不在同一分量 → 加入，合并{1,4}和{2}
+  第3步：取(1,3)=3，1和3不在同一分量 → 加入，合并{1,2,4}和{3}
+  第4步：取(4,6)=3，4和6不在同一分量 → 加入，合并
+  第5步：取(1,5)=4，1和5不在同一分量 → 加入。现在6个顶点全部连通！
+          MST已有5条边(n−1=5)，完成 ✅
+
+  ★ 核心：Kruskal每次都取全局最小边，用并查集判断是否形成环。
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、算法伪代码对比</h2>
+
+  <div class="card">
+    <h3><span class="prim">Prim算法伪代码</span></h3>
+    <pre><span class="cm">// 朴素Prim O(V²)</span>
+<span class="fn">Prim</span>(G) {
+    lowcost[<span class="num">1</span>] = <span class="num">0</span>;                 <span class="cm">// 顶点1加入MST</span>
+    <span class="kw">for</span> i = <span class="num">2</span> to n:
+        lowcost[i] = G[<span class="num">1</span>][i];      <span class="cm">// 初始化到MST的最短距离</span>
+    <span class="kw">for</span> i = <span class="num">1</span> to n<span class="num">-1</span>:              <span class="cm">// 还需选n-1个顶点</span>
+        <span class="fn">找lowcost中最小值对应的顶点k</span>
+        <span class="fn">将k加入MST</span>
+        <span class="kw">for</span> j = <span class="num">1</span> to n:             <span class="cm">// 更新lowcost</span>
+            <span class="kw">if</span> G[k][j] &lt; lowcost[j]:
+                lowcost[j] = G[k][j];
+}</pre>
+  </div>
+
+  <div class="card">
+    <h3><span class="kruskal">Kruskal算法伪代码</span></h3>
+    <pre><span class="cm">// Kruskal O(E·logE)</span>
+<span class="fn">Kruskal</span>(G) {
+    <span class="fn">将所有边按权值升序排序</span>;        <span class="cm">// O(E·logE)</span>
+    <span class="fn">初始化并查集</span>，每个顶点一个集合;
+    count = <span class="num">0</span>;                     <span class="cm">// 已选边数</span>
+    <span class="kw">for</span> 每条边(u,v) <span class="kw">in</span> 排序后的边集:
+        <span class="kw">if</span> <span class="fn">Find</span>(u) != <span class="fn">Find</span>(v):   <span class="cm">// 不形成环</span>
+            <span class="fn">将边加入MST</span>;
+            <span class="fn">Union</span>(u, v);            <span class="cm">// 合并分量</span>
+            count++;
+            <span class="kw">if</span> count == n<span class="num">-1</span>: <span class="kw">break</span>; <span class="cm">// MST完成</span>
+}</pre>
+  </div>
+</div>
+
+<!-- ============ 第5节 ============ -->
+<div class="section">
+  <h2>五、选择建议与记忆口诀</h2>
+
+  <div class="card">
+    <table>
+      <tr><th>图类型</th><th>推荐算法</th><th>原因</th></tr>
+      <tr><td>稠密图（边多）</td><td><span class="prim">Prim（朴素O(V²)）</span></td><td>Kruskal排序O(E·logE)太大</td></tr>
+      <tr><td>稀疏图（边少）</td><td><span class="kruskal">Kruskal O(E·logE)</span></td><td>E≈V，排序开销可接受</td></tr>
+      <tr><td>需要堆优化</td><td><span class="prim">Prim + 堆 O(E·logV)</span></td><td>适合稀疏图的Prim变种</td></tr>
+    </table>
+  </div>
+
+  <div class="tip">
+    <strong>🧠 记忆口诀：</strong><br>
+    • <span class="prim">Prim</span> = "<strong>P</strong>ick <strong>v</strong>ertex"（从顶点出发） —— 一棵树从小到大<br>
+    • <span class="kruskal">Kruskal</span> = "<strong>K</strong>ruskal picks edges"（从边出发） —— 一片森林合并成树<br>
+    • 两者都是<strong>贪心算法</strong>，MST结果是唯一的（当边权都不相等时）
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 常考易错：</strong><br>
+    • 两种算法得到的MST<strong>可能不同</strong>（当存在相等权值边时），但<strong>总权值一定相同</strong>（MST的权值是唯一的）。<br>
+    • Prim不需要并查集，Kruskal必须用并查集判断环。<br>
+    • 两者的前提都是<strong>无向连通图</strong>，如果图不连通则不存在生成树。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

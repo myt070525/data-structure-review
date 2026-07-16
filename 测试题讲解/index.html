@@ -131,6 +131,7 @@ body {
 .nav-item .tag.fill { background: #2a1a3a; color: #c084fc; }
 .nav-item .tag.short { background: #1a2a1a; color: var(--green); }
 .nav-item .tag.code { background: #3a1a1a; color: var(--red); }
+.nav-item .tag.interactive { background: #1a3a2a; color: #4ade80; }
 
 /* search */
 .search-box {
@@ -292,9 +293,11 @@ const questions = [
   // 编程题
   { id: '27', file: '27_编程题_叶结点链表化.html', title: '编程题第1题', sub: '叶结点链表化', group: '编程题', tag: 'code' },
   { id: '28', file: '28_编程题_链表按序插入.html', title: '编程题第2题', sub: '链表按序插入', group: '编程题', tag: 'code' },
+  // 交互演示
+  { id: '🎮', file: 'BST交互演示_插入序列.html', title: 'BST交互演示', sub: '动手试试BST插入过程', group: '🧪 交互演示', tag: 'short' },
 ];
 
-const tagLabels = { choice: '选', fill: '填', short: '简', code: '码' };
+const tagLabels = { choice: '选', fill: '填', short: '简', code: '码', interactive: '🎮' };
 let currentIndex = 0;
 
 // Build nav

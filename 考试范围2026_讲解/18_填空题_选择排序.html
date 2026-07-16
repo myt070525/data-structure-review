@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空18 · 选择排序</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --orange: #f39c12;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm { color: #546e7a; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.min-elem { background: #2ecc71; color:#0d1b2a; font-weight:700; padding:2px 8px; border-radius:3px; }
+.sorted { background: #4dc9f6; color:#0d1b2a; font-weight:700; padding:2px 8px; border-radius:3px; }
+.current { background: #e2b04a; color:#0d1b2a; font-weight:700; padding:2px 8px; border-radius:3px; }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第8题 · 简单选择排序</h1>
+  <p class="subtitle">序列 12,33,25,7,19 第二趟排序后 → 7,12,25,33,19</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">第二趟排序后：<span style="color:var(--gold-light)">7, 12, 25, 33, 19</span></div>
+  <div class="note" style="color:var(--muted);margin-top:8px;">第一趟选出最小7→[<span style="color:#2ecc71;">7</span>,33,25,12,19]；第二趟选出次小12→[<span style="color:#4dc9f6;">7,12</span>,25,33,19]</div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、简单选择排序算法思想</h2>
+  <div class="card">
+    <p>简单选择排序（Simple Selection Sort）的基本思想：</p>
+    <ul>
+      <li>第 i 趟：从待排序区间 [i, n] 中选出<strong>最小元素</strong></li>
+      <li>将其与<strong>第 i 个位置</strong>的元素交换</li>
+      <li>经过 n−1 趟后，序列有序</li>
+    </ul>
+    <p><strong>关键特征：</strong>每趟只交换<strong>一次</strong>（找到最小元素后与当前位置交换），比较次数固定为 O(n²)，交换次数为 O(n)。</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、ASCII分步展示两趟选择排序过程</h2>
+
+  <div class="card">
+    <h3>初始序列</h3>
+    <div class="ascii">
+  索引:    [1]    [2]    [3]    [4]    [5]
+        ┌─────┬─────┬─────┬─────┬─────┐
+        │ 12  │ 33  │ 25  │  7  │ 19  │
+        └─────┴─────┴─────┴─────┴─────┘
+         ↑                             ↑
+        i=1                     待排序区间[1..5]
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🏷️ 第一趟排序（i=1）：选出最小值 7</h3>
+    <div class="ascii">
+  在[12, 33, 25, 7, 19]中找最小值：
+        ┌─────┬─────┬─────┬─────┬─────┐
+        │ 12  │ 33  │ 25  │ <span class="min-elem"> 7 </span> │ 19  │  ← 最小是7，位置4
+        └─────┴─────┴─────┴─────┴─────┘
+          ↑                 ↑
+        i=1              min=4
+
+  交换位置1(12)和位置4(7)：
+        ┌─────┬─────┬─────┬─────┬─────┐
+  交换前 │ 12  │ 33  │ 25  │  7  │ 19  │
+        └─────┴─────┴─────┴─────┴─────┘
+          ↕ swap ↕
+        ┌─────┬─────┬─────┬─────┬─────┐
+  交换后 │ <span class="sorted"> 7 </span> │ 33  │ 25  │ 12  │ 19  │  ← 7归位！
+        └─────┴─────┴─────┴─────┴─────┘
+          ↑
+      已排序区[1]     待排序区[2..5] → 33,25,12,19
+    </div>
+
+    <div style="text-align:center;margin-top:0.5rem;">
+      <span style="background:#2ecc71;color:#0d1b2a;padding:4px 12px;border-radius:4px;font-weight:700;">第一趟结果：7, 33, 25, 12, 19</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🏷️ 第二趟排序（i=2）：选出次小值 12</h3>
+    <div class="ascii">
+  已排序：[<span class="sorted">7</span>]  待排序：[33, 25, 12, 19] 中找最小值：
+        ┌─────┬─────┬─────┬─────┬─────┐
+        │  7  │ 33  │ 25  │ <span class="min-elem">12</span> │ 19  │  ← 最小是12，位置4
+        └─────┴─────┴─────┴─────┴─────┘
+        已排序  ↑                 ↑
+              i=2              min=4
+
+  交换位置2(33)和位置4(12)：
+        ┌─────┬─────┬─────┬─────┬─────┐
+  交换前 │  7  │ 33  │ 25  │ 12  │ 19  │
+        └─────┴─────┴─────┴─────┴─────┘
+                ↕ swap ↕
+        ┌─────┬─────┬─────┬─────┬─────┐
+  交换后 │ <span class="sorted"> 7 </span> │ <span class="sorted">12</span> │ 25  │ 33  │ 19  │  ← 7,12归位！
+        └─────┴─────┴─────┴─────┴─────┘
+                ↑
+      已排序区[1..2]      待排序区[3..5] → 25,33,19
+    </div>
+
+    <div style="text-align:center;margin-top:0.5rem;">
+      <span style="background:#4dc9f6;color:#0d1b2a;padding:4px 12px;border-radius:4px;font-weight:700;">第二趟结果：7, 12, 25, 33, 19 ✅</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、完整五趟排序一览</h2>
+
+  <table>
+    <tr><th>趟次</th><th>待排序区间</th><th>找到的最小值</th><th>与谁交换</th><th>排序后序列</th></tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">0</span></td>
+      <td>—</td><td>—</td><td>—</td>
+      <td style="font-family:monospace;">12, 33, 25, 7, 19</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">1</span></td>
+      <td>[1..5]</td><td>7（位置4）</td><td>12（位置1）</td>
+      <td style="font-family:monospace;"><span class="sorted">7</span>, 33, 25, 12, 19</td>
+    </tr>
+    <tr style="background:rgba(226,176,74,0.12);">
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;background:var(--gold);">2</span></td>
+      <td>[2..5]</td><td>12（位置4）</td><td>33（位置2）</td>
+      <td style="font-family:monospace;font-weight:700;color:var(--gold-light);"><span class="sorted">7</span>, <span class="sorted">12</span>, 25, 33, 19</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">3</span></td>
+      <td>[3..5]</td><td>19（位置5）</td><td>25（位置3）</td>
+      <td style="font-family:monospace;"><span class="sorted">7</span>, <span class="sorted">12</span>, <span class="sorted">19</span>, 33, 25</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">4</span></td>
+      <td>[4..5]</td><td>25（位置5）</td><td>33（位置4）</td>
+      <td style="font-family:monospace;"><span class="sorted">7</span>, <span class="sorted">12</span>, <span class="sorted">19</span>, <span class="sorted">25</span>, <span class="sorted">33</span></td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <strong>💡 为什么只有4趟（n−1=4）？</strong>因为当n−1个元素都排好后，最后一个元素自然就在正确位置上了。所以5个元素只需4趟。
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、算法复杂度分析</h2>
+  <table>
+    <tr><th>指标</th><th>值</th><th>说明</th></tr>
+    <tr><td>比较次数</td><td>n(n−1)/2</td><td>每趟比较 n−i 次，总计固定</td></tr>
+    <tr><td>交换次数</td><td>0 ~ n−1</td><td>最好0次（已有序），最坏n−1次</td></tr>
+    <tr><td>时间复杂度</td><td><strong>O(n²)</strong></td><td>最好/最坏/平均都是O(n²)</td></tr>
+    <tr><td>空间复杂度</td><td><strong>O(1)</strong></td><td>仅需几个辅助变量</td></tr>
+    <tr><td>稳定性</td><td><strong>不稳定</strong></td><td>交换可能打乱相等元素的相对顺序</td></tr>
+  </table>
+
+  <div class="danger">
+    <strong>⚠️ 选择排序为什么不稳定？</strong><br>
+    例如序列 [5, 5', 2]（5'表示第二个5）。第一趟找到最小值2，与第一个5交换 → [2, 5', 5]。原来5在5'前面，现在5'在5前面了。相等元素的相对顺序被改变 → <strong>不稳定</strong>。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

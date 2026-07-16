@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第7题 · 双亲表示法求树高</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(60,184,120,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+  .header .q-box code {
+    background: #0a1525; color: var(--cyan); padding: 2px 6px; border-radius: 3px;
+    font-family: 'Cascadia Code',monospace;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+  .ascii-box .p  { color: var(--purple); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第7题</div>
+  <h1>🌳 双亲表示法求树的高度</h1>
+  <div class="q-box">
+    用双亲表示法存储树，数组为 <code>[7, 0, -1, 2, 3, 0, 0, 3]</code>，<br>
+    则该树的高度为（　）。<br><br>
+    A. 3 &nbsp;&nbsp; B. 4 &nbsp;&nbsp; <strong>C. 5</strong> &nbsp;&nbsp; D. 6
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">C — 高度为 5</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">根结点下标2（值-1），最深路径长度为5</div>
+</div>
+
+<!-- ==================== 1: PARENT NOTATION ==================== -->
+<div class="section">
+  <h2>一、什么是双亲表示法？</h2>
+  <div class="card">
+    <p><strong>双亲表示法：</strong>用一个数组存储树中每个结点的<strong>父结点下标</strong>。根结点的父结点记为 <code>-1</code>。</p>
+    <p>给定数组 <code>parent[8] = [7, 0, -1, 2, 3, 0, 0, 3]</code>：</p>
+
+    <table>
+      <tr><th>结点下标 i</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+      <tr><td>parent[i] (父结点)</td><td>7</td><td>0</td><td style="color:var(--gold);font-weight:700">-1</td><td>2</td><td>3</td><td>0</td><td>0</td><td>3</td></tr>
+    </table>
+
+    <p>解读：</p>
+    <ul>
+      <li>结点 <strong>2</strong> 的 parent = <strong>-1</strong> → 结点2是<strong>根结点</strong>（没有父亲）</li>
+      <li>结点 <strong>3</strong> 的 parent = <strong>2</strong> → 结点3的父亲是结点2</li>
+      <li>结点 <strong>0</strong> 的 parent = <strong>7</strong> → 结点0的父亲是结点7</li>
+      <li>结点 <strong>7</strong> 的 parent = <strong>3</strong> → 结点7的父亲是结点3</li>
+      <li>等等...</li>
+    </ul>
+
+    <div class="info">
+      <strong>🔑 核心思路：</strong>从每个结点出发，沿着 parent 指针向上追溯，直到遇到 -1（根），途经的结点数就是该结点的<strong>深度</strong>。树的高度 = 所有结点深度的<strong>最大值</strong>。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 2: BUILD TREE ==================== -->
+<div class="section">
+  <h2>二、根据数组还原树结构</h2>
+  <div class="card">
+    <h3>方法：按父子关系逐层构建</h3>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>找到根：</strong>parent[2] = -1 → 结点 <strong>2</strong> 是根
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>列出父子关系：</strong><br>
+        结点3→父2，结点4→父3，结点7→父3，<br>
+        结点0→父7，结点1→父0，结点5→父0，结点6→父0
+      </div>
+    </div>
+
+    <div class="ascii-box">
+<span class="hl">树结构（ASCII绘制）</span>
+
+              <span class="hl">[2]</span>          ← 根结点 (parent=-1)，第1层
+               │
+              <span class="b">[3]</span>          ← parent=2，第2层
+             ┌─┴─┐
+            <span class="c">[4]</span>  <span class="p">[7]</span>       ← parent=3，第3层
+                 │
+                <span class="g">[0]</span>        ← parent=7，第4层
+               ┌─┼─┐
+              <span class="r">[1]</span><span class="r">[5]</span><span class="r">[6]</span>     ← parent=0，第5层
+
+<span class="hl">树高 = 5（从根[2]到叶子[1]/[5]/[6]经过5个结点）</span></div>
+
+    <p>逐层结构：</p>
+    <table>
+      <tr><th>层数</th><th>结点</th><th>层次</th></tr>
+      <tr><td>第1层</td><td>结点2</td><td>根</td></tr>
+      <tr><td>第2层</td><td>结点3</td><td>—</td></tr>
+      <tr><td>第3层</td><td>结点4, 结点7</td><td>—</td></tr>
+      <tr><td>第4层</td><td>结点0</td><td>—</td></tr>
+      <tr><td style="color:var(--gold);font-weight:700">第5层</td><td style="color:var(--gold);font-weight:700">结点1, 结点5, 结点6</td><td style="color:var(--gold)">最深！</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 3: DEPTH CALCULATION ==================== -->
+<div class="section">
+  <h2>三、计算每个结点的深度（追溯父结点法）</h2>
+  <div class="card">
+    <table>
+      <tr><th>结点 i</th><th>追溯路径（i→parent→...→根）</th><th>深度</th></tr>
+      <tr>
+        <td>0</td>
+        <td style="font-family:monospace">0 → 7 → 3 → 2 → -1</td>
+        <td>4</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td style="font-family:monospace;color:var(--gold)">1 → 0 → 7 → 3 → 2 → -1</td>
+        <td style="color:var(--gold);font-weight:700">5</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td style="font-family:monospace">2 → -1</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td style="font-family:monospace">3 → 2 → -1</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td style="font-family:monospace">4 → 3 → 2 → -1</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td style="font-family:monospace;color:var(--gold)">5 → 0 → 7 → 3 → 2 → -1</td>
+        <td style="color:var(--gold);font-weight:700">5</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td style="font-family:monospace;color:var(--gold)">6 → 0 → 7 → 3 → 2 → -1</td>
+        <td style="color:var(--gold);font-weight:700">5</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td style="font-family:monospace">7 → 3 → 2 → -1</td>
+        <td>3</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:1rem">最大深度 = <strong>5</strong> → 树的高度 = <strong>5</strong>。</p>
+
+    <div class="tip">
+      <strong>💡 注意：</strong>树的<strong>高度</strong> = 从根到最远叶子的<strong>结点数</strong>（不是边数）。结点1、5、6到根分别经过5个结点，所以树高为5。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 4: LONGEST PATH ==================== -->
+<div class="section">
+  <h2>四、最深路径可视化</h2>
+  <div class="card">
+    <p>三条最深路径（长度均为5）：</p>
+    <div class="ascii-box">
+<span class="hl">路径1：2 → 3 → 7 → 0 → 1</span>
+  <span class="hl">[2]</span> → <span class="b">[3]</span> → <span class="p">[7]</span> → <span class="g">[0]</span> → <span class="r">[1]</span>  （5个结点）
+
+<span class="hl">路径2：2 → 3 → 7 → 0 → 5</span>
+  <span class="hl">[2]</span> → <span class="b">[3]</span> → <span class="p">[7]</span> → <span class="g">[0]</span> → <span class="r">[5]</span>  （5个结点）
+
+<span class="hl">路径3：2 → 3 → 7 → 0 → 6</span>
+  <span class="hl">[2]</span> → <span class="b">[3]</span> → <span class="p">[7]</span> → <span class="g">[0]</span> → <span class="r">[6]</span>  （5个结点）
+
+<span class="c">最短路径（路径1）：2 → 3 → 4</span>
+  <span class="hl">[2]</span> → <span class="b">[3]</span> → <span class="c">[4]</span>  （3个结点）</div>
+  </div>
+</div>
+
+<!-- ==================== 5: ALGORITHM ==================== -->
+<div class="section">
+  <h2>五、求树高的通用算法</h2>
+  <div class="card">
+    <p>对于双亲表示法，求每个结点深度的方法：</p>
+
+    <div class="code-block"><span class="cmt">/* 计算结点 i 的深度 */</span>
+<span class="kw">int</span> <span class="fn">depth</span>(<span class="kw">int</span> parent[], <span class="kw">int</span> i) {
+    <span class="kw">int</span> d = <span class="num">0</span>;
+    <span class="kw">while</span> (i != <span class="num">-1</span>) {
+        d++;
+        i = parent[i];   <span class="cmt">// 向上追溯到父结点</span>
+    }
+    <span class="kw">return</span> d;
+}
+
+<span class="cmt">/* 树的高度 = 所有结点深度的最大值 */</span>
+<span class="kw">int</span> <span class="fn">treeHeight</span>(<span class="kw">int</span> parent[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> maxDepth = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++) {
+        <span class="kw">int</span> d = <span class="fn">depth</span>(parent, i);
+        <span class="kw">if</span> (d > maxDepth) maxDepth = d;
+    }
+    <span class="kw">return</span> maxDepth;
+}</div>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>遍历每个结点</strong>，从该结点出发，沿着 parent 数组向上追溯直到 -1
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>计数</strong>追溯过程中经过的结点数（包括自身和根）
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>取最大值</strong>作为树的高度
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: OPTION CHECK ==================== -->
+<div class="section">
+  <h2>六、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>高度</th><th>判断</th><th>说明</th></tr>
+      <tr><td style="font-weight:700">A</td><td>3</td><td class="bad">❌</td><td>只数了2→3→4这条短路径，忽略了更深的分支</td></tr>
+      <tr><td style="font-weight:700">B</td><td>4</td><td class="bad">❌</td><td>可能误以为结点0是最深的（深度4），遗漏了结点1/5/6</td></tr>
+      <tr><td style="font-weight:700;color:var(--gold)">C</td><td style="color:var(--gold);font-weight:700">5</td><td class="good">✅</td><td>正确！最深路径2→3→7→0→[1/5/6]经过5个结点</td></tr>
+      <tr><td style="font-weight:700">D</td><td>6</td><td class="bad">❌</td><td>可能多算了一层或把边数当成了高度</td></tr>
+    </table>
+
+    <div class="danger">
+      <strong>⚠️ 易错提醒：</strong>容易漏掉结点1、5、6——它们的父结点都是0，而0的深度是4，所以它们的深度是5。务必检查<strong>所有叶子结点</strong>，取最大深度。
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 双亲表示法是第5章树的存储结构之一。理解"向上追溯"求深度的方法即可应对此类题目。
+</div>
+
+</div>
+</body>
+</html>

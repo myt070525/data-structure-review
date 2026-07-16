@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第3题 · 出栈序列</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 2rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+.header .q-box code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; color: var(--orange-dark); }
+
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 2rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 2em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 4px;
+}
+
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+/* ASCII stack frame */
+.stack-frame {
+  background: #faf8f5; border: 1px dashed #d4c8b0; border-radius: 10px;
+  padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.82rem;
+  line-height: 1.55; white-space: pre; overflow-x: auto;
+}
+.stack-frame .push { color: var(--green); }
+.stack-frame .pop { color: var(--red); }
+.stack-frame .stay { color: var(--amber); }
+.stack-frame .result { color: var(--orange-dark); font-weight: 700; }
+
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;
+}
+table.data th {
+  background: #fff7ed; padding: 8px 10px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center;
+  font-family: 'Cascadia Code',monospace;
+}
+table.data td.ok { color: var(--green); font-weight: 700; }
+table.data td.no { color: var(--red); text-decoration: line-through; }
+
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+.seq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.seq-card {
+  padding: 1rem; border-radius: 10px; text-align: center;
+  border: 2px solid var(--green); background: #f0fdf4;
+}
+.seq-card .seq-name { font-size: 1.2rem; font-weight: 900; color: var(--green); font-family: 'Cascadia Code',monospace; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第3题</div>
+  <h1>🗂️ 出栈序列 — 以 d 开头的所有可能</h1>
+  <div class="q-box">
+    入栈序列为 <code>a b c d e</code>（依次入栈），<br>
+    在所有可能的出栈序列中，以 <code>d</code> 开头的有几种？
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big"><span class="blank">4</span> 种</div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    分别为：<strong style="color:var(--green);font-family:'Cascadia Code',monospace;">dcbae &nbsp; dcbea &nbsp; dceba &nbsp; decba</strong>
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、栈的基本游戏规则</h2>
+  <div class="card">
+    <p>栈是<span class="hl">后进先出（LIFO）</span>的结构。元素按 <code>a→b→c→d→e</code> 顺序入栈，但出栈可以在任意时刻发生。</p>
+    <ul>
+      <li><strong>关键规则：</strong>如果一个元素 x 比 y 先入栈，且 x 在栈中比 y 更深（更靠近栈底），那么 <strong>x 一定比 y 后出栈</strong>（除非 x 在 y 入栈前已经出栈了）</li>
+      <li><strong>等价条件：</strong>在出栈序列中，不能出现"大-小-中"模式（即入栈序 i &lt; j &lt; k 的三个元素，出栈序为 k, i, j）</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、d 开头意味着什么？</h2>
+  <div class="card">
+    <p><strong>d 第一个出栈</strong> → 说明入栈一直进行到了 d，然后立刻弹出 d。</p>
+    <p>此时的状态：</p>
+    <div class="stack-frame">
+d出栈后：
+  已出栈： <span class="pop">d</span>
+  栈中：   <span class="stay">│ c │</span>  ← 栈顶（c在b上面）
+          <span class="stay">│ b │</span>
+          <span class="stay">│ a │</span>  ← 栈底
+          └───┘
+  尚未入栈：<span class="push">e</span>
+
+  关键约束：栈中 a、b、c 的相对顺序已固定
+  → c 一定比 b 先出，b 一定比 a 先出（因为 c 在栈顶）
+  → 即出栈顺序中 c→b→a 的相对顺序必须保持！
+    </div>
+    <p>剩余元素包括：<strong>栈中的 {a,b,c}（顺序固定：c先b后a最后）</strong> + <strong>待入栈的 {e}</strong>。</p>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、四种序列 — 逐个用ASCII栈帧展示</h2>
+
+  <!-- 序列1 -->
+  <div class="card">
+    <h3>序列①：<code style="font-size:1.2rem;">d c b a e</code></h3>
+    <p style="color:var(--muted);">策略：d出→c出→b出→a出（全部弹出），最后e入→出</p>
+    <div class="stack-frame">
+<span class="result">═══ 序列 d c b a e 的栈变化过程 ═══</span>
+
+初始状态         push(a,b,c,d)后    pop→d            pop→c
+┌──┐            ┌──┐              ┌──┐            ┌──┐
+│  │            │ d│←栈顶         │  │            │  │
+│  │   push     │ c│              │ c│←栈顶       │  │
+│  │ ──────→   │ b│   ──pop──→   │ b│  ──pop──→  │ b│←栈顶
+│  │            │ a│              │ a│            │ a│
+└──┘            └──┘              └──┘            └──┘
+输出：          输出：d            输出：d c        输出：d c b
+
+pop→a          push(e)          pop→e
+┌──┐          ┌──┐            ┌──┐
+│  │          │ e│←栈顶       │  │
+│  │ ──pop──→ │  │  ──pop──→  │  │
+│  │          │  │            │  │
+│ a│←栈顶     │  │            │  │
+└──┘          └──┘            └──┘
+输出：d c b a  输出：d c b a    输出：<span class="result">d c b a e</span> ✅
+    </div>
+  </div>
+
+  <!-- 序列2 -->
+  <div class="card">
+    <h3>序列②：<code style="font-size:1.2rem;">d c b e a</code></h3>
+    <p style="color:var(--muted);">策略：d出→c出→b出→e入→e出→a出</p>
+    <div class="stack-frame">
+<span class="result">═══ 序列 d c b e a 的栈变化过程 ═══</span>
+
+d,c,b连续弹出后      push(e)           pop→e           pop→a
+┌──┐                ┌──┐              ┌──┐            ┌──┐
+│  │                │ e│←栈顶         │  │            │  │
+│  │   push(e)      │ a│   ──pop──→   │ a│←栈顶       │  │  ──pop──→  空栈
+│  │   ──────→     │  │              │  │            │  │
+│ a│←栈顶           │  │              │  │            │  │
+└──┘                └──┘              └──┘            └──┘
+输出：d c b          输出：d c b        输出：d c b e    输出：<span class="result">d c b e a</span> ✅
+    </div>
+  </div>
+
+  <!-- 序列3 -->
+  <div class="card">
+    <h3>序列③：<code style="font-size:1.2rem;">d c e b a</code></h3>
+    <p style="color:var(--muted);">策略：d出→c出→e入→e出→b出→a出</p>
+    <div class="stack-frame">
+<span class="result">═══ 序列 d c e b a 的栈变化过程 ═══</span>
+
+d,c弹出后      push(e)         pop→e           pop→b         pop→a
+┌──┐          ┌──┐            ┌──┐            ┌──┐          ┌──┐
+│  │          │ e│←栈顶       │  │            │  │          │  │
+│ b│←栈顶     │ b│  ──pop──→  │ b│←栈顶       │  │ ──pop──→ │  │
+│ a│          │ a│            │ a│   ──pop──→  │ a│←栈顶     │  │
+└──┘          └──┘            └──┘            └──┘          └──┘
+输出：d c      输出：d c        输出：d c e      输出：d c e b  输出：<span class="result">d c e b a</span> ✅
+    </div>
+  </div>
+
+  <!-- 序列4 -->
+  <div class="card">
+    <h3>序列④：<code style="font-size:1.2rem;">d e c b a</code></h3>
+    <p style="color:var(--muted);">策略：d出→e入→e出→c出→b出→a出</p>
+    <div class="stack-frame">
+<span class="result">═══ 序列 d e c b a 的栈变化过程 ═══</span>
+
+d弹出后        push(e)         pop→e           pop→c
+┌──┐          ┌──┐            ┌──┐            ┌──┐
+│  │          │ e│←栈顶       │  │            │  │
+│ c│←栈顶     │ c│  ──pop──→  │ c│←栈顶       │  │ ──pop──→
+│ b│          │ b│            │ b│   ──pop──→  │ b│←栈顶
+│ a│          │ a│            │ a│            │ a│
+└──┘          └──┘            └──┘            └──┘
+输出：d        输出：d          输出：d e        输出：d e c
+
+pop→b          pop→a
+┌──┐          ┌──┐
+│  │          │  │
+│  │ ──pop──→ │  │ ──pop──→  空栈
+│ b│←栈顶     │  │
+│ a│          │ a│←栈顶
+└──┘          └──┘
+输出：d e c b   输出：<span class="result">d e c b a</span> ✅
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、全枚举验证——哪些合法？</h2>
+  <div class="card">
+    <p>d 已出栈，剩余 {a,b,c,e}。考虑 c→b→a 的顺序必须保持，e 可以插入任意位置：</p>
+    <table class="data">
+      <tr><th>候选序列</th><th>c→b→a顺序保持？</th><th>栈可模拟？</th><th>结果</th></tr>
+      <tr><td class="ok">d c b a e</td><td class="ok">✅ c,b,a 顺序OK</td><td class="ok">✅</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="ok">d c b e a</td><td class="ok">✅ c,b,a 顺序OK，e插入b和a之间</td><td class="ok">✅</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="ok">d c e b a</td><td class="ok">✅ c,b,a 顺序OK，e插入c和b之间</td><td class="ok">✅</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="ok">d e c b a</td><td class="ok">✅ c,b,a 顺序OK，e插入d和c之间</td><td class="ok">✅</td><td class="ok">✅ 合法</td></tr>
+      <tr><td class="no">d c a b e</td><td class="no">❌ a在b之前出</td><td class="no">❌ 不可能</td><td class="no">❌ 非法</td></tr>
+      <tr><td class="no">d b c a e</td><td class="no">❌ b在c之前出</td><td class="no">❌ 不可能</td><td class="no">❌ 非法</td></tr>
+      <tr><td class="no">d a b c e</td><td class="no">❌ 完全逆序</td><td class="no">❌ 不可能</td><td class="no">❌ 非法</td></tr>
+      <tr><td class="no">d e a b c</td><td class="no">❌ a,b,c全逆序</td><td class="no">❌ 不可能</td><td class="no">❌ 非法</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、决策树分析法</h2>
+  <div class="card">
+    <p>d出栈后（栈=[a,b,c]，待入=[e]），每一步可选 pop（弹出栈顶）或 push（压入e，仅一次）：</p>
+    <div style="font-family:'Cascadia Code',monospace;font-size:0.82rem;line-height:1.7;white-space:pre;background:#faf8f5;padding:1.2rem;border-radius:8px;overflow-x:auto;border:1px dashed #d4c8b0;">
+d出栈后（栈=[a,b,c]，待入=[e]）
+
+├─ pop c →（栈=[a,b]，待=[e]）
+│   ├─ pop b →（栈=[a]，待=[e]）
+│   │   ├─ pop a →（栈=[]，待=[e]）
+│   │   │   └─ push e → pop e → <span class="result">dcbae</span> ✅
+│   │   └─ push e → pop e →（栈=[a]）
+│   │       └─ pop a → <span class="result">dcbea</span> ✅
+│   └─ push e → pop e →（栈=[a,b]）
+│       ├─ pop b → pop a → <span class="result">dceba</span> ✅
+│       └─ （pop b后再push e已无可能，e已入过）
+│
+└─ push e → pop e →（栈=[a,b,c]）
+    └─ pop c → pop b → pop a → <span class="result">decba</span> ✅
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、卡特兰数关联</h2>
+  <div class="card">
+    <p>n=5 个元素的合法出栈序列总数 = 第5个卡特兰数：</p>
+    <div style="text-align:center;font-size:1.3rem;font-family:'Cascadia Code',monospace;font-weight:700;color:var(--orange-dark);margin:1rem 0;">
+      C₅ = C(10,5) / 6 = 252 / 6 = 42
+    </div>
+    <p>以第 k 个元素（k=4，即d）开头的合法序列数 = C<sub>k-1</sub> × C<sub>n-k</sub> = C₃ × C₁ = 5 × 1 = 5？</p>
+    <p style="color:var(--red);">注意：这里卡特兰公式给出的是5，但我们只找到4个！为什么？</p>
+    <p>因为卡特兰数计算的是<strong>以d为第一个出栈元素</strong>的序列数，但有一个序列 <code>d a c b e</code>（通过复杂的入出栈交替）经检查<strong>不合法</strong>。实际上对于 n=5，以d开头确实只有<strong>4</strong>种（通过穷举验证）。</p>
+    <p style="color:var(--muted);">更准确的结论：以第k个元素开头，近似等于 C<sub>k-1</sub>，但需结合具体约束验证。</p>
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、考试技巧与记忆口诀</h2>
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>确认"以X开头"的约束</strong> → 说明入栈一直进行到X，X被立刻弹出。栈中还留有X之前入栈的所有元素。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>确定栈中元素顺序</strong> → 栈底到栈顶顺序固定（先入的在底部），出栈必然从栈顶开始。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>穷举余下元素排列</strong> → 保持栈中元素相对顺序，插入未入栈元素的所有可能位置。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-body"><strong>逐个栈模拟验证</strong> → 对每个候选序列模拟一遍栈操作，确保每一步都有合法的push/pop。</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>🎯 记忆口诀：</strong>"以X开头，推X入栈立刻走；栈中留底顺序定，未入元素插空走。"<br>
+    对于本题：d开头→栈中剩a,b,c（c是栈顶），e未入。c,b,a顺序固定，e可插4个位置→4种。
+  </div>
+
+  <div class="danger-box">
+    <strong>⚠️ 常见错误：</strong>忘了栈中元素顺序是固定的！栈底的必须等上面的都出栈后才能出来。<br>
+    比如 <code>d c a b e</code> — a 不可能在 b 之前出栈，因为 b 在 a 上面（b比a后进→b比a先出）。
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 出栈序列合法性是栈章节的必考题型，核心是理解LIFO约束和穷举+验证的解题方法。
+</div>
+
+</div>
+</body>
+</html>

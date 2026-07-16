@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第3题 · 链表适用场景</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 20% 15%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(60,207,207,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 2rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1rem 0;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .9rem; line-height: 1.75; overflow-x: auto;
+    white-space: pre; color: #c8d6e5;
+  }
+  .code-block .kw { color: #c084fc; font-weight: 700; }
+  .code-block .fn { color: #6ee7b7; }
+  .code-block .cmt { color: #6b7280; font-style: italic; }
+  .code-block .num { color: #fbbf24; }
+  .code-block .blank { color: #e0556a; text-decoration: underline; text-underline-offset: 4px; }
+  .code-block .op  { color: #e2b04a; }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.5; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  .vs-card { padding: 1.5rem; border-radius: 14px; text-align: center; }
+  .vs-card.arr { border: 2px solid var(--blue); background: rgba(74,144,217,.06); }
+  .vs-card.ll  { border: 2px solid var(--green); background: rgba(60,184,120,.06); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .vs-grid { grid-template-columns: 1fr; }
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第3题</div>
+  <h1>⛓️ 链表最适合的应用场景</h1>
+  <div class="q-box">
+    链表最适合用于（　）的场景。<br><br>
+    A. 频繁随机访问元素 &nbsp;&nbsp; <strong>B. 频繁插入和删除元素</strong><br>
+    C. 存储少量固定数据 &nbsp;&nbsp; D. 需要二分查找
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">B — 频繁插入和删除</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">链表插入/删除 O(1)，数组插入/删除 O(n)</div>
+</div>
+
+<!-- ==================== 1: INTUITION ==================== -->
+<div class="section">
+  <h2>一、直观理解：数组 vs 链表</h2>
+  <div class="card">
+    <div class="vs-grid">
+      <div class="vs-card arr">
+        <div style="font-size:2rem">📐</div>
+        <h3 style="color:var(--blue)">数组（Array）</h3>
+        <p style="font-size:.9rem">像<strong>电影院座位</strong>：<br>每个座位有固定编号，<br>第5排第3座——瞬间找到。<br>但中间插入一个人？<br><span style="color:var(--red)">所有人都要往后挪！</span></p>
+        <table style="font-size:.8rem">
+          <tr><th>操作</th><th>时间</th></tr>
+          <tr><td>随机访问</td><td class="good">O(1)</td></tr>
+          <tr><td>插入</td><td class="bad">O(n)</td></tr>
+          <tr><td>删除</td><td class="bad">O(n)</td></tr>
+        </table>
+      </div>
+      <div class="vs-card ll">
+        <div style="font-size:2rem">⛓️</div>
+        <h3 style="color:var(--green)">链表（Linked List）</h3>
+        <p style="font-size:.9rem">像<strong>寻宝游戏</strong>：<br>每张纸条告诉你下一张在哪里。<br>中间插入一张纸条？<br><span style="color:var(--green)">只需改两个箭头指向！</span></p>
+        <table style="font-size:.8rem">
+          <tr><th>操作</th><th>时间</th></tr>
+          <tr><td>随机访问</td><td class="bad">O(n)</td></tr>
+          <tr><td>插入</td><td class="good">O(1)</td></tr>
+          <tr><td>删除</td><td class="good">O(1)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 2: WHY B ==================== -->
+<div class="section">
+  <h2>二、逐项分析</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>场景</th><th>最适合的结构</th><th>判断</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">A</td>
+        <td>频繁随机访问元素</td>
+        <td><strong>数组</strong>（O(1)随机访问）</td>
+        <td class="bad">❌ 链表随机访问 O(n)</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td>频繁插入和删除</td>
+        <td><strong>链表</strong>（O(1)插入删除）</td>
+        <td class="good">✅ 最佳匹配！</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">C</td>
+        <td>存储少量固定数据</td>
+        <td><strong>数组</strong>（更紧凑、无指针开销）</td>
+        <td class="bad">❌ 小数据用数组更高效</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">D</td>
+        <td>需要二分查找</td>
+        <td><strong>数组</strong>（需要随机访问）</td>
+        <td class="bad">❌ 链表不支持二分查找</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 3: INSERTION ASCII ART ==================== -->
+<div class="section">
+  <h2>三、链表插入操作——为什么是 O(1)？</h2>
+  <div class="card">
+    <h3>在结点 P 之后插入新结点 Q</h3>
+
+    <div class="ascii-box">
+<span class="hl">【插入前】</span>
+  <span class="b">[A]</span> ──→ <span class="b">[B]</span> ──→ <span class="b">[C]</span> ──→ NULL
+            <span class="g">↑ P指向这里</span>
+
+<span class="hl">【步骤1】让Q的next指向P的next（即B原本指向的C）</span>
+  <span class="b">[A]</span> ──→ <span class="b">[B]</span> ──→ <span class="b">[C]</span> ──→ NULL
+            │
+            <span class="g">[Q]</span> ──→ <span class="b">[C]</span>    ← Q->next = P->next
+
+<span class="hl">【步骤2】让P的next指向Q</span>
+  <span class="b">[A]</span> ──→ <span class="b">[B]</span> ──→ <span class="g">[Q]</span> ──→ <span class="b">[C]</span> ──→ NULL
+            │
+            P->next = Q
+
+<span class="hl">【插入后】</span>
+  <span class="b">[A]</span> ──→ <span class="b">[B]</span> ──→ <span class="g">[Q]</span> ──→ <span class="b">[C]</span> ──→ NULL</div>
+
+    <p style="margin-top:1rem">只需要<strong>修改两个指针</strong>，不需要移动任何已有数据。这就是 O(1) 的原因。</p>
+  </div>
+</div>
+
+<!-- ==================== 4: ARRAY INSERTION ==================== -->
+<div class="section">
+  <h2>四、对比：数组插入为什么是 O(n)？</h2>
+  <div class="card">
+    <h3>在数组中间插入一个元素 99</h3>
+
+    <div class="ascii-box">
+<span class="hl">【插入前】</span>
+  下标:  [0]  [1]  [2]  [3]  [4]
+  数据:  <span class="b">10</span>  <span class="b">20</span>  <span class="b">30</span>  <span class="b">40</span>  <span class="b">50</span>
+                  <span class="g">↑ 要在下标2插入 99</span>
+
+<span class="hl">【步骤】从后往前，逐个后移</span>
+  [0]  [1]  [2]  [3]  [4]  [5]
+  <span class="b">10</span>  <span class="b">20</span>  _?_  <span class="b">30</span>  <span class="b">40</span>  <span class="b">50</span>   ← 50→[5], 40→[4], 30→[3]
+  <span class="b">10</span>  <span class="b">20</span>  <span class="g">99</span>  <span class="b">30</span>  <span class="b">40</span>  <span class="b">50</span>   ← 在[2]放入 99
+
+<span class="hl">【插入后】</span>
+  下标:  [0]  [1]  [2]  [3]  [4]  [5]
+  数据:  <span class="b">10</span>  <span class="b">20</span>  <span class="g">99</span>  <span class="b">30</span>  <span class="b">40</span>  <span class="b">50</span></div>
+
+    <p style="margin-top:1rem">移动了 3 个元素（30, 40, 50）。最坏情况（在开头插入）需要移动<strong>全部 n 个元素</strong> → O(n)。</p>
+  </div>
+</div>
+
+<!-- ==================== 5: CODE COMPARISON ==================== -->
+<div class="section">
+  <h2>五、代码实现对比</h2>
+  <div class="card">
+    <div class="vs-grid">
+      <div>
+        <h3 style="color:var(--blue);text-align:center">数组插入（O(n)）</h3>
+        <div class="code-block"><span class="cmt">// 在下标pos处插入val</span>
+<span class="kw">void</span> <span class="fn">arrInsert</span>(<span class="kw">int</span> arr[], <span class="kw">int</span> n,
+               <span class="kw">int</span> pos, <span class="kw">int</span> val) {
+    <span class="cmt">// 从后往前移</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = n; i > pos; i--)
+        arr[i] = arr[i-<span class="num">1</span>];  <span class="cmt">// O(n)</span>
+    arr[pos] = val;
+}</div>
+      </div>
+      <div>
+        <h3 style="color:var(--green);text-align:center">链表插入（O(1)）</h3>
+        <div class="code-block"><span class="cmt">// 在结点p之后插入val</span>
+<span class="kw">void</span> <span class="fn">listInsert</span>(Node* p, <span class="kw">int</span> val) {
+    Node* q = <span class="fn">newNode</span>(val);
+    q->next = p->next;  <span class="cmt">// O(1)</span>
+    p->next = q;        <span class="cmt">// O(1)</span>
+}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: TIME COMPLEXITY TABLE ==================== -->
+<div class="section">
+  <h2>六、数组 vs 链表 —— 时间复杂度全面对比</h2>
+  <div class="card">
+    <table>
+      <tr><th>操作</th><th>数组</th><th>链表</th><th>胜出</th></tr>
+      <tr>
+        <td>随机访问（按下标）</td>
+        <td class="good">O(1)</td>
+        <td class="bad">O(n)</td>
+        <td>🏆 数组</td>
+      </tr>
+      <tr>
+        <td>头部插入</td>
+        <td class="bad">O(n)</td>
+        <td class="good">O(1)</td>
+        <td>🏆 链表</td>
+      </tr>
+      <tr>
+        <td>尾部插入（有尾指针）</td>
+        <td class="good">O(1)</td>
+        <td class="good">O(1)</td>
+        <td>🤝 平手</td>
+      </tr>
+      <tr>
+        <td>中间插入（已知位置）</td>
+        <td class="bad">O(n)</td>
+        <td class="good">O(1)</td>
+        <td>🏆 链表</td>
+      </tr>
+      <tr>
+        <td>删除（已知位置）</td>
+        <td class="bad">O(n)</td>
+        <td class="good">O(1)</td>
+        <td>🏆 链表</td>
+      </tr>
+      <tr>
+        <td>查找（按值）</td>
+        <td class="bad">O(n)</td>
+        <td class="bad">O(n)</td>
+        <td>🤝 平手</td>
+      </tr>
+      <tr>
+        <td>二分查找</td>
+        <td class="good">O(log n)</td>
+        <td style="color:var(--red)">不支持</td>
+        <td>🏆 数组</td>
+      </tr>
+      <tr>
+        <td>空间开销</td>
+        <td>纯数据</td>
+        <td style="color:var(--red)">数据+指针</td>
+        <td>🏆 数组</td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <strong>🎯 选择原则：</strong>
+      <ul>
+        <li><strong>频繁随机访问 → 数组</strong>（按下标直接跳转）</li>
+        <li><strong>频繁插入删除 → 链表</strong>（只改指针，不移动数据）</li>
+        <li><strong>需要二分查找 → 数组</strong>（链表不支持二分查找）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 7: REAL WORLD ==================== -->
+<div class="section">
+  <h2>七、现实世界中的例子</h2>
+  <div class="card">
+    <div class="step-row">
+      <span class="step-num">🎵</span>
+      <div class="step-content">
+        <strong>音乐播放器的播放列表：</strong>用<strong>双向链表</strong>实现。下一首、上一首就是沿着指针走。插入一首新歌到队列中间只需改两个指针。
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">📝</span>
+      <div class="step-content">
+        <strong>操作系统的进程调度：</strong>用<strong>循环链表</strong>实现。CPU时间片轮转，每个进程执行一小段时间后转到链表下一个。
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">🖼️</span>
+      <div class="step-content">
+        <strong>图像的像素数组：</strong>用<strong>数组</strong>实现。需要快速访问任意像素 (x, y)，O(1) 随机访问。
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="danger">
+  <strong>⚠️ 考试陷阱：</strong>注意题目问的是"链表最适合"。如果问"数组最适合"，答案就是"频繁随机访问"。这两个结构是互补的，考试经常放在一起对比考查。
+</div>
+
+<div class="footer-note">
+  📖 链表是第2章核心内容。理解"改指针 vs 移数据"的区别，就能秒杀所有数组vs链表的对比题。
+</div>
+
+</div>
+</body>
+</html>

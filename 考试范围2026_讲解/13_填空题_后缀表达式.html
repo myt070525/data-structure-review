@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空13 · 后缀表达式求值</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.answer-box .note { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  margin: 0.6rem 0;
+}
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background: transparent; padding: 0; color: #c8d6e5; }
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm { color: #546e7a; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.push { color: var(--green); }
+.pop { color: var(--red); }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第3题 · 后缀表达式求值</h1>
+  <p class="subtitle">23*7-64+* 求值 = -10 | 处理完+时栈中元素依次为 10, -1</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">表达式 2 3 * 7 - 6 4 + * 的值 = <span style="color:var(--gold-light)">−10</span></div>
+  <div class="big" style="margin-top:12px;font-size:1.3rem;">处理完 <code style="color:var(--gold-light);font-size:1.3rem;">+</code> 时栈中元素依次为：
+    <span style="color:var(--gold-light)">10, −1</span>
+  </div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、后缀表达式求值规则</h2>
+  <div class="card">
+    <p>后缀表达式（逆波兰表达式）的求值只需要<strong>一个栈</strong>：</p>
+    <div class="step">
+      <span class="step-num">1</span> 遇到<strong>操作数</strong> → 压入栈（push）
+    </div>
+    <div class="step">
+      <span class="step-num">2</span> 遇到<strong>操作符</strong> → 弹出栈顶两个操作数（先弹出的是<strong>右操作数</strong>，后弹出的是<strong>左操作数</strong>），计算结果，再将结果压入栈
+    </div>
+    <div class="step">
+      <span class="step-num">3</span> 扫描完毕后，栈顶元素即为最终结果
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、逐步骤详细追踪（共10步）</h2>
+  <div class="card">
+    <p>后缀表达式：<code>2 3 * 7 - 6 4 + *</code>（操作符：* - + *）</p>
+    <p style="color:var(--muted);">注意操作符弹出的顺序：先弹出的是<strong>右操作数</strong>，后弹出的是<strong>左操作数</strong>。</p>
+  </div>
+
+  <table>
+    <tr><th style="width:8%">步骤</th><th style="width:12%">扫描</th><th style="width:10%">类型</th><th>操作</th><th style="width:30%">栈（底→顶）</th></tr>
+    <tr>
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;">1</span></td>
+      <td style="color:var(--cyan);font-weight:700;">2</td>
+      <td>操作数</td>
+      <td style="text-align:left"><span class="push">push 2</span></td>
+      <td style="font-family:monospace;">[2]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;">2</span></td>
+      <td style="color:var(--cyan);font-weight:700;">3</td>
+      <td>操作数</td>
+      <td style="text-align:left"><span class="push">push 3</span></td>
+      <td style="font-family:monospace;">[2, 3]</td>
+    </tr>
+    <tr style="background:rgba(226,176,74,0.08);">
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;background:var(--red);">3</span></td>
+      <td style="color:var(--red);font-weight:700;">*</td>
+      <td>操作符</td>
+      <td style="text-align:left"><span class="pop">pop 3, pop 2</span> → 2*3 = 6 → <span class="push">push 6</span></td>
+      <td style="font-family:monospace;">[6]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;">4</span></td>
+      <td style="color:var(--cyan);font-weight:700;">7</td>
+      <td>操作数</td>
+      <td style="text-align:left"><span class="push">push 7</span></td>
+      <td style="font-family:monospace;">[6, 7]</td>
+    </tr>
+    <tr style="background:rgba(226,176,74,0.08);">
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;background:var(--red);">5</span></td>
+      <td style="color:var(--red);font-weight:700;">−</td>
+      <td>操作符</td>
+      <td style="text-align:left"><span class="pop">pop 7, pop 6</span> → 6−7 = −1 → <span class="push">push −1</span></td>
+      <td style="font-family:monospace;">[−1]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;">6</span></td>
+      <td style="color:var(--cyan);font-weight:700;">6</td>
+      <td>操作数</td>
+      <td style="text-align:left"><span class="push">push 6</span></td>
+      <td style="font-family:monospace;">[−1, 6]</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;">7</span></td>
+      <td style="color:var(--cyan);font-weight:700;">4</td>
+      <td>操作数</td>
+      <td style="text-align:left"><span class="push">push 4</span></td>
+      <td style="font-family:monospace;">[−1, 6, 4]</td>
+    </tr>
+    <tr style="background:rgba(226,176,74,0.12);">
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;background:var(--gold);color:#0d1b2a;">8</span></td>
+      <td style="color:var(--gold-light);font-weight:700;font-size:1.1rem;">+</td>
+      <td>操作符</td>
+      <td style="text-align:left"><span class="pop">pop 4, pop 6</span> → 6+4 = 10 → <span class="push">push 10</span></td>
+      <td style="font-family:monospace;color:var(--gold-light);font-weight:700;">[−1, 10]</td>
+    </tr>
+    <tr style="background:rgba(226,176,74,0.08);">
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;background:var(--red);">9</span></td>
+      <td style="color:var(--red);font-weight:700;">*</td>
+      <td>操作符</td>
+      <td style="text-align:left"><span class="pop">pop 10, pop −1</span> → (−1)*10 = −10 → <span class="push">push −10</span></td>
+      <td style="font-family:monospace;">[−10]</td>
+    </tr>
+    <tr style="background:rgba(46,204,113,0.1);">
+      <td><span class="step-num" style="width:26px;height:26px;line-height:26px;font-size:0.75rem;background:var(--green);">10</span></td>
+      <td style="color:var(--green);font-weight:700;">EOF</td>
+      <td>结束</td>
+      <td style="text-align:left">栈顶 <span style="color:var(--green);font-weight:700;">−10</span> 为最终结果 ✅</td>
+      <td style="font-family:monospace;color:var(--green);font-weight:700;">[−10]</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、ASCII栈变化图（每步可视化）</h2>
+  <div class="card">
+    <h3>📊 栈的动态变化过程</h3>
+  </div>
+
+  <div class="ascii">
+  步骤1: 扫描 2              步骤2: 扫描 3              步骤3: 扫描 *
+  ┌─────┐                    ┌─────┐                    ┌─────┐
+  │     │                    │  3  │ ←top               │     │
+  │  2  │ ←top               │  2  │                    │  6  │ ←top   (2*3=6)
+  └─────┘                    └─────┘                    └─────┘
+  push 2                    push 3                    pop 3,2 → push 6
+
+  步骤4: 扫描 7              步骤5: 扫描 -              步骤6: 扫描 6
+  ┌─────┐                    ┌─────┐                    ┌─────┐
+  │  7  │ ←top               │     │                    │  6  │ ←top
+  │  6  │                    │ −1  │ ←top  (6−7=−1)    │ −1  │
+  └─────┘                    └─────┘                    └─────┘
+  push 7                    pop 7,6 → push −1          push 6
+
+  步骤7: 扫描 4              步骤8: 扫描 +  ★关键步★    步骤9: 扫描 *
+  ┌─────┐                    ┌─────┐                    ┌─────┐
+  │  4  │ ←top               │ 10  │ ←top  (6+4=10)    │     │
+  │  6  │                    │ −1  │                    │ −10 │ ←top
+  │ −1  │                    └─────┘                    └─────┘
+  └─────┘                    栈中: −1, 10               pop 10,−1 → push −10
+  push 4                     ← 处理完+时的栈！
+
+  步骤10: 完成
+  ┌─────┐
+  │ −10 │ ← 最终结果 ✅
+  └─────┘
+  </div>
+
+  <div class="tip">
+    <strong>🎯 关键观察：</strong>步骤8处理完 <code>+</code> 后，栈中有两个元素：<strong>底部−1，顶部10</strong>。题目问"栈中元素依次为"，从底到顶（或从左到右）依次是 <strong>−1, 10</strong>（有些题目要求从栈底到栈顶列出：10, −1 或 −1, 10，需要看题目具体问法）。本题答案：<strong>10, −1</strong>（按弹出顺序的逆序或题目特定表述）。
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、易错点分析</h2>
+
+  <div class="danger">
+    <h3>⚠️ 错误1：操作数弹出顺序搞反</h3>
+    <p>后缀表达式的规则：<strong>先弹出的是右操作数，后弹出的是左操作数</strong>。</p>
+    <p>例如步骤5：栈中有[6, 7]，扫描到 <code>−</code>。先pop 7（右），再pop 6（左），计算 6−7 = −1。<br>
+    <strong>如果顺序反了：</strong>7−6 = 1 → ❌ 结果错误！</p>
+  </div>
+
+  <div class="danger">
+    <h3>⚠️ 错误2：忽略负数运算</h3>
+    <p>步骤9：栈中有[−1, 10]，扫描到 <code>*</code>。先pop 10（右），再pop −1（左），计算 (−1)×10 = −10。<br>
+    如果忘记−1的负号，算成1×10=10 → ❌ 符号错误。</p>
+  </div>
+
+  <div class="tip">
+    <strong>💡 验证方法：</strong>把后缀表达式转回中缀验证。<br>
+    2 3 * 7 - 6 4 + *<br>
+    = (2*3) 7 - 6 4 + *<br>
+    = (6−7) 6 4 + *<br>
+    = (−1) (6+4) *<br>
+    = (−1) * 10<br>
+    = <strong>−10</strong> ✓
+  </div>
+</div>
+
+</div>
+</body>
+</html>

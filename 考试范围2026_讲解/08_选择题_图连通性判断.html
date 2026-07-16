@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第8题 · 图的连通性判断</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 75%, rgba(74,144,217,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第8题</div>
+  <h1>🕸️ 图的连通性判断方法</h1>
+  <div class="q-box">
+    下列方法中，<strong>不能</strong>用于判断无向图连通性的是（　）。<br><br>
+    A. 深度优先搜索(DFS) &nbsp;&nbsp; <strong>B. 拓扑排序</strong><br>
+    C. 广度优先搜索(BFS) &nbsp;&nbsp; D. 生成树
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">B — 拓扑排序</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">拓扑排序只能用于有向无环图(DAG)，不能判断无向图连通性</div>
+</div>
+
+<!-- ==================== 1: CONNECTIVITY ==================== -->
+<div class="section">
+  <h2>一、什么是图的连通性？</h2>
+  <div class="card">
+    <p><strong>连通图：</strong>在无向图中，如果任意两个顶点之间都有路径相连，则称该图是连通的。</p>
+    <p>判断连通性的本质：<span class="hl">从一个顶点出发，看能否访问到所有其他顶点</span>。</p>
+
+    <div class="ascii-box">
+<span class="hl">连通的无向图</span>          <span class="hl">不连通的无向图</span>
+  [A]───[B]                [A]───[B]     [D]───[E]
+   │     │                  │     │
+  [C]───[D]                [C]           [F]
+                                    
+  从A出发可到B,C,D           从A出发只能到B,C，到不了D,E,F
+  → <span class="g">连通 ✅</span>                 → <span class="r">不连通 ❌</span></div>
+  </div>
+</div>
+
+<!-- ==================== 2: METHODS TABLE ==================== -->
+<div class="section">
+  <h2>二、各种方法的连通性判断能力对比</h2>
+  <div class="card">
+    <table>
+      <tr><th>方法</th><th>能否判断无向图连通性</th><th>原理</th><th>适用范围</th></tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">DFS</td>
+        <td class="good">✅ 能</td>
+        <td>从一个顶点DFS，看是否遍历到所有顶点</td>
+        <td>有向图 + 无向图</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">BFS</td>
+        <td class="good">✅ 能</td>
+        <td>从一个顶点BFS，看是否遍历到所有顶点</td>
+        <td>有向图 + 无向图</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">生成树</td>
+        <td class="good">✅ 能</td>
+        <td>若能生成包含所有顶点的树 → 连通</td>
+        <td>无向连通图</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">最短路径</td>
+        <td class="good">✅ 能</td>
+        <td>若存在到所有顶点的最短路径 → 连通</td>
+        <td>有权图</td>
+      </tr>
+      <tr style="background:rgba(224,85,106,.08)">
+        <td style="color:var(--red);font-weight:700">拓扑排序</td>
+        <td class="bad">❌ 不能</td>
+        <td style="color:var(--red)">只能用于<strong>有向无环图(DAG)</strong></td>
+        <td style="color:var(--red)">仅限DAG</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 3: WHY TOPOLOGICAL SORT FAILS ==================== -->
+<div class="section">
+  <h2>三、为什么拓扑排序不能判断无向图连通性？</h2>
+  <div class="card">
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>拓扑排序的定义：</strong>将有向无环图(DAG)中的顶点排成一个线性序列，使得对任意有向边 u→v，u 在序列中出现在 v 之前。
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>核心前提：</strong>拓扑排序<strong>只能应用于有向无环图(DAG)</strong>。无向图没有"方向"，根本不能进行拓扑排序。
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>即使强行转换：</strong>如果把无向图的每条边当成两条有向边来处理，拓扑排序会因为存在环（无向边来回走就是环）而失败。拓扑排序要求图中<strong>不能有环</strong>。
+      </div>
+    </div>
+
+    <div class="ascii-box">
+<span class="hl">拓扑排序 vs 连通性判断</span>
+
+<span class="g">拓扑排序能判断的：</span>
+  · 有向图是否有环（能完成拓扑排序 → 无环）
+  · DAG中的顶点的先后依赖关系
+
+<span class="r">拓扑排序不能判断的：</span>
+  · 无向图是否连通（根本不能应用于无向图！）
+  · 有向图是否强连通（拓扑排序只关心偏序关系）</div>
+
+    <div class="danger">
+      <strong>🚫 根本原因：</strong>拓扑排序基于<strong>有向边</strong>和<strong>偏序关系</strong>，这两个概念在无向图中根本不存在。所以拓扑排序连"入场券"都没有，更谈不上判断连通性。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 4: HOW OTHERS WORK ==================== -->
+<div class="section">
+  <h2>四、DFS/BFS/生成树 如何判断连通性</h2>
+  <div class="card">
+    <h3>DFS / BFS 判断连通性</h3>
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>任选一个起始顶点</strong>，执行 DFS 或 BFS 遍历
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>遍历结束后</strong>，检查 visited[] 数组
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>若所有顶点都被访问过</strong> → 图连通；否则 → 不连通
+      </div>
+    </div>
+
+    <h3>生成树判断连通性</h3>
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>对无向图执行 Prim 或 Kruskal 算法</strong>
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>若生成树包含 n 个顶点</strong>（n为图的顶点总数）→ 连通
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>若无法生成包含全部顶点的树</strong> → 不连通（存在多个连通分量）
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 5: OPTIONS ==================== -->
+<div class="section">
+  <h2>五、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>方法</th><th>能判断无向图连通性？</th><th>原因</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">A</td>
+        <td>深度优先搜索(DFS)</td>
+        <td class="good">✅ 能</td>
+        <td>DFS遍历，检查是否访问全部顶点</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">B</td>
+        <td>拓扑排序</td>
+        <td class="bad">❌ 不能</td>
+        <td>只能用于有向无环图(DAG)</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">C</td>
+        <td>广度优先搜索(BFS)</td>
+        <td class="good">✅ 能</td>
+        <td>BFS遍历，检查是否访问全部顶点</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">D</td>
+        <td>生成树</td>
+        <td class="good">✅ 能</td>
+        <td>生成树包含全部顶点 → 连通</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 6: COMPARISON ==================== -->
+<div class="section">
+  <h2>六、图算法适用范围总表</h2>
+  <div class="card">
+    <table>
+      <tr><th>算法</th><th>有向图</th><th>无向图</th><th>能否判连通</th><th>能否判有环</th><th>主要用途</th></tr>
+      <tr>
+        <td style="color:var(--cyan)">DFS</td>
+        <td>✅</td><td>✅</td><td class="good">✅</td><td class="good">✅</td><td>遍历、连通分量、环检测</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan)">BFS</td>
+        <td>✅</td><td>✅</td><td class="good">✅</td><td class="good">✅</td><td>遍历、最短路径(无权)、连通分量</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan)">生成树</td>
+        <td>—</td><td>✅</td><td class="good">✅</td><td>—</td><td>最小生成树、连通性</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan)">最短路径</td>
+        <td>✅</td><td>✅</td><td class="good">✅</td><td>—</td><td>Dijkstra、Floyd等</td>
+      </tr>
+      <tr style="background:rgba(224,85,106,.06)">
+        <td style="color:var(--red)">拓扑排序</td>
+        <td style="color:var(--red)">仅DAG</td><td style="color:var(--red)">❌</td><td class="bad">❌</td><td class="good">✅</td><td>任务调度、依赖排序</td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <strong>🎯 记忆技巧：</strong>拓扑排序 = "有向无环图专用"，和连通性是两个不同维度的问题。就像"排序"和"搜索"是不同的事——拓扑排序是给顶点排序，不是检查图是否连通。
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 图的连通性是第6章基础概念。DFS和BFS是判断连通性的标准方法，拓扑排序是DAG特有的算法。
+</div>
+
+</div>
+</body>
+</html>

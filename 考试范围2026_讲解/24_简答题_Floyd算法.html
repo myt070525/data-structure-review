@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答24 · Floyd算法</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 1.9rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+  line-height: 2;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.changed { color: #2ecc71; font-weight: 700; }
+.inf { color: #546e7a; }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📐 简答第6题 · Floyd算法求最短路径</h1>
+  <p class="subtitle">3顶点v₀,v₁,v₂ | 有向图 | D⁽⁻¹⁾ → D⁽⁰⁾ → D⁽¹⁾ → D⁽²⁾ 四矩阵变化</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">
+    Floyd算法：从 D<sup>(−1)</sup> 到 D<sup>(2)</sup> 逐步引入中间顶点<br>
+    最终得到所有顶点对之间的最短路径
+  </div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、Floyd算法思想</h2>
+  <div class="card">
+    <p>Floyd算法（Floyd-Warshall）求<strong>每一对顶点之间的最短路径</strong>。核心递推公式：</p>
+    <div class="ascii">
+  D^(k)[i][j] = min( D^(k−1)[i][j] ,  D^(k−1)[i][k] + D^(k−1)[k][j] )
+                 └─ 不经过k ─┘   └────── 经过k ──────┘
+    </div>
+    <p>即：第k次迭代时，考虑<strong>以顶点k作为中间顶点</strong>是否能使路径更短。</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、有向图结构（3顶点）</h2>
+
+  <div class="ascii">
+  3个顶点: v₀, v₁, v₂
+  有向边及权值：
+    v₀ ──4──→ v₁
+    v₀ ──11─→ v₂
+    v₁ ──3──→ v₀
+    v₁ ──2──→ v₂
+    v₂ ──6──→ v₀
+
+  邻接矩阵表示（∞表示无边，0表示自身）：
+         v₀   v₁   v₂
+    v₀ [  0    4   11 ]
+    v₁ [  3    0    2 ]
+    v₂ [  6   ∞    0 ]
+    </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、四个矩阵的变化过程</h2>
+
+  <div class="card">
+    <h3>D<sup>(−1)</sup> —— 初始邻接矩阵（不经过任何中间顶点）</h3>
+    <div class="ascii">
+           v₀   v₁   v₂
+      v₀ [  0    4   11  ]
+      v₁ [  3    0    2  ]
+      v₂ [  6   ∞    0  ]
+
+  ∞表示两点之间没有直接边，距离为无穷大。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>D<sup>(0)</sup> —— 允许经过顶点v₀</h3>
+    <p style="color:var(--muted);">检查是否可以通过v₀缩短任意两点间的距离：</p>
+    <div class="ascii">
+  D^(0)[i][j] = min( D^(-1)[i][j] , D^(-1)[i][0] + D^(-1)[0][j] )
+
+  检查 v₁→v₂: 原=2, 经v₀: v₁→v₀(3)+v₀→v₂(11)=14, 2<14 → 不变
+  检查 v₂→v₁: 原=∞, 经v₀: v₂→v₀(6)+v₀→v₁(4)=10 < ∞ → <span class="changed">更新为10</span>
+
+           v₀   v₁   v₂
+      v₀ [  0    4   11  ]
+      v₁ [  3    0    2  ]
+      v₂ [  6  <span class="changed">10</span>    0  ]  ← v₂→v₁从∞变为10
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>D<sup>(1)</sup> —— 允许经过顶点v₀和v₁</h3>
+    <div class="ascii">
+  D^(1)[i][j] = min( D^(0)[i][j] , D^(0)[i][1] + D^(0)[1][j] )
+
+  检查 v₀→v₂: 原=11, 经v₁: v₀→v₁(4)+v₁→v₂(2)=6 < 11 → <span class="changed">更新为6</span>
+  检查 v₂→v₀: 原=6, 经v₁: v₂→v₁(10)+v₁→v₀(3)=13, 6<13 → 不变
+
+           v₀   v₁   v₂
+      v₀ [  0    4   <span class="changed">6</span>  ]  ← v₀→v₂从11变为6
+      v₁ [  3    0    2  ]
+      v₂ [  6   10    0  ]
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>D<sup>(2)</sup> —— 允许经过所有顶点（最终结果）</h3>
+    <div class="ascii">
+  D^(2)[i][j] = min( D^(1)[i][j] , D^(1)[i][2] + D^(1)[2][j] )
+
+  检查 v₀→v₁: 原=4, 经v₂: v₀→v₂(6)+v₂→v₁(10)=16, 4<16 → 不变
+  检查 v₁→v₀: 原=3, 经v₂: v₁→v₂(2)+v₂→v₀(6)=8, 3<8 → 不变
+
+           v₀   v₁   v₂
+      v₀ [  0    4    6  ]   ← 最终最短路径矩阵
+      v₁ [  3    0    2  ]
+      v₂ [  6   10    0  ]
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、变化总结表</h2>
+
+  <table>
+    <tr><th>迭代</th><th>允许的中间顶点</th><th>发生的变化</th><th>原因</th></tr>
+    <tr>
+      <td>D<sup>(−1)</sup></td>
+      <td>无（直接边）</td>
+      <td>—</td>
+      <td>初始邻接矩阵，∞表示无边</td>
+    </tr>
+    <tr>
+      <td>D<sup>(0)</sup></td>
+      <td>{v₀}</td>
+      <td class="changed">v₂→v₁: ∞→10</td>
+      <td>路径 v₂→v₀→v₁ = 6+4 = 10</td>
+    </tr>
+    <tr>
+      <td>D<sup>(1)</sup></td>
+      <td>{v₀, v₁}</td>
+      <td class="changed">v₀→v₂: 11→6</td>
+      <td>路径 v₀→v₁→v₂ = 4+2 = 6</td>
+    </tr>
+    <tr>
+      <td>D<sup>(2)</sup></td>
+      <td>{v₀, v₁, v₂}</td>
+      <td>无变化</td>
+      <td>经过v₂没有更短路径</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <strong>🧠 Floyd算法核心记忆：</strong><br>
+    • 三重循环：<strong>for k=0 to n−1</strong>（中间顶点）<br>
+    &nbsp;&nbsp; <strong>for i=0 to n−1</strong>（起点）<br>
+    &nbsp;&nbsp;&nbsp;&nbsp; <strong>for j=0 to n−1</strong>（终点）<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D[i][j] = min(D[i][j], D[i][k] + D[k][j])<br>
+    • 时间复杂度：<strong>O(n³)</strong>，空间复杂度：<strong>O(n²)</strong><br>
+    • 允许<strong>负权边</strong>，但不允许<strong>负权环</strong>
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 注意：</strong>k循环必须在最外层！这是Floyd算法的关键。如果把k放在内侧，算法将不正确。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：Merge合并顺序表 - 填空补全</title>
+<style>
+    :root {
+        --bg: #0d1b2a;
+        --fg: #c8d6e5;
+        --accent: #e2b04a;
+        --accent2: #4da6ff;
+        --green: #2ecc71;
+        --red: #e74c3c;
+        --cyan: #00cec9;
+        --card-bg: #112240;
+        --card-bg2: #152238;
+        --border: #1e3a5f;
+        --shadow: 0 2px 16px rgba(0,0,0,0.4);
+        --code-bg: #0a1628;
+        --ascii-bg: #0f1d30;
+        --table-stripe: #132238;
+        --tip-bg: #0d2b1a;
+        --warn-bg: #2b1f0d;
+        --danger-bg: #2b0d0d;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #0d1b2a 0%, #0f1f35 40%, #0a1525 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.8rem 1rem 1.8rem;
+        background: linear-gradient(135deg, #1a2744, #0d1b2a);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 28px rgba(226,176,74,0.15);
+        border-bottom: 2px solid var(--accent);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; color: var(--accent); }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: var(--accent); color: #0d1b2a;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.6;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.blue   { border-left-color: var(--accent2); }
+    .card.red    { border-left-color: var(--red); }
+    .card.cyan   { border-left-color: var(--cyan); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #1e3a5f;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #d4af6a; }
+    .code-block {
+        background: var(--code-bg); color: #e2e8f0; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre; border: 1px solid #1e3a5f;
+    }
+    .code-block .kw { color: #38bdf8; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #64748b; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .blank { background: var(--accent); color: #0d1b2a; padding: 1px 8px; border-radius: 3px; font-weight: 700; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.88rem; line-height: 1.45;
+        background: var(--ascii-bg); padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #1e3a5f;
+        margin: 1rem 0; color: #c8d6e5;
+    }
+    .ascii-art .hl { color: var(--accent); font-weight: 700; }
+    .ascii-art .l1 { color: #4da6ff; }
+    .ascii-art .l2 { color: #2ecc71; }
+    .ascii-art .l3 { color: var(--accent); font-weight: 700; }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #1e3a5f; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #0d1b2a; font-weight: 600; }
+    tr:nth-child(even) td { background: var(--table-stripe); }
+    .highlight { background: #2b1f0d !important; font-weight: 700; color: var(--accent); }
+    .tip-box {
+        background: var(--tip-bg); border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: var(--warn-bg); border-left: 4px solid var(--accent);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .danger-box {
+        background: var(--danger-bg); border-left: 4px solid var(--red);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #0d1b2a;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .blank-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px; background: var(--accent); color: #0d1b2a;
+        border-radius: 50%; font-weight: 700; font-size: 0.9rem;
+        margin-right: 6px; flex-shrink: 0;
+    }
+    footer {
+        text-align: center; color: #4a5568; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #1e3a5f;
+    }
+    ul, ol { color: #c8d6e5; }
+    p { color: #c8d6e5; }
+    code { 
+        background: #1a2744; color: var(--accent); 
+        padding: 1px 6px; border-radius: 4px; font-family: "Fira Code","Consolas",monospace;
+        font-size: 0.9em;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.72rem; padding: 0.7rem; }
+        .ascii-art { font-size: 0.65rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📋 编程题：Merge合并顺序表（填空补全）</h1>
+    <div class="subtitle">第28题 · 合并两个顺序表为一个新顺序表</div>
+    <div class="answer-badge">
+        ✅ 填空答案：<br>
+        ① malloc(sizeof(struct SqList)) &nbsp;&nbsp; ② L1-&gt;MaxSize + L2-&gt;MaxSize<br>
+        ③ L1-&gt;N + L2-&gt;N &nbsp;&nbsp; ④ L3
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目理解：我们要做什么？</h2>
+
+<h3>1.1 问题描述</h3>
+<p>
+已知两个顺序表 <code>L1</code> 和 <code>L2</code>，每个顺序表都存有若干元素。要求编写函数 <code>Merge</code>，
+<b>将L1和L2中的所有元素依次复制到一个新创建的顺序表L3中</b>（先L1的所有元素，再L2的所有元素），并返回L3的指针。
+题目给出了完整代码框架，留了4个空需要填写。
+</p>
+
+<h3>1.2 顺序表结构定义</h3>
+<div class="code-block">
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">ElementType</span> *Data;    <span class="cmt">// 指向动态分配的数组空间</span>
+    <span class="type">int</span> MaxSize;            <span class="cmt">// 数组的最大容量（已分配的槽位数）</span>
+    <span class="type">int</span> N;                 <span class="cmt">// 当前实际存储的元素个数（N ≤ MaxSize）</span>
+} <span class="type">SqList</span>;
+</div>
+
+<h3>1.3 合并策略</h3>
+<p>这道题的合并方式是最简单的<b>拼接</b>：先把L1的所有元素依次放入L3，再把L2的所有元素依次放入L3。不需要排序，不需要去重。</p>
+</div>
+
+<!-- ============ FILL-IN REASONING ============ -->
+<div class="card green">
+<h2>二、逐空推导：四个空分别考什么？</h2>
+
+<!-- 空① -->
+<h3>填空①：<code>L3 = <span class="blank">malloc(sizeof(struct SqList))</span>;</code></h3>
+<table>
+    <tr><th>考察点</th><td>动态内存分配 —— 为结构体本身分配空间</td></tr>
+    <tr><th>推导过程</th>
+        <td style="text-align:left;">
+            <ol style="margin-left:1.2rem; line-height:2;">
+                <li>L3是一个指针（<code>struct SqList *L3</code>），它需要指向一个有效的SqList结构体。</li>
+                <li>目前L3未初始化（野指针），直接使用L3-&gt;xxx会崩溃。</li>
+                <li>所以必须先用<b>malloc</b>为<b>SqList结构体本身</b>分配堆内存。</li>
+                <li><code>sizeof(struct SqList)</code> 获取SqList结构体的大小（通常是三个字段：一个指针+两个int = 16或24字节，取决于平台）。</li>
+            </ol>
+        </td>
+    </tr>
+    <tr><th>易错点</th>
+        <td style="text-align:left;">
+            ❌ 写成 <code>malloc(sizeof(ElementType) * N)</code> —— 那是给Data数组分配空间，不是给结构体本身分配。<br>
+            ❌ 写成 <code>malloc(sizeof(SqList *))</code> —— 分配的是指针大小（8字节），不够存结构体。<br>
+            ✅ 必须是 <code>sizeof(struct SqList)</code> 或 <code>sizeof(SqList)</code>。
+        </td>
+    </tr>
+</table>
+
+<!-- 空② -->
+<h3>填空②：<code>L3-&gt;MaxSize = <span class="blank">L1-&gt;MaxSize + L2-&gt;MaxSize</span>;</code></h3>
+<table>
+    <tr><th>考察点</th><td>容量计算 —— 新顺序表需要多大空间？</td></tr>
+    <tr><th>推导过程</th>
+        <td style="text-align:left;">
+            <ol style="margin-left:1.2rem; line-height:2;">
+                <li>L3要容纳L1和L2的<b>全部</b>元素。</li>
+                <li>最坏情况：L1满了（N1 = MaxSize1），L2也满了（N2 = MaxSize2），合并后需要 MaxSize1 + MaxSize2 个槽位。</li>
+                <li>因此L3的最大容量 = L1的最大容量 + L2的最大容量。</li>
+                <li>后续用这个MaxSize去malloc Data数组：<code>L3-&gt;Data = malloc(sizeof(ElementType) * L3-&gt;MaxSize)</code>。</li>
+            </ol>
+        </td>
+    </tr>
+    <tr><th>易错点</th>
+        <td style="text-align:left;">
+            ❌ 写成 <code>L1-&gt;N + L2-&gt;N</code> —— N是当前元素数，但MaxSize表示最大容量。如果后续还有插入操作，用N可能不够。<br>
+            ❌ 写成 <code>L1-&gt;MaxSize > L2-&gt;MaxSize ? L1-&gt;MaxSize : L2-&gt;MaxSize</code> —— 这是取最大值，但合并需要的是<b>和</b>而非<b>最大值</b>。<br>
+            ✅ <code>L1-&gt;MaxSize + L2-&gt;MaxSize</code>。
+        </td>
+    </tr>
+</table>
+
+<!-- 空③ -->
+<h3>填空③：<code>L3-&gt;N = <span class="blank">L1-&gt;N + L2-&gt;N</span>;</code></h3>
+<table>
+    <tr><th>考察点</th><td>元素个数统计 —— 合并后有多少个元素？</td></tr>
+    <tr><th>推导过程</th>
+        <td style="text-align:left;">
+            <ol style="margin-left:1.2rem; line-height:2;">
+                <li>前面的两个for循环已经把L1的N₁个元素和L2的N₂个元素都复制到了L3-&gt;Data中。</li>
+                <li>所以L3中实际存储的元素个数 = L1的元素个数 + L2的元素个数。</li>
+                <li>k的值最后就是L1-&gt;N + L2-&gt;N（因为k从0开始，每次k++）。</li>
+                <li>用L3-&gt;N记录这个数，后续遍历L3时才知道有效元素的范围。</li>
+            </ol>
+        </td>
+    </tr>
+    <tr><th>易错点</th>
+        <td style="text-align:left;">
+            ❌ 写成 <code>k</code> —— 虽然k的值恰好等于L1-&gt;N + L2-&gt;N（功能上等价），但考试填空要看上下文，代码中k是局部变量，写成k可能也被接受。不过从"语义清晰"角度，写N的和更好。<br>
+            ❌ 写成 <code>L3-&gt;MaxSize</code> —— MaxSize是容量，可能大于实际元素数。<br>
+            ✅ <code>L1-&gt;N + L2-&gt;N</code>。
+        </td>
+    </tr>
+</table>
+
+<!-- 空④ -->
+<h3>填空④：<code>return <span class="blank">L3</span>;</code></h3>
+<table>
+    <tr><th>考察点</th><td>函数返回值 —— 返回什么？</td></tr>
+    <tr><th>推导过程</th>
+        <td style="text-align:left;">
+            <ol style="margin-left:1.2rem; line-height:2;">
+                <li>函数签名是 <code>struct SqList *Merge(...)</code>，返回值类型是<b>指向SqList的指针</b>。</li>
+                <li>L3是我们新创建并填充好的顺序表指针。</li>
+                <li>调用者通过这个返回值获取合并后的顺序表，后续可以遍历L3-&gt;Data[0] 到 L3-&gt;Data[L3-&gt;N-1]。</li>
+                <li>所以返回L3即可。</li>
+            </ol>
+        </td>
+    </tr>
+    <tr><th>易错点</th>
+        <td style="text-align:left;">
+            ❌ 写成 <code>*L3</code> —— 解引用后是结构体本身，类型不匹配（函数返回指针）。<br>
+            ❌ 写成 <code>&amp;L3</code> —— 取指针的地址，变成二级指针了。<br>
+            ❌ 写成 <code>L3-&gt;Data</code> —— 返回的是内部数组指针，丢失了MaxSize和N信息。<br>
+            ✅ <code>L3</code>。
+        </td>
+    </tr>
+</table>
+</div>
+
+<!-- ============ FULL CODE ============ -->
+<div class="card blue">
+<h2>三、完整代码 &amp; 结构示意图</h2>
+
+<h3>3.1 完整Merge函数</h3>
+<div class="code-block">
+<span class="kw">struct</span> <span class="type">SqList</span> *<span class="fn">Merge</span>(<span class="kw">struct</span> <span class="type">SqList</span> *L1, <span class="kw">struct</span> <span class="type">SqList</span> *L2) {
+    <span class="kw">struct</span> <span class="type">SqList</span> *L3;
+    <span class="type">int</span> i, k = <span class="num">0</span>;
+
+    <span class="cmt">// ─── 空①：为L3结构体本身分配内存 ───</span>
+    L3 = <span class="blank">malloc(sizeof(struct SqList))</span>;
+
+    <span class="cmt">// ─── 空②：设置L3的最大容量 ───</span>
+    L3-&gt;MaxSize = <span class="blank">L1-&gt;MaxSize + L2-&gt;MaxSize</span>;
+
+    <span class="cmt">// 根据MaxSize为Data数组分配空间</span>
+    L3-&gt;Data = <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">ElementType</span>) * L3-&gt;MaxSize);
+
+    L3-&gt;N = <span class="num">0</span>;                            <span class="cmt">// 初始元素个数为0</span>
+
+    <span class="cmt">// 复制L1的所有元素</span>
+    <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; L1-&gt;N; i++)
+        L3-&gt;Data[k++] = L1-&gt;Data[i];
+
+    <span class="cmt">// 复制L2的所有元素</span>
+    <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; L2-&gt;N; i++)
+        L3-&gt;Data[k++] = L2-&gt;Data[i];
+
+    <span class="cmt">// ─── 空③：设置L3的实际元素个数 ───</span>
+    L3-&gt;N = <span class="blank">L1-&gt;N + L2-&gt;N</span>;
+
+    <span class="cmt">// ─── 空④：返回新顺序表指针 ───</span>
+    <span class="kw">return</span> <span class="blank">L3</span>;
+}
+</div>
+
+<h3>3.2 调用示例</h3>
+<div class="code-block">
+<span class="cmt">// 假设已创建 L1 = [10, 20, 30] (N=3, MaxSize=10)</span>
+<span class="cmt">//         L2 = [40, 50]      (N=2, MaxSize=8)</span>
+
+<span class="kw">struct</span> <span class="type">SqList</span> *result = <span class="fn">Merge</span>(L1, L2);
+
+<span class="cmt">// result-&gt;Data = [10, 20, 30, 40, 50]</span>
+<span class="cmt">// result-&gt;N = 5</span>
+<span class="cmt">// result-&gt;MaxSize = 18</span>
+</div>
+</div>
+
+<!-- ============ VISUAL ============ -->
+<div class="card">
+<h2>四、可视化：顺序表合并全过程</h2>
+
+<h3>4.1 合并前：两个独立的顺序表</h3>
+<div class="ascii-art">
+    ┌──────────────────── L1 ────────────────────┐
+    │  MaxSize = 10                              │
+    │  N = 3                                     │
+    │  Data ──→ [ <span class="l1">10</span> ][ <span class="l1">20</span> ][ <span class="l1">30</span> ][  ][  ][  ][  ][  ][  ][  ] │
+    │             0     1     2    3   4   5   6   7   8    9 │
+    └────────────────────────────────────────────┘
+
+    ┌──────────────────── L2 ────────────────────┐
+    │  MaxSize = 8                               │
+    │  N = 2                                     │
+    │  Data ──→ [ <span class="l2">40</span> ][ <span class="l2">50</span> ][  ][  ][  ][  ][  ][  ]  │
+    │             0     1    2   3   4   5   6    7 │
+    └────────────────────────────────────────────┘
+</div>
+
+<h3>4.2 步骤一：malloc L3结构体（空①）</h3>
+<div class="ascii-art">
+    堆内存中分配一个新的 SqList 结构体：
+    ┌─────────── L3 ───────────┐
+    │  MaxSize = ?  (未初始化)  │
+    │  N = ?       (未初始化)  │
+    │  Data = ?    (野指针)    │
+    └──────────────────────────┘
+</div>
+
+<h3>4.3 步骤二：设置L3-&gt;MaxSize（空②）</h3>
+<div class="ascii-art">
+    L3-&gt;MaxSize = L1-&gt;MaxSize + L2-&gt;MaxSize = 10 + 8 = <span class="hl">18</span>
+
+    然后 malloc Data数组：
+    Data = malloc(sizeof(ElementType) × 18)
+    ┌──────────────────── L3.Data (18个槽位) ────────────────────┐
+    │[  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]│
+    │ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17 │
+    └──────────────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>4.4 步骤三：复制L1元素（第一个for循环）</h3>
+<div class="ascii-art">
+    k=0: L3-&gt;Data[0] = L1-&gt;Data[0] = 10  → k=1
+    k=1: L3-&gt;Data[1] = L1-&gt;Data[1] = 20  → k=2
+    k=2: L3-&gt;Data[2] = L1-&gt;Data[2] = 30  → k=3
+
+    ┌──────────────────── L3.Data ──────────────────────────────┐
+    │[<span class="l1">10</span>][<span class="l1">20</span>][<span class="l1">30</span>][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]│
+    │ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17 │
+    └──────────────────────────────────────────────────────────────────────┘
+    k = 3
+</div>
+
+<h3>4.5 步骤四：复制L2元素（第二个for循环）</h3>
+<div class="ascii-art">
+    k=3: L3-&gt;Data[3] = L2-&gt;Data[0] = 40  → k=4
+    k=4: L3-&gt;Data[4] = L2-&gt;Data[1] = 50  → k=5
+
+    ┌──────────────────── L3.Data ──────────────────────────────┐
+    │[<span class="l1">10</span>][<span class="l1">20</span>][<span class="l1">30</span>][<span class="l2">40</span>][<span class="l2">50</span>][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]│
+    │ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17 │
+    └──────────────────────────────────────────────────────────────────────┘
+    k = 5
+</div>
+
+<h3>4.6 步骤五：设置L3-&gt;N（空③）并返回（空④）</h3>
+<div class="ascii-art">
+    L3-&gt;N = L1-&gt;N + L2-&gt;N = 3 + 2 = <span class="hl">5</span>
+
+    ┌──────────────────── 最终 L3 ────────────────────┐
+    │  MaxSize = <span class="hl">18</span>                                   │
+    │  N = <span class="hl">5</span>                                       │
+    │  Data ──→ [<span class="l1">10</span>][<span class="l1">20</span>][<span class="l1">30</span>][<span class="l2">40</span>][<span class="l2">50</span>][  ]...[  ]    │
+    │             0    1    2    3    4    5      17  │
+    └─────────────────────────────────────────────────┘
+    有效数据范围：Data[0..4]（共N=5个元素）
+    空闲空间：Data[5..17]（共MaxSize-N=13个空位）
+</div>
+</div>
+
+<!-- ============ MEMORY LAYOUT ============ -->
+<div class="card cyan">
+<h2>五、内存布局详解：malloc了两次什么？</h2>
+
+<p>这段代码一共调用了<b>两次malloc</b>，分配的是不同层级的内存：</p>
+
+<table>
+    <tr><th>malloc调用</th><th>分配对象</th><th>大小</th><th>目的</th></tr>
+    <tr>
+        <td><code>malloc(sizeof(struct SqList))</code></td>
+        <td><b>SqList结构体本身</b></td>
+        <td>≈16～24字节</td>
+        <td>存放MaxSize、N、Data指针这三个字段。如果没有这个结构体，Data指针就没地方放。</td>
+    </tr>
+    <tr>
+        <td><code>malloc(sizeof(ElementType) * L3-&gt;MaxSize)</code></td>
+        <td><b>Data数组</b></td>
+        <td>= sizeof(ElementType) × 18</td>
+        <td>存放实际的元素数据。这是一个独立的连续内存块。</td>
+    </tr>
+</table>
+
+<div class="ascii-art">
+    堆内存中的两层结构：
+
+    ① SqList结构体               ② Data数组（独立内存块）
+    ┌────────────────┐          ┌──────────────────────────┐
+    │ MaxSize = 18   │          │[10][20][30][40][50]...[  ]│
+    │ N = 5          │          └──────────────────────────┘
+    │ Data ──────────┼──────→    (18个ElementType的连续空间)
+    └────────────────┘
+
+    注意：Data是一个<b>指针</b>，它存储的是数组的首地址。
+    L3-&gt;Data[i] 等价于 *(L3-&gt;Data + i)。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>关键理解：</b>为什么需要两次malloc？因为SqList结构体和它内部的数组是<b>两个独立的内存块</b>。如果只malloc结构体而不malloc数组，Data就是野指针；如果只malloc数组而没有结构体，MaxSize和N就没地方存。
+</div>
+</div>
+
+<!-- ============ BOUNDARY ============ -->
+<div class="card red">
+<h2>六、边界情况分析</h2>
+
+<h3>情况1：L1为空（N=0），L2有元素</h3>
+<div class="ascii-art">
+    L1: N=0, MaxSize=10, Data=[空]
+    L2: N=3, MaxSize=8,  Data=[40,50,60]
+
+    结果：L3-&gt;Data = [40,50,60]
+          L3-&gt;N = 0+3 = 3 ✅
+          第一个for循环i&lt;0不执行，k保持0。
+          第二个for循环正常复制L2的元素。
+</div>
+
+<h3>情况2：两个表都为空</h3>
+<div class="ascii-art">
+    L1: N=0, MaxSize=10
+    L2: N=0, MaxSize=8
+
+    结果：L3-&gt;N = 0+0 = 0 ✅
+          L3-&gt;MaxSize = 10+8 = 18（虽然暂时没用到）
+          两个for循环都不执行，k保持0。
+          返回的L3是一个空的顺序表，Data数组有18个空位。
+</div>
+
+<h3>情况3：L1的MaxSize远大于N</h3>
+<div class="ascii-art">
+    L1: N=2, MaxSize=100, Data=[1,2]
+    L2: N=3, MaxSize=5,   Data=[3,4,5]
+
+    L3-&gt;MaxSize = 100 + 5 = 105
+    L3-&gt;N = 2 + 3 = 5
+    Data数组有105个槽位，但只用了前5个。✅
+    虽然有100个空位有点浪费，但题目不要求压缩。
+</div>
+
+<div class="tip-box">
+    💡 所有边界情况的处理都是自然的，无需特殊if判断——因为循环条件是 <code>i &lt; N</code>，N=0时循环体直接跳过。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card">
+<h2>七、常见错误 &amp; 考点总结</h2>
+
+<div class="danger-box">
+    🔴 <b>致命错误1：混淆两次malloc的用途！</b><br>
+    空①是malloc结构体（<code>sizeof(struct SqList)</code>），下一行是malloc数组（<code>sizeof(ElementType) * MaxSize</code>）。<br>
+    两者不能互换：不能用malloc数组的代码填到空①，也不能用malloc结构体的代码填到空②的位置。<br>
+    <b>记忆："先有壳（结构体），再有肉（数组）。"</b>
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：空②写成N的和而非MaxSize的和。</b><br>
+    <code>L1-&gt;N + L2-&gt;N</code> 虽然"当前够用"，但MaxSize表示的是<b>最大容量</b>。<br>
+    如果后续还要向L3插入新元素，用N的和作为MaxSize可能不够。题目框架用MaxSize作为数组分配大小的依据，自然应该用MaxSize的和。<br>
+    当然，在当前代码逻辑下（只合并不插入），N的和也是够用的。但从变量语义上，MaxSize应对应MaxSize。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：空③写成k或L3-&gt;MaxSize。</b><br>
+    写k：虽然k的值恰好等于L1-&gt;N+L2-&gt;N，但这不是"推导"出来的。考试更看重语义：L3的元素个数 = L1的元素个数 + L2的元素个数。<br>
+    写MaxSize：MaxSize=18，但实际只有5个元素，N=18会导致后续遍历访问到垃圾数据。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：空④返回L3-&gt;Data或*L3。</b><br>
+    返回Data：调用者只能拿到数组，丢失了N和MaxSize信息，无法知道有多少个有效元素。<br>
+    返回*L3：类型错误——函数返回指针，不是结构体值。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误5：忘记初始化L3-&gt;N = 0。</b><br>
+    虽然题目代码里已经写了，但如果自己写类似函数，忘记初始化N会导致空③之前N是垃圾值。
+</div>
+
+<div class="tip-box">
+    💡 <b>考试心法：</b><br>
+    这道题的4个空恰好覆盖了"创建新顺序表"的完整流程——<br>
+    ① <b>分配结构体</b>（malloc结构体）<br>
+    ② <b>规划容量</b>（计算MaxSize）<br>
+    ③ <b>统计个数</b>（计算N）<br>
+    ④ <b>返回指针</b>（return）<br>
+    每个空都可以从"这个变量代表什么"以及"它应该等于什么"两个角度推导出来。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"结构体先malloc开天地，MaxSize求和定容量。N数相加标边界，返回L3指针就完毕。"
+</div>
+</div>
+
+<!-- ============ CONTRAST ============ -->
+<div class="card blue">
+<h2>八、拓展对比：顺序表 Merge vs 链表 Merge</h2>
+<table>
+    <tr><th>维度</th><th>顺序表Merge（本题）</th><th>有序链表Merge</th></tr>
+    <tr>
+        <td>合并策略</td>
+        <td>直接拼接（先L1后L2），O(n₁+n₂)</td>
+        <td>归并（比较大小依次取），O(n₁+n₂)</td>
+    </tr>
+    <tr>
+        <td>结果有序性</td>
+        <td>不保证有序</td>
+        <td>保证有序</td>
+    </tr>
+    <tr>
+        <td>空间</td>
+        <td>需要新数组，O(n₁+n₂)额外空间</td>
+        <td>可以原地（改指针），O(1)额外空间</td>
+    </tr>
+    <tr>
+        <td>内存分配</td>
+        <td>需要malloc结构体+数组</td>
+        <td>通常复用原结点（不新建）</td>
+    </tr>
+    <tr>
+        <td>典型考点</td>
+        <td>malloc用法、MaxSize vs N</td>
+        <td>归并逻辑、指针操作</td>
+    </tr>
+</table>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构考试范围2026 · Merge合并顺序表 · 第28题详解
+</footer>
+
+</body>
+</html>

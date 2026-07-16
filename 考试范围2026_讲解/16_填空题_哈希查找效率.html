@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空16 · 哈希查找效率</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.formula {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  padding: 1rem;
+  margin: 0.8rem 0;
+  background: rgba(226,176,74,0.06);
+  border: 1px dashed var(--gold);
+  border-radius: 8px;
+}
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第6题 · 哈希查找效率影响因素</h1>
+  <p class="subtitle">影响哈希表查找效率的三个关键因素 & 装填因子详解</p>
+</div>
+
+<div class="answer-box">
+  <div class="big" style="font-size:1.3rem;line-height:2;">
+    三个因素：<br>
+    ① <span style="color:var(--gold-light)">哈希函数</span> &nbsp;
+    ② <span style="color:var(--gold-light)">处理冲突的方法</span> &nbsp;
+    ③ <span style="color:var(--gold-light)">装填因子</span>
+  </div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、哈希查找的基本原理</h2>
+  <div class="card">
+    <p>哈希表（Hash Table）通过<strong>哈希函数</strong> H(key) 将关键字映射到表中的某个地址。理想情况下，一次计算就能定位到目标元素 → O(1)时间复杂度。但实际上，不同的关键字可能映射到同一地址，产生<strong>冲突</strong>（Collision），冲突的处理效率决定了哈希表的实际性能。</p>
+  </div>
+
+  <div class="ascii">
+  ┌──────────┐    哈希函数     ┌──────────────────┐
+  │  key     │ ─────────────→ │  地址 = H(key)    │
+  │ "Alice"  │   H("Alice")   │   槽位 3          │
+  └──────────┘                └──────────────────┘
+        │
+        │  可能存在冲突：H("Bob") = H("Alice") = 3
+        ▼
+  ┌──────────────────────────────────────────────┐
+  │  哈希表  [0] [1] [2] [3] [4] [5] [6] ...    │
+  │                ↑      ↑                      │
+  │            Alice和Bob都映射到3，需要冲突处理  │
+  └──────────────────────────────────────────────┘
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、三大影响因素详解</h2>
+
+  <div class="card">
+    <h3><span class="step-num">1</span> 哈希函数（Hash Function）</h3>
+    <p>哈希函数 H(key) 将关键字映射为地址。好的哈希函数应该：</p>
+    <ul>
+      <li><span class="hl-green">均匀分布</span>：关键字均匀散布到地址空间，减少冲突</li>
+      <li><span class="hl-green">计算简单</span>：函数本身不能太复杂，否则抵消哈希的优势</li>
+      <li><span class="hl-green">覆盖面广</span>：充分利用整个地址空间</li>
+    </ul>
+    <p><strong>常见哈希函数：</strong></p>
+    <table>
+      <tr><th>方法</th><th>公式</th><th>特点</th></tr>
+      <tr><td>除留余数法</td><td>H(key) = key mod p</td><td>最常用，p一般取≤表长的最大素数</td></tr>
+      <tr><td>直接定址法</td><td>H(key) = a·key + b</td><td>无冲突但空间大</td></tr>
+      <tr><td>平方取中法</td><td>取key²的中间几位</td><td>分布较均匀</td></tr>
+      <tr><td>折叠法</td><td>分段叠加</td><td>适合长关键字</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">2</span> 处理冲突的方法（Collision Resolution）</h3>
+    <p>当两个不同的关键字映射到同一地址时，需要冲突处理策略。主要有两大类：</p>
+    <table>
+      <tr><th>类别</th><th>方法</th><th>原理</th><th>优缺点</th></tr>
+      <tr>
+        <td rowspan="2"><strong>开放定址法</strong><br>（Open Addressing）</td>
+        <td>线性探测</td>
+        <td>冲突后依次查找下一个空位</td>
+        <td>简单，但易产生"聚集"</td>
+      </tr>
+      <tr>
+        <td>二次探测 / 双哈希</td>
+        <td>用二次函数或第二个哈希函数决定步长</td>
+        <td>减少聚集，但计算复杂</td>
+      </tr>
+      <tr>
+        <td><strong>链地址法</strong><br>（Separate Chaining）</td>
+        <td>拉链法</td>
+        <td>每个槽位维护一个链表，冲突元素挂在链表上</td>
+        <td>不受表长限制，但需要额外指针空间</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">3</span> 装填因子（Load Factor）</h3>
+    <div class="formula">装填因子 α = 表中记录数 / 哈希表长度 = n / m</div>
+    <p><strong>装填因子是衡量哈希表"满"的程度的指标：</strong></p>
+    <ul>
+      <li>α 越大 → 表越满 → 冲突概率越高 → 查找效率越低</li>
+      <li>α 越小 → 表越空 → 冲突概率越低 → 查找效率越高（但空间浪费大）</li>
+      <li>一般建议 α 控制在 <strong>0.6 ~ 0.9</strong> 之间</li>
+    </ul>
+
+    <div class="ascii">
+  α = 0.3（稀疏）              α = 0.8（适中）              α = 1.2（过载！）
+  ┌──┬──┬──┬──┬──┐        ┌──┬──┬──┬──┬──┐        ┌──┬──┬──┬──┬──┐
+  │12│  │  │34│  │        │12│56│78│34│90│        │12│45│23│67│89│
+  └──┴──┴──┴──┴──┘        └──┴──┴──┴──┴──┘        └──┴──┴──┴──┴──┘
+  冲突少，效率高             冲突适中，经常用          冲突严重！需要扩容
+  但浪费空间                 平衡点                    查找效率大幅下降
+    </div>
+
+    <p style="margin-top:1rem;"><strong>装填因子 α 与平均查找长度（ASL）的关系：</strong></p>
+    <table>
+      <tr><th>冲突处理方法</th><th>成功ASL（近似公式）</th><th>失败ASL（近似公式）</th></tr>
+      <tr><td>线性探测</td><td>½(1 + 1/(1−α))</td><td>½(1 + 1/(1−α)²)</td></tr>
+      <tr><td>二次探测/双哈希</td><td>−(1/α)·ln(1−α)</td><td>1/(1−α)</td></tr>
+      <tr><td>链地址法</td><td>1 + α/2</td><td>α + e^(−α)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、三个因素如何相互影响？</h2>
+  <div class="card">
+    <p>这三个因素不是孤立的。它们共同决定了哈希表的实际效率：</p>
+    <div class="ascii">
+                     ┌──────────────────┐
+                     │   哈希函数 H(key)  │  ← 决定了冲突的"先天概率"
+                     └────────┬─────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+        均匀分布好        分布不均匀        计算太复杂
+        冲突少 ✅         冲突多 ❌         得不偿失 ❌
+              │               │
+              ▼               ▼
+     ┌────────────────────────────────┐
+     │       处理冲突的方法              │  ← 决定了冲突后的"补救效率"
+     │  开放定址法 / 链地址法           │
+     └────────────────┬───────────────┘
+                      │
+                      ▼
+     ┌────────────────────────────────┐
+     │       装填因子 α = n/m          │  ← 决定了表整体的"拥挤程度"
+     │  α大→冲突多→效率低              │
+     │  α小→冲突少→效率高但浪费空间     │
+     └────────────────────────────────┘
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、装填因子详解（重点）</h2>
+  <div class="card">
+    <h3>📐 定义与计算</h3>
+    <div class="formula">装填因子 α = n / m</div>
+    <p>其中 n = 已存入的记录数，m = 哈希表的总长度（槽位数）。</p>
+
+    <p><strong>示例：</strong>哈希表长度为11，已存入8个记录，则 α = 8/11 ≈ 0.727。</p>
+
+    <h3>🔑 为什么装填因子重要？</h3>
+    <p>装填因子直接决定了<strong>冲突的概率</strong>。根据生日悖论（Birthday Paradox），当表中已有23个记录时，两个记录冲突的概率就超过50%——即使表长很大。装填因子越大，新插入的记录越难找到空位。</p>
+
+    <h3>📊 不同α下的线性探测ASL变化</h3>
+    <table>
+      <tr><th>α</th><th>0.1</th><th>0.3</th><th>0.5</th><th>0.7</th><th>0.8</th><th>0.9</th><th>0.95</th></tr>
+      <tr><th>成功ASL</th><td>1.06</td><td>1.21</td><td>1.50</td><td>2.17</td><td>3.00</td><td>5.50</td><td>10.50</td></tr>
+      <tr><th>失败ASL</th><td>1.12</td><td>1.52</td><td>2.50</td><td>6.06</td><td>13.0</td><td>50.5</td><td>200.5</td></tr>
+    </table>
+    <p style="color:var(--red);margin-top:0.8rem;">⚠️ α接近1时，ASL暴涨！因此哈希表一般不能让α超过0.85。</p>
+  </div>
+
+  <div class="tip">
+    <strong>🎯 三个因素记忆口诀：</strong><br>
+    "<strong>函</strong>数散得好（哈希函数），<strong>冲</strong>突处理好（冲突方法），<strong>装</strong>得不能太满（装填因子）"<br>
+    简记：<strong>函-冲-装</strong>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

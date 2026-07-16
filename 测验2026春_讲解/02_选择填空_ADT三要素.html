@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第2题 · ADT三要素</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 2rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 2rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 4em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 6px;
+}
+
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .fn { color: #e2e8f0; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;
+}
+table.data th {
+  background: #fff7ed; padding: 10px 12px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center;
+}
+table.data tr.hl-row { background: #fffbeb; }
+table.data td.left { text-align: left; }
+
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+/* 三要素卡片 */
+.triad-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin: 1.2rem 0;
+}
+.triad-card {
+  text-align: center; padding: 1.5rem 1rem; border-radius: 12px;
+  border: 2px solid; position: relative;
+}
+.triad-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.triad-card .title { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+.triad-card .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+.triad-card.card1 { background: #fff7ed; border-color: #fdba74; }
+.triad-card.card2 { background: #fef2f2; border-color: #fca5a5; }
+.triad-card.card3 { background: #f0fdf4; border-color: #86efac; }
+
+.badge-missing {
+  display: inline-block; background: var(--red); color: #fff; padding: 3px 10px;
+  border-radius: 12px; font-size: 0.8rem; font-weight: 700;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第2题</div>
+  <h1>📋 ADT三要素 — 抽象数据类型的"说明书"</h1>
+  <div class="q-box">
+    ADT（抽象数据类型）的三要素不包括以下哪一项？<br>
+    选项：A. 数据对象 &nbsp; B. 数据关系 &nbsp; C. 基本操作 &nbsp; D. 存储结构
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big"><span class="blank">数据关系</span> 不是ADT三要素</div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    ADT三要素：<strong style="color:var(--green);">①数据对象</strong>  <strong style="color:var(--green);">②数据关系</strong>  <strong style="color:var(--green);">③基本操作</strong><br>
+    而 <strong style="color:var(--red);">存储结构</strong> 不属于ADT定义范畴——那是"物理实现"的事！
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、什么是ADT？—— 一个生动的类比</h2>
+  <div class="card">
+    <p>ADT（Abstract Data Type，抽象数据类型）就像一份<strong>产品说明书</strong>：</p>
+    <table class="data">
+      <tr><th>类比</th><th>ADT</th><th>说明</th></tr>
+      <tr>
+        <td>📖 说明书</td>
+        <td class="left"><strong>ADT定义</strong></td>
+        <td class="left">只告诉你"能做什么"，不告诉你"怎么做的"</td>
+      </tr>
+      <tr class="hl-row">
+        <td>🔧 产品实现</td>
+        <td class="left"><strong>数据结构（物理实现）</strong></td>
+        <td class="left">具体的代码、存储方式（如数组/链表实现栈）</td>
+      </tr>
+    </table>
+    <p style="margin-top:0.8rem;"><span class="hl">关键区分：ADT = 逻辑层面（What），数据结构 = 物理层面（How）。</span></p>
+    <p>比如："栈"的ADT定义了 push、pop、peek 等操作——但不管你是用数组实现还是链表实现，ADT描述不变。</p>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、ADT三要素 — 详细拆解</h2>
+
+  <div class="triad-grid">
+    <div class="triad-card card1">
+      <div class="icon">📦</div>
+      <div class="title">① 数据对象<br>(Data Object)</div>
+      <div class="desc">定义了"操作的对象是什么"。比如栈的数据对象是一组同类型元素的集合。</div>
+    </div>
+    <div class="triad-card card2">
+      <div class="icon">🔗</div>
+      <div class="title">② 数据关系<br>(Data Relationship)</div>
+      <div class="desc">定义元素之间的<strong>逻辑关系</strong>。比如栈中元素是"后进先出"的线性关系。</div>
+    </div>
+    <div class="triad-card card3">
+      <div class="icon">⚙️</div>
+      <div class="title">③ 基本操作<br>(Basic Operations)</div>
+      <div class="desc">定义可以对这些数据做什么。如栈的 push、pop、isEmpty 等。</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <p>三要素之间的关系：<span class="hl">数据对象 + 数据关系 = 数据的逻辑结构；再加上基本操作，构成完整的 ADT。</span></p>
+    <p style="color:var(--muted);">存储结构（顺序存储/链式存储）不属于ADT——它是<strong>实现层面</strong>的考量。</p>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、关键辨析：ADT vs 数据结构</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>对比维度</th><th>ADT（抽象数据类型）</th><th>数据结构（Data Structure）</th></tr>
+      <tr>
+        <td>层次</td>
+        <td><strong>逻辑层</strong> — What to do</td>
+        <td><strong>物理层</strong> — How to do</td>
+      </tr>
+      <tr class="hl-row">
+        <td>关注点</td>
+        <td>数据对象、关系、操作的定义</td>
+        <td>数据在内存中的存储方式</td>
+      </tr>
+      <tr>
+        <td>例子</td>
+        <td>"栈支持 push 和 pop"</td>
+        <td>"用数组实现栈，top指针指向栈顶"</td>
+      </tr>
+      <tr>
+        <td>包含关系</td>
+        <td colspan="2" style="color:var(--muted);">ADT 定义"长什么样"+ "能干什么"，数据结构负责"怎么存"</td>
+      </tr>
+      <tr class="hl-row">
+        <td>是否关心存储？</td>
+        <td><strong style="color:var(--red);">❌ 不关心</strong></td>
+        <td><strong style="color:var(--green);">✅ 核心关注</strong></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、以"栈"为例看ADT三要素</h2>
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>数据对象：</strong>D = { a<sub>i</sub> | a<sub>i</sub> ∈ ElemType, i = 1, 2, ..., n, n ≥ 0 }<br>
+        <span style="color:var(--muted);">→ 说白了：栈是一组同类型数据的集合，可以为空（n=0）。</span>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>数据关系：</strong>R = { &lt;a<sub>i-1</sub>, a<sub>i</sub>&gt; | a<sub>i-1</sub> 在 a<sub>i</sub> 之前入栈，i = 2,...,n }<br>
+        <span style="color:var(--muted);">→ 元素呈线性关系，且遵循 <strong>LIFO（后进先出）</strong>。</span>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>基本操作：</strong><br>
+        <code>InitStack(&amp;S)</code> — 初始化空栈<br>
+        <code>Push(&amp;S, e)</code> — 入栈<br>
+        <code>Pop(&amp;S, &amp;e)</code> — 出栈<br>
+        <code>GetTop(S, &amp;e)</code> — 取栈顶<br>
+        <code>StackEmpty(S)</code> — 判空
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、选项逐一分析</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>选项</th><th>内容</th><th>是ADT三要素？</th><th>判断理由</th></tr>
+      <tr>
+        <td>A</td><td>数据对象</td>
+        <td style="color:var(--green);font-weight:700;">✅ 是</td>
+        <td class="left">ADT首先要明确操作的对象是什么</td>
+      </tr>
+      <tr class="hl-row">
+        <td>B</td><td>数据关系</td>
+        <td style="color:var(--green);font-weight:700;">✅ 是</td>
+        <td class="left">元素之间的逻辑关系——线性？树形？图形？</td>
+      </tr>
+      <tr>
+        <td>C</td><td>基本操作</td>
+        <td style="color:var(--green);font-weight:700;">✅ 是</td>
+        <td class="left">ADT必须定义可以对该数据类型执行哪些操作</td>
+      </tr>
+      <tr class="hl-row" style="background:#fef2f2;">
+        <td><strong>D</strong></td>
+        <td><strong>存储结构</strong></td>
+        <td style="color:var(--red);font-weight:700;">❌ 不是</td>
+        <td class="left"><strong>存储结构属于物理实现，不属于ADT！</strong>ADT只关心逻辑层面</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="danger-box">
+    <strong>⚠️ 经典陷阱：</strong>很多同学混淆"数据关系"和"存储结构"。<br>
+    • <strong>数据关系</strong> = 逻辑上的（前后件关系、LIFO等）→ 属于ADT ✅<br>
+    • <strong>存储结构</strong> = 物理上的（顺序存储、链式存储）→ 不属于ADT ❌
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、知识点层级关系图</h2>
+  <div class="card">
+    <div style="font-family:'Cascadia Code',monospace;font-size:0.85rem;line-height:1.7;text-align:center;white-space:pre;background:#faf8f5;padding:1.5rem;border-radius:8px;border:1px dashed #d4c8b0;">
+┌─────────────────────────────────────────────────┐
+│              数据类型（Data Type）                 │
+│  ┌───────────────────────────────────────────┐  │
+│  │         抽象数据类型 ADT                     │  │
+│  │  ┌──────────┬──────────┬──────────┐       │  │
+│  │  │ ①数据对象│②数据关系│③基本操作│       │  │
+│  │  │  (集合)  │(逻辑关系)│(增删改查)│       │  │
+│  │  └──────────┴──────────┴──────────┘       │  │
+│  │         ↓ 用具体的...来实现 ↓               │  │
+│  └───────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────┐  │
+│  │         数据结构（Data Structure）           │  │
+│  │  ┌─────────────────┬─────────────────┐    │  │
+│  │  │   顺序存储结构    │   链式存储结构    │    │  │
+│  │  │  (数组/连续内存)  │  (指针/非连续)   │    │  │
+│  │  └─────────────────┴─────────────────┘    │  │
+│  └───────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘
+    </div>
+    <p style="margin-top:1rem;text-align:center;color:var(--muted);">
+      ADT 在上层定义"是什么"和"能干什么"，数据结构在下层负责"怎么存"。<br>
+      <strong>存储结构不在ADT的三要素之中，而是数据结构的范畴。</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、记忆口诀与常见考题</h2>
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num" style="background:var(--amber);">记</div>
+      <div class="step-body">
+        <strong style="font-size:1.1rem;">"ADT三要素：数据对象、数据关系、基本操作"</strong><br>
+        口诀：<span class="hl">"对象有关系，操作来办事"</span> — 九个字记住三个要素。<br>
+        存储结构 = "怎么存"，那是物理层面，不是ADT的活！
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>🎯 同类考题预测：</strong><br>
+    • 问"以下哪个不是数据结构的三要素" → 注意区分ADT三要素和数据结构三要素<br>
+    • 问"ADT定义包括哪些内容" → 选数据对象+关系+操作<br>
+    • 问"逻辑结构和存储结构的关系" → ADT定义逻辑结构，数据结构关心存储结构
+  </div>
+
+  <div class="danger-box">
+    <strong>⚠️ 易混淆点再强调：</strong><br>
+    <strong>数据结构的三要素 ≠ ADT的三要素！</strong><br>
+    数据结构的三要素通常指：<strong>逻辑结构、存储结构、数据运算</strong>。<br>
+    而ADT的三要素是：<strong>数据对象、数据关系、基本操作</strong>。<br>
+    <span style="color:var(--muted);">注意"存储结构"在数据结构中是一个要素，但在ADT中不是！</span>
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 ADT是第1章的重要概念，理解ADT与数据结构的区别是整个课程的基石。
+</div>
+
+</div>
+</body>
+</html>

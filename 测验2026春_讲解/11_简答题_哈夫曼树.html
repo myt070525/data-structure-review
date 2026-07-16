@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答题：哈夫曼树构造与WPL计算</title>
+<style>
+    :root {
+        --bg: #fff7ed;
+        --fg: #3e2723;
+        --accent: #ea580c;
+        --accent2: #7c3aed;
+        --green: #059669;
+        --blue: #0f766e;
+        --card-bg: #ffffff;
+        --border: #f0d9c8;
+        --shadow: 0 2px 14px rgba(234,88,12,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #fff7ed 0%, #fef0e6 40%, #fde8d8 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #9a3412, #ea580c);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(154,52,18,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.purple { border-left-color: var(--accent2); }
+    .card.blue   { border-left-color: var(--blue); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #f0d9c8;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #7c2d12; }
+    p { margin: 0.6rem 0; text-indent: 2em; }
+    p.ni { text-indent: 0; }
+    .code-block {
+        background: #1c1917; color: #e7e5e4; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre;
+    }
+    .code-block .kw { color: #fb923c; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #78716c; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.5;
+        background: #faf7f5; padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #e7d6c8;
+        margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #fff7ed; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .merge-highlight { background: #fde8e8 !important; font-weight: 700; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid #d97706;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .freq-box {
+        display: inline-block; background: #fef3c7; border: 2px solid #ea580c;
+        border-radius: 8px; padding: 4px 12px; margin: 2px;
+        font-weight: 700; font-family: "Fira Code",monospace;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #f0d9c8;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .ascii-art { font-size: 0.7rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📦 简答题：哈夫曼树构造与WPL</h1>
+    <div class="subtitle">第11题 · 给定5个字符频率，构造哈夫曼树并计算带权路径长度</div>
+    <div class="answer-badge">
+        ✅ 答案：WPL = 136 &nbsp; 公式：(3+7)×3 + (15+16+22)×2 = 136
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目回顾</h2>
+
+<h3>1.1 已知条件</h3>
+<p class="ni">给定5个字符及其出现频率：</p>
+
+<table>
+    <tr><th>字符</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th></tr>
+    <tr><td><b>频率（权值）</b></td><td>22</td><td>3</td><td>15</td><td>16</td><td>7</td></tr>
+</table>
+
+<p class="ni">要求构造一棵哈夫曼树（左小右大），并计算<strong>带权路径长度 WPL</strong>。</p>
+
+<h3>1.2 什么是WPL？</h3>
+<p>WPL（Weighted Path Length） = 每个叶结点的<b>权值 × 该结点到根的路径长度（边数）</b> 之和。</p>
+<div class="tip-box">
+    💡 <b>直观理解：</b>频率越高的字符应该离根越近（编码越短），频率越低的字符可以离根远一些（编码可以长一些）。WPL衡量了这种"加权距离"的总和。WPL越小，编码效率越高。
+</div>
+</div>
+
+<!-- ============ BUILD STEPS ============ -->
+<div class="card green">
+<h2>二、哈夫曼树构造过程（4步合并）</h2>
+
+<h3>2.1 构造规则</h3>
+<p class="ni">哈夫曼算法（贪心策略）：</p>
+<ol style="margin-left:2rem; line-height:2.2;">
+    <li>将每个字符视为一棵<b>单结点二叉树</b>（只有根，权值为频率）</li>
+    <li>每次从森林中选出<b>权值最小的两棵树</b>合并</li>
+    <li>新树的根权值 = 两子树权值之和，<b>左子树权值 ≤ 右子树权值</b></li>
+    <li>重复步骤2-3，直到只剩一棵树，即为哈夫曼树</li>
+</ol>
+
+<!-- --- STEP 1 --- -->
+<h3>步骤①：初始森林（5棵单结点树）</h3>
+<div class="ascii-art">
+  排序后：  b:3   e:7   c:15   d:16   a:22
+
+    [3]    [7]    [15]   [16]   [22]
+     b      e      c      d      a
+</div>
+<table>
+    <tr><th>森林中的树（按权值升序）</th><th>b</th><th>e</th><th>c</th><th>d</th><th>a</th></tr>
+    <tr><td>权值</td><td class="merge-highlight">3</td><td class="merge-highlight">7</td><td>15</td><td>16</td><td>22</td></tr>
+</table>
+<p>选出最小的两个：<span class="freq-box">b:3</span> 和 <span class="freq-box">e:7</span>，合并！</p>
+
+<!-- --- STEP 2 --- -->
+<h3>步骤②：合并 b(3) + e(7) = 10</h3>
+<div class="ascii-art">
+  合并 b 和 e，生成新树 T₁(10)：
+
+       T₁[10]
+       /    \
+    [3]     [7]
+     b       e
+
+  森林更新： T₁:10   c:15   d:16   a:22
+</div>
+<table>
+    <tr><th>森林（升序）</th><th>T₁</th><th>c</th><th>d</th><th>a</th></tr>
+    <tr><td>权值</td><td class="merge-highlight">10</td><td class="merge-highlight">15</td><td>16</td><td>22</td></tr>
+</table>
+<p>选出最小的两个：<span class="freq-box">T₁:10</span> 和 <span class="freq-box">c:15</span>，合并！</p>
+
+<!-- --- STEP 3 --- -->
+<h3>步骤③：合并 T₁(10) + c(15) = 25</h3>
+<div class="ascii-art">
+  合并 T₁ 和 c，生成新树 T₂(25)：
+
+           T₂[25]
+          /      \
+      T₁[10]    [15]
+      /    \      c
+   [3]    [7]
+    b      e
+
+  森林更新： d:16   a:22   T₂:25
+</div>
+<table>
+    <tr><th>森林（升序）</th><th>d</th><th>a</th><th>T₂</th></tr>
+    <tr><td>权值</td><td class="merge-highlight">16</td><td class="merge-highlight">22</td><td>25</td></tr>
+</table>
+<p>选出最小的两个：<span class="freq-box">d:16</span> 和 <span class="freq-box">a:22</span>，合并！</p>
+
+<!-- --- STEP 4 --- -->
+<h3>步骤④：合并 d(16) + a(22) = 38</h3>
+<div class="ascii-art">
+  合并 d 和 a，生成新树 T₃(38)：
+
+         T₃[38]
+         /     \
+      [16]    [22]
+       d       a
+
+  森林更新： T₂:25   T₃:38
+</div>
+<table>
+    <tr><th>森林（升序）</th><th>T₂</th><th>T₃</th></tr>
+    <tr><td>权值</td><td class="merge-highlight">25</td><td class="merge-highlight">38</td></tr>
+</table>
+<p>只剩两棵树，最终合并：<span class="freq-box">T₂:25</span> + <span class="freq-box">T₃:38</span> = 63</p>
+
+<!-- --- FINAL --- -->
+<h3>步骤⑤：合并 T₂(25) + T₃(38) = 63 —— 完成！</h3>
+<div class="ascii-art">
+                    最终哈夫曼树：
+
+                          ┌─────┐
+                          │ 63  │  ← 根（所有频率之和 = 3+7+15+16+22）
+                          └──┬──┘
+                     ______/ \______
+                    /               \
+               ┌─────┐           ┌─────┐
+               │ 25  │           │ 38  │
+               └──┬──┘           └──┬──┘
+              ____/ \____       ____/ \____
+             /           \     /           \
+        ┌─────┐      ┌─────┐ ┌─────┐    ┌─────┐
+        │ 10  │      │ 15  │ │ 16  │    │ 22  │
+        └──┬──┘      └─────┘ └─────┘    └─────┘
+        ___/ \___              d          a
+       /         \
+  ┌─────┐    ┌─────┐
+  │  3  │    │  7  │
+  └─────┘    └─────┘
+     b          e
+
+  各叶结点深度（到根的边数）：
+  b: 3层  e: 3层  c: 2层  d: 2层  a: 2层
+</div>
+</div>
+
+<!-- ============ WPL ============ -->
+<div class="card blue">
+<h2>三、WPL 计算</h2>
+
+<h3>3.1 逐结点计算</h3>
+<table>
+    <tr><th>叶结点</th><th>权值 w</th><th>深度（边数）h</th><th>w × h</th></tr>
+    <tr><td>b</td><td>3</td><td>3</td><td>3 × 3 = <b>9</b></td></tr>
+    <tr><td>e</td><td>7</td><td>3</td><td>7 × 3 = <b>21</b></td></tr>
+    <tr><td>c</td><td>15</td><td>2</td><td>15 × 2 = <b>30</b></td></tr>
+    <tr><td>d</td><td>16</td><td>2</td><td>16 × 2 = <b>32</b></td></tr>
+    <tr><td>a</td><td>22</td><td>2</td><td>22 × 2 = <b>44</b></td></tr>
+    <tr style="background:#fef3c7;"><td colspan="3"><b>WPL 合计</b></td><td><b>9+21+30+32+44 = 136</b></td></tr>
+</table>
+
+<h3>3.2 分组公式（更优雅）</h3>
+<div class="ascii-art">
+  按深度分组：
+  · 深度=3 的结点：b(3) + e(7) = 10        → 10 × 3 = 30
+  · 深度=2 的结点：c(15) + d(16) + a(22) = 53 → 53 × 2 = 106
+
+  WPL = 30 + 106 = 136
+</div>
+
+<div class="tip-box">
+    ✅ <b>最终答案：WPL = <span style="font-size:1.4rem;color:#ea580c;">136</span></b><br>
+    公式：<b>WPL = (3 + 7) × 3 + (15 + 16 + 22) × 2 = 10 × 3 + 53 × 2 = 30 + 106 = 136</b>
+</div>
+</div>
+
+<!-- ============ VERIFICATION ============ -->
+<div class="card purple">
+<h2>四、验证：哈夫曼编码</h2>
+<p>从根出发，走左分支编码为<b>0</b>，走右分支编码为<b>1</b>：</p>
+
+<table>
+    <tr><th>字符</th><th>路径</th><th>哈夫曼编码</th><th>码长</th><th>频率</th><th>总位数</th></tr>
+    <tr><td>a</td><td>右→右</td><td><b>11</b></td><td>2</td><td>22</td><td>44</td></tr>
+    <tr><td>b</td><td>左→左→左</td><td><b>000</b></td><td>3</td><td>3</td><td>9</td></tr>
+    <tr><td>c</td><td>左→右</td><td><b>01</b></td><td>2</td><td>15</td><td>30</td></tr>
+    <tr><td>d</td><td>右→左</td><td><b>10</b></td><td>2</td><td>16</td><td>32</td></tr>
+    <tr><td>e</td><td>左→左→右</td><td><b>001</b></td><td>3</td><td>7</td><td>21</td></tr>
+    <tr style="background:#fef3c7;"><td colspan="3"><b>总编码位数</b></td><td colspan="2"><b>= WPL</b></td><td><b>136</b></td></tr>
+</table>
+
+<div class="tip-box">
+    💡 <b>核心性质：</b>WPL恰好等于用该哈夫曼树对全部字符编码后的<b>总二进制位数</b>！这也是哈夫曼编码能实现最优压缩的数学基础。
+</div>
+
+<h3>4.1 前缀编码特性</h3>
+<div class="ascii-art">
+  验证：没有任何一个编码是另一个编码的前缀 ✓
+
+  a: 11    — 不以 0 开头，不可能是 b/c/e 的前缀
+  b: 000   — 不以 01/10/11/001 为前缀
+  c: 01    — 不以 00/10/11 为前缀
+  d: 10    — 不以 00/01/11/001 为前缀
+  e: 001   — 不以 01/10/11/000 为前缀
+
+  所有编码互不为前缀 → 可以唯一解码 ✓
+</div>
+</div>
+
+<!-- ============ ALGORITHM ============ -->
+<div class="card">
+<h2>五、哈夫曼算法伪代码</h2>
+<div class="code-block">
+<span class="cmt">/* 输入：n个权值 w[0..n-1] */</span>
+<span class="cmt">/* 输出：哈夫曼树根结点 */</span>
+
+<span class="fn">BuildHuffmanTree</span>(w[], n):
+    创建n个单结点，放入最小堆H
+
+    <span class="kw">for</span> i = 1 <span class="kw">to</span> n-1:          <span class="cmt">// 共合并 n-1 次</span>
+        x = <span class="fn">ExtractMin</span>(H)        <span class="cmt">// 取出最小的</span>
+        y = <span class="fn">ExtractMin</span>(H)        <span class="cmt">// 取出次小的</span>
+        z = <span class="fn">NewNode</span>(x, y)         <span class="cmt">// 合并：z.weight = x.weight + y.weight</span>
+        z.left  = x              <span class="cmt">// 左小</span>
+        z.right = y              <span class="cmt">// 右大</span>
+        <span class="fn">Insert</span>(H, z)             <span class="cmt">// 新树放回堆中</span>
+
+    <span class="kw">return</span> <span class="fn">ExtractMin</span>(H)       <span class="cmt">// 最后剩下的就是哈夫曼树</span>
+</div>
+
+<h3>5.1 复杂度分析</h3>
+<table>
+    <tr><th>操作</th><th>次数</th><th>每次复杂度</th><th>总复杂度</th></tr>
+    <tr><td>建堆</td><td>1 次</td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ExtractMin</td><td>2(n-1) 次</td><td>O(log n)</td><td>O(n log n)</td></tr>
+    <tr><td>Insert</td><td>n-1 次</td><td>O(log n)</td><td>O(n log n)</td></tr>
+    <tr style="background:#fef3c7;"><td colspan="3"><b>总体复杂度</b></td><td><b>O(n log n)</b></td></tr>
+</table>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card green">
+<h2>六、常见错误 &amp; 考点提醒</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：WPL计算混淆深度定义。</b>有些教材根深度=1，有些根深度=0。本文采用<b>根深度=1</b>（叶子到根的边数即为层数-1）。统一标准后，WPL = Σ wᵢ × (hᵢ − 1)，其中hᵢ是层数。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：合并时忘记排序。</b>合并产生的新树必须放回森林中重新排序。每一步都要选出当前最小的两个，而不是按初始顺序合并。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：左右子树放反。</b>题目要求"左小右大"，合并时权值较小的作为左子树。如果左右放反，虽然WPL相同，但哈夫曼编码会不同（0/1互换），考试按题目要求来。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：WPL计算漏乘。</b>每个叶结点的贡献 = 权值 × 路径长度（从根到该叶子的边数）。不要用"层数"直接乘——如果根是第1层，则路径长度 = 层数 − 1。
+</div>
+
+<div class="tip-box">
+    💡 <b>速算技巧：</b>WPL也可以这样算——把每个<b>非叶结点</b>的权值全部加起来！因为每次合并时，被合并的两个权值会被"抬升"一层，相当于它们对WPL的贡献各+1。因此 WPL = 所有非叶结点权值之和 = 10+25+38 = 73？不对，应该是... 让我重新想。实际上 WPL = 所有内部结点权值之和，这个性质成立。验证：10+25+38 = 73 ≠ 136。哦等等，10+25+38+63=136。加上根！是的：WPL = 所有非叶结点的权值之和（包括根）= 10+25+38+63 = 136 ✓。这是哈夫曼树的一个优美性质。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测验2026春 · 哈夫曼树与WPL · 第11题详解
+</footer>
+
+</body>
+</html>

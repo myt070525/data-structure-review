@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第5题 · 循环队列判空条件</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 25% 25%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 70%, rgba(60,207,207,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 2rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第5题</div>
+  <h1>🔄 循环队列的判空条件</h1>
+  <div class="q-box">
+    关于循环队列为空时的描述，<strong>正确</strong>的是（　）。<br><br>
+    A. front 和 rear 必须都为 0<br>
+    <strong>B. front == rear，可在任意下标位置</strong><br>
+    C. front 必须比 rear 大 1<br>
+    D. rear 必须比 front 大 1
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">B — front == rear，可在任意下标</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">队空条件是 front == rear，不限制具体位置</div>
+</div>
+
+<!-- ==================== 1: CIRCULAR QUEUE ==================== -->
+<div class="section">
+  <h2>一、什么是循环队列？</h2>
+  <div class="card">
+    <p>循环队列是把数组的<strong>首尾逻辑上连接起来</strong>形成环形。就像操场跑道——跑到终点（数组末尾）后，绕回到起点（数组开头）继续跑。这通过<strong>取模运算</strong>来实现。</p>
+
+    <div class="ascii-box">
+<span class="hl">循环队列 = 环形数组（大小 M = 8）</span>
+
+          [0]   [1]   [2]   [3]
+       ╔═════╤═════╤═════╤═════╗
+       ║     │     │     │     ║
+       ║     │     │     │     ║
+       ╟─────┼─────┼─────┼─────╢  ← 数组，但首尾逻辑相连
+       ║     │     │     │     ║
+       ║     │     │     │     ║
+       ╚═════╧═════╧═════╧═════╝
+          [7]   [6]   [5]   [4]
+
+<span class="c">   rear：指向队尾的下一个空位（入队位置）
+  front：指向队头元素（出队位置）</span></div>
+  </div>
+</div>
+
+<!-- ==================== 2: CIRCLE DIAGRAM ==================== -->
+<div class="section">
+  <h2>二、队空时 front == rear 可以在任意位置</h2>
+  <div class="card">
+    <h3>场景演示：队空时 front 和 rear 的不同位置</h3>
+
+    <div class="ascii-box">
+<span class="hl">情形1：初始状态，front=rear=0（最常见）</span>
+   M=8, 数组大小8
+        ┌───┬───┬───┬───┬───┬───┬───┬───┐
+  下标: │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │
+        └───┴───┴───┴───┴───┴───┴───┴───┘
+          <span class="g">F/R</span>
+   front=0, rear=0 → front==rear → <span class="g">队空 ✅</span>
+
+<span class="hl">情形2：经过几次入队出队后，front=rear=3（也是队空！）</span>
+        ┌───┬───┬───┬───┬───┬───┬───┬───┐
+  下标: │   │   │   │ 3 │   │   │   │   │
+        └───┴───┴───┴───┴───┴───┴───┴───┘
+                      <span class="g">F/R</span>
+   front=3, rear=3 → front==rear → <span class="g">队空 ✅</span>
+
+<span class="hl">情形3：绕了一圈后，front=rear=6（依然是队空！）</span>
+        ┌───┬───┬───┬───┬───┬───┬───┬───┐
+  下标: │   │   │   │   │   │   │ 6 │   │
+        └───┴───┴───┴───┴───┴───┴───┴───┘
+                                  <span class="g">F/R</span>
+   front=6, rear=6 → front==rear → <span class="g">队空 ✅</span></div>
+
+    <p style="margin-top:1rem">
+      <strong>关键结论：</strong>只要 <code>front == rear</code>，无论它们指向数组的哪个位置，队列就是空的。所以选项B正确——可以在<strong>任意下标</strong>。
+    </p>
+  </div>
+</div>
+
+<!-- ==================== 3: FORMULA ==================== -->
+<div class="section">
+  <h2>三、公式推导</h2>
+  <div class="card">
+    <h3>队空条件</h3>
+    <div style="text-align:center;font-size:1.4rem;margin:1rem 0;font-weight:700;color:var(--gold)">
+      front == rear &nbsp;→&nbsp; 队空
+    </div>
+
+    <h3>队满条件（牺牲一个空间）</h3>
+    <div style="text-align:center;font-size:1.4rem;margin:1rem 0;font-weight:700;color:var(--red)">
+      (rear + 1) % M == front &nbsp;→&nbsp; 队满
+    </div>
+
+    <h3>元素个数公式</h3>
+    <div style="text-align:center;font-size:1.3rem;margin:1rem 0;font-weight:700;color:var(--cyan)">
+      元素个数 = (rear - front + M) % M
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>推导：</strong>当 rear ≥ front 时，元素数 = rear - front（正常情况）
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>推导：</strong>当 rear &lt; front 时（绕了一圈），元素数 = rear + M - front
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>统一定义：</strong>统一公式 (rear - front + M) % M 涵盖了以上两种情况
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>💡 验证：</strong>当队列为空（front==rear）时，元素个数 = (rear - rear + M) % M = M % M = <strong>0</strong>。公式自洽！
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 4: OPTIONS ==================== -->
+<div class="section">
+  <h2>四、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>描述</th><th>判断</th><th>原因</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">A</td>
+        <td>front和rear必须都为0</td>
+        <td class="bad">❌ 错误</td>
+        <td>不限于0，任何位置都可以</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td>front==rear，可在任意下标</td>
+        <td class="good">✅ 正确</td>
+        <td>队空唯一条件是front==rear</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">C</td>
+        <td>front必须比rear大1</td>
+        <td class="bad">❌ 错误</td>
+        <td>这是另一种设计下的特殊情况</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">D</td>
+        <td>rear必须比front大1</td>
+        <td class="bad">❌ 错误</td>
+        <td>rear=front+1时队列只有1个元素</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 5: EMPTY vs FULL ==================== -->
+<div class="section">
+  <h2>五、队空 vs 队满 —— 容易混淆的一对</h2>
+  <div class="card">
+    <table>
+      <tr><th>状态</th><th>条件</th><th>元素个数</th><th>特点</th></tr>
+      <tr>
+        <td style="color:var(--green);font-weight:700">队空</td>
+        <td style="font-family:monospace">front == rear</td>
+        <td>0</td>
+        <td>front和rear可在任意位置</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red);font-weight:700">队满</td>
+        <td style="font-family:monospace">(rear+1)%M == front</td>
+        <td>M-1</td>
+        <td>牺牲一个空间来区分空和满</td>
+      </tr>
+      <tr>
+        <td>正常</td>
+        <td style="font-family:monospace">front ≠ rear</td>
+        <td>(rear-front+M)%M</td>
+        <td>队列中有元素</td>
+      </tr>
+    </table>
+
+    <div class="ascii-box">
+<span class="hl">圆圈视角：front 和 rear 在环形跑道上的关系</span>
+
+              rear
+               ↓
+       [ ] [ ] [ ] [ ]
+    [ ]               [ ]
+    [ ]               [ ]
+    [ ]               [ ]
+       [ ] [ ] [ ] [ ]
+               ↑
+             front
+
+   <span class="g">front == rear → 队空</span>（两者重合在任意位置）
+
+              rear
+               ↓
+       [x] [x] [ ] [x]
+    [x]               [x]
+    [x]               [x]
+    [x]               [x]
+       [x] [x] [x] [x]
+                    ↑
+                  front
+
+   <span class="r">(rear+1)%M == front → 队满</span>（rear紧跟在front后面）</div>
+
+    <div class="info">
+      <strong>🔑 为什么不直接用全部空间？</strong>如果 M 个空间全用，队空 (front==rear) 和队满 (front==rear) 就无法区分了——它们在数学上是同一个条件！所以约定<strong>牺牲一个空间</strong>，用 (rear+1)%M == front 表示队满。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: EXAMPLE ==================== -->
+<div class="section">
+  <h2>六、实例演算</h2>
+  <div class="card">
+    <p><strong>题目：</strong>循环队列大小 M=9，初始 front=rear=4。操作后 front=7, rear=2，求元素个数。</p>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>套公式：</strong>元素个数 = (rear - front + M) % M = (2 - 7 + 9) % 9
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>计算：</strong>(2 - 7 + 9) = 4，4 % 9 = <strong>4</strong>
+      </div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>验证：</strong>front=7, rear=2，说明元素在 [7, 8, 0, 1]，共 4 个元素。✅
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>🎯 记忆技巧：</strong>循环队列有三宝——队空 front==rear，队满 (rear+1)%M==front，个数 (rear-front+M)%M。背熟这三条，循环队列题全秒。
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 循环队列是第3章队列部分的核心考点。理解"环形"思想和"取模运算"是关键。
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第8题 · 二叉树左子树结点数</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 1.9rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+.header .q-box code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; color: var(--orange-dark); }
+
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 2.2rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 1.5em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 4px;
+}
+
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+.ascii-box {
+  background: #faf8f5; border: 1px dashed #d4c8b0; border-radius: 10px;
+  padding: 1.2rem 1.5rem; margin: 1rem 0;
+  font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85rem;
+  line-height: 1.6; white-space: pre; overflow-x: auto;
+}
+
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;
+}
+table.data th {
+  background: #fff7ed; padding: 8px 10px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: center;
+  font-family: 'Cascadia Code',monospace;
+}
+
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+.tree-vis {
+  font-family: 'Cascadia Code',monospace; font-size: 0.85rem; line-height: 1.5;
+  white-space: pre; text-align: center; margin: 1rem 0;
+}
+.tree-vis .root-hl { color: var(--red); font-weight: 900; }
+.tree-vis .left-hl { color: var(--blue); font-weight: 700; }
+.tree-vis .right-hl { color: var(--green); font-weight: 700; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第8题</div>
+  <h1>🌳 二叉树左子树 — 中序+后序重建</h1>
+  <div class="q-box">
+    二叉树的中序遍历序列：<code>A B C D E F G</code><br>
+    后序遍历序列：<code>B D C A F G E</code><br>
+    问：该二叉树的<strong>左子树</strong>有几个结点？
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big">左子树有 <span class="blank">4</span> 个结点</div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    根结点为 <strong>E</strong>（后序最后一个），左子树包含 <strong>A, B, C, D</strong>
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、三种遍历的核心特征</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>遍历方式</th><th>顺序</th><th>关键特征</th></tr>
+      <tr>
+        <td>先序 (Preorder)</td>
+        <td><strong>根</strong> → 左 → 右</td>
+        <td><span class="hl">第一个是根</span></td>
+      </tr>
+      <tr class="hl-row">
+        <td>中序 (Inorder)</td>
+        <td>左 → <strong>根</strong> → 右</td>
+        <td><span class="hl">根把序列分为左右子树</span></td>
+      </tr>
+      <tr>
+        <td>后序 (Postorder)</td>
+        <td>左 → 右 → <strong>根</strong></td>
+        <td><span class="hl">最后一个是根</span></td>
+      </tr>
+    </table>
+    <p style="margin-top:0.8rem;">本题给了<strong>中序+后序</strong>，这是最常见的"已知两种遍历，重建二叉树"题型。</p>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、重建步骤 — 从后序找根，从中序分左右</h2>
+  <div class="card">
+    <h3>核心算法（递归）：</h3>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong>后序序列的最后一个结点 = 整棵树的根</strong>。本题后序最后是 <code>E</code> → 根是 <strong>E</strong>。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong>在中序序列中找到根 E</strong>。中序 = A B C D <span class="hl">E</span> F G。E 左边的 {A,B,C,D} 是左子树，右边的 {F,G} 是右子树。</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong>递归重建左子树和右子树</strong>。从后序中按长度切分出左子树的后序和右子树的后序。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、完整重建过程 — ASCII图解</h2>
+
+  <div class="card">
+    <h3>第1层：确定整棵树的根</h3>
+    <div class="ascii-box">
+中序：A  B  C  D  <span class="root-hl">E</span>  F  G
+后序：B  D  C  A  F  G  <span class="root-hl">E</span>  ← 最后一个是根！
+
+       中序中 E 左边 = {A,B,C,D} → 左子树（4个结点）
+       中序中 E 右边 = {F,G}     → 右子树（2个结点）
+
+       后序中左子树部分 = 前4个：{B,D,C,A}
+       后序中右子树部分 = 接着2个：{F,G}
+       后序中根 = 最后一个：{E}
+
+                 <span class="root-hl">E</span>
+                /   \
+        {A,B,C,D}   {F,G}
+         (左子树)    (右子树)
+          4个结点     2个结点
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>第2层：重建左子树（中序=A,B,C,D，后序=B,D,C,A）</h3>
+    <div class="ascii-box">
+左子树中序：A  B  C  D
+左子树后序：B  D  C  <span class="root-hl">A</span>  ← 最后一个A是左子树的根！
+
+       中序中 A 左边 = {} → 左子树的左子树为空
+       中序中 A 右边 = {B,C,D} → 左子树的右子树（3个结点）
+
+                 <span class="root-hl">E</span>
+                /   \
+          <span class="root-hl">A</span>       {F,G}
+            \
+          {B,C,D}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>第3层：重建{A,B,C,D}中A的右子树（中序=B,C,D，后序=B,D,C）</h3>
+    <div class="ascii-box">
+右子树(A的)中序：B  C  D
+右子树(A的)后序：B  D  <span class="root-hl">C</span>  ← 最后一个C是根！
+
+       中序中 C 左边 = {B} → 左子树（1个结点）
+       中序中 C 右边 = {D} → 右子树（1个结点）
+
+                 <span class="root-hl">E</span>
+                /   \
+          <span class="root-hl">A</span>       {F,G}
+            \
+          <span class="root-hl">C</span>
+          /   \
+         B     D
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>第4层：重建右子树{F,G}（中序=F,G，后序=F,G,?）</h3>
+    <div class="ascii-box">
+右子树(E的)中序：F  G
+右子树(E的)后序：F  <span class="root-hl">G</span>  ← 最后一个G是根！
+
+       中序中 G 左边 = {F} → 左子树（1个结点）
+       中序中 G 右边 = {} → 右子树为空
+
+                 <span class="root-hl">E</span>
+                /   \
+          <span class="root-hl">A</span>       <span class="root-hl">G</span>
+            \     /
+          <span class="root-hl">C</span>     F
+          /   \
+         B     D
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、完整二叉树结构</h2>
+  <div class="card">
+    <div class="tree-vis">
+                <span class="root-hl">E</span>
+               /   \
+              /     \
+         <span class="left-hl">A</span>           <span class="right-hl">G</span>
+          \         /
+           \       /
+        <span class="left-hl">C</span>         <span class="right-hl">F</span>
+         / \
+        /   \
+   <span class="left-hl">B</span>         <span class="left-hl">D</span>
+
+   左子树（E的左孩子A及其后代）：A, C, B, D  → <span class="hl">共4个结点</span>
+   右子树（E的右孩子G及其后代）：G, F       → 共2个结点
+   根：E                                   → 1个结点
+   总计：7个结点
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、验证：遍历一致性检查</h2>
+  <div class="card">
+    <p>用ASCII树验证三种遍历结果是否与题目一致：</p>
+    <div class="ascii-box">
+树结构：
+                E
+               / \
+              A   G
+               \  /
+               C F
+              / \
+             B   D
+
+先序（根左右）：E → A → C → B → D → G → F
+               = <span style="color:var(--green);">E A C B D G F</span>
+
+中序（左根右）：A → B → C → D → E → F → G
+               = <span style="color:var(--green);">A B C D E F G</span> ✅ 与题目一致！
+
+后序（左右根）：B → D → C → A → F → G → E
+               = <span style="color:var(--green);">B D C A F G E</span> ✅ 与题目一致！
+    </div>
+    <p style="text-align:center;color:var(--green);font-weight:700;">✅ 验证通过！重建正确。</p>
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、答题总结</h2>
+  <div class="card">
+    <p><strong>问题：左子树有几个结点？</strong></p>
+    <p>从重建的树可知，E的左子树包含：A（直接左孩子）、C、B、D。共<strong>4个结点</strong>。</p>
+
+    <div class="tip-box">
+      <strong>🎯 快速解法（不用完整重建）：</strong><br>
+      ① 后序最后 = 根 E<br>
+      ② 中序中 E 左边的元素个数 = 左子树结点数<br>
+      ③ 中序 = A B C D <span class="hl">E</span> F G → E 左边 4 个 → <strong>答案：4</strong><br>
+      <span style="color:var(--muted);">只需两步！不需要完整画出树。</span>
+    </div>
+
+    <div class="danger-box">
+      <strong>⚠️ 注意：</strong>题目问的是"左子树有几个结点"，不是"左孩子有几个"。左子树包含左孩子及其所有后代。如果只数直接左孩子（A一个），那就错了！
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、同类题型技巧</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>已知条件</th><th>能唯一确定二叉树？</th><th>关键步骤</th></tr>
+      <tr>
+        <td>先序 + 中序</td>
+        <td style="color:var(--green);">✅ 能</td>
+        <td>先序第一个=根，中序划分左右</td>
+      </tr>
+      <tr class="hl-row">
+        <td>中序 + 后序</td>
+        <td style="color:var(--green);">✅ 能（本题）</td>
+        <td>后序最后一个=根，中序划分左右</td>
+      </tr>
+      <tr>
+        <td>先序 + 后序</td>
+        <td style="color:var(--red);">❌ 不一定</td>
+        <td>无法唯一确定（除非是满二叉树等特殊情况）</td>
+      </tr>
+      <tr>
+        <td>只有一种遍历</td>
+        <td style="color:var(--red);">❌ 不能</td>
+        <td>信息不足</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 根据遍历序列重建二叉树是第6章的核心技能。记住：后序最后=根，中序划分左右子树。
+</div>
+
+</div>
+</body>
+</html>

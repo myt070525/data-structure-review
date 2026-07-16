@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答19 · 二叉树重建</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 1.9rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.root-mark { color: var(--gold-light); font-weight: 700; background: rgba(226,176,74,0.15); padding:1px 6px; border-radius:3px; }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📐 简答第1题 · 二叉树重建</h1>
+  <p class="subtitle">先序 BCDEAFG + 中序 DECFAGB → 后序 EDFGACB</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">后序遍历序列：<span style="color:var(--gold-light)">E D F G A C B</span></div>
+  <div class="note" style="color:var(--muted);margin-top:8px;">根 = B，递归分割左右子树</div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、重建原理</h2>
+  <div class="card">
+    <p>已知<strong>先序遍历</strong>和<strong>中序遍历</strong>可以唯一确定一棵二叉树。核心原理：</p>
+    <ul>
+      <li><strong>先序序列的第一个元素</strong>一定是<strong>根结点</strong></li>
+      <li>在中序序列中找到根的位置 → <strong>左边是左子树，右边是右子树</strong></li>
+      <li>递归地对左右子树重复上述过程</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、ASCII分步重建二叉树</h2>
+
+  <div class="card">
+    <h3><span class="step-num">1</span> 确定根结点</h3>
+    <div class="ascii">
+  先序: <span class="root-mark">B</span> C D E A F G     →  根 = <span class="root-mark">B</span>
+  中序: D E C F A <span class="root-mark">G</span> B
+                     ↑
+        等一下，让我仔细看：
+        先序 = B C D E A F G（7个字符）
+        中序 = D E C F A G B（题目说 DECFAGB）
+
+  中序中 B 在最后：
+  中序: D  E  C  F  A  G  <span class="root-mark">B</span>
+        ├─ 左子树(6个) ─┤  根
+
+  所以 B 的左子树包含 {D,E,C,F,A,G}，右子树为空。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">2</span> 重建B的左子树（6个结点）</h3>
+    <div class="ascii">
+  左子树的先序（从先序中取B之后的6个）：C D E A F G
+  左子树的中序（从中序中B前面的6个）：   D E C F A G
+
+  先序第一个 = C → C是左子树的根
+  中序中C的位置：
+    中序: D E <span class="root-mark">C</span> F A G
+          ├左─┤ ↑ ├─右─┤
+
+  C的左子树中序 = {D, E}  (2个结点)
+  C的右子树中序 = {F, A, G} (3个结点)
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">3</span> 递归构建C的左子树</h3>
+    <div class="ascii">
+  左子树先序（从先序中取C后的2个）：D E
+  左子树中序：                       D E
+
+  先序第一个 = D → D是根
+  中序: <span class="root-mark">D</span> E  → D的左子树为空，右子树={E}
+
+  D的右子树：
+    先序 = E，中序 = E → E是叶子结点
+
+       C
+      /
+     D
+      \
+       E
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">4</span> 递归构建C的右子树</h3>
+    <div class="ascii">
+  右子树先序（取D,E之后）：A F G
+  右子树中序：             F A G
+
+  先序第一个 = A → A是根
+  中序: F <span class="root-mark">A</span> G  → A的左子树={F}，右子树={G}
+
+  F是单结点（叶子），G是单结点（叶子）
+
+       C
+      / \
+     D   A
+      \  / \
+       E F  G
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">5</span> 完整的二叉树</h3>
+    <div class="ascii">
+                 B
+                /
+               C
+              / \
+             D   A
+              \  / \
+               E F  G
+
+  验证先序: B → C → D → E → A → F → G  = BCDEAFG ✓
+  验证中序: D → E → C → F → A → G → B  = DECFAGB ✓
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、求后序遍历序列</h2>
+  <div class="card">
+    <h3>后序遍历规则：左 → 右 → 根</h3>
+    <div class="ascii">
+  (D的左子树: 空 → 跳过)
+  (D的右子树: E)
+        遍历E: E没有孩子 → 输出 <span class="hl-gold">E</span>
+  (回到D) → 输出 <span class="hl-gold">D</span>
+
+  (A的左子树: F) → 输出 <span class="hl-gold">F</span>
+  (A的右子树: G) → 输出 <span class="hl-gold">G</span>
+  (回到A) → 输出 <span class="hl-gold">A</span>
+
+  (回到C) → 输出 <span class="hl-gold">C</span>
+
+  (B的右子树: 空)
+  (回到B) → 输出 <span class="hl-gold">B</span>
+
+  ─────────────────────────────
+  后序序列: E D F G A C B
+    </div>
+
+    <div class="formula" style="text-align:center;font-size:1.3rem;font-weight:700;color:var(--gold-light);padding:1rem;margin:0.8rem 0;background:rgba(226,176,74,0.06);border:1px dashed var(--gold);border-radius:8px;">
+      后序 = <strong>E D F G A C B</strong> ✅
+    </div>
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、重建算法的通用步骤</h2>
+  <div class="card">
+    <div class="step">
+      <span class="step-num">1</span> 从<strong>先序序列</strong>中取第一个元素作为当前子树的根
+    </div>
+    <div class="step">
+      <span class="step-num">2</span> 在<strong>中序序列</strong>中找到该根的位置，将中序分为左、右两部分
+    </div>
+    <div class="step">
+      <span class="step-num">3</span> 根据左子树中序的长度，从先序中切出左子树先序和右子树先序
+    </div>
+    <div class="step">
+      <span class="step-num">4</span> 递归地对左右子树重复步骤1-3
+    </div>
+    <div class="step">
+      <span class="step-num">5</span> 当序列为空时，递归结束（空树）
+    </div>
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 注意：</strong>仅知先序和后序<strong>不能唯一确定</strong>二叉树。必须知道<strong>中序</strong>才能唯一确定。因为中序区分了左右子树。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

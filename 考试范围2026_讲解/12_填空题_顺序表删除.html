@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空12 · 顺序表删除</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 2rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  margin: 0.6rem 0;
+}
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background: transparent; padding: 0; color: #c8d6e5; }
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.num { color: #f78c6c; }
+.cm { color: #546e7a; }
+.op { color: #89ddff; }
+.type { color: #ffcb6b; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+.idx { color: var(--muted); font-size: 0.8rem; }
+.val { color: var(--gold-light); font-weight: 700; }
+.moved { color: var(--cyan); }
+.deleted { color: var(--red); text-decoration: line-through; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第2题 · 顺序表删除操作</h1>
+  <p class="subtitle">删除第 i 个元素需要移动 n−i 个元素 —— 数组删除前后对比</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">移动元素个数 = <span style="color:var(--gold-light)">n − i</span></div>
+  <div class="note" style="color:var(--muted);margin-top:8px;">长度为n的顺序表中，删除第i个（1≤i≤n）元素，需要将后面 n−i 个元素依次前移一位</div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、顺序表删除的基本原理</h2>
+  <div class="card">
+    <p>顺序表（数组存储的线性表）的存储特点是：所有元素<strong>连续存放</strong>在一片内存中。这使得：</p>
+    <ul>
+      <li><span class="hl-green">优点</span>：可以随机存取（O(1)访问任意位置）</li>
+      <li><span class="hl-red">缺点</span>：插入/删除需要移动大量元素（O(n)）</li>
+    </ul>
+    <p>删除第 <code>i</code> 个元素后，原来在第 <code>i+1</code> 到第 <code>n</code> 位置的元素必须<strong>全部前移一位</strong>，填补被删除的空位。所以需要移动的元素个数是：从第 <code>i+1</code> 到第 <code>n</code>，共 <code>n − (i+1) + 1 = <strong>n − i</strong></code> 个。</p>
+  </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、ASCII图解：删除前后对比</h2>
+  <div class="card">
+    <h3>📌 例：长度为8的顺序表，删除第3个元素（i=3，值为25）</h3>
+    <p style="color:var(--muted);">n=8, i=3 → 需要移动 n−i = 8−3 = <strong>5个</strong>元素</p>
+  </div>
+
+  <div class="ascii">
+    ╔══════════════════════════════════════════════════════════════╗
+    ║              删 除 前  (length = 8)                         ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║                                                              ║
+    ║   索引:   [0]    [1]    [2]    [3]    [4]    [5]    [6]    [7]
+    ║          ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+    ║          │ 12  │ 34  │ 25  │ 67  │ 89  │ 43  │ 56  │ 78  │
+    ║          └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    ║            1     2     3     4     5     6     7     8    ←位置
+    ║                          ↑
+    ║                    删除第3个(25)
+    ║                          │
+    ║             这5个元素都要往前移一格 ↓
+    ║          ┌─────────────────────────────────────────┐
+    ║          │  ←67  ←89  ←43  ←56  ←78   (5个元素)   │
+    ║          └─────────────────────────────────────────┘
+    ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║              删 除 后  (length = 7)                         ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║
+    ║   索引:   [0]    [1]    [2]    [3]    [4]    [5]    [6]
+    ║          ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+    ║          │ 12  │ 34  │ 67  │ 89  │ 43  │ 56  │ 78  │
+    ║          └─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+    ║            1     2     3     4     5     6     7    ←新位置
+    ║                          ↑
+    ║                 原来67移到第3位了
+    ║
+    ╚══════════════════════════════════════════════════════════════╝
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、各位置删除需要移动的元素个数</h2>
+  <div class="card">
+    <p>对于长度为 <code>n</code> 的顺序表，删除位置 <code>i</code> 的元素：</p>
+  </div>
+
+  <table>
+    <tr><th>删除位置 i</th><th>删除的元素</th><th>需要移动的后面元素</th><th>移动个数 n−i</th></tr>
+    <tr><td>1（第一个）</td><td>12</td><td>34,67,89,43,56,78</td><td><strong>7</strong></td></tr>
+    <tr><td>2</td><td>34</td><td>67,89,43,56,78</td><td><strong>6</strong></td></tr>
+    <tr><td>3</td><td>25</td><td>67,89,43,56,78</td><td><strong>5</strong></td></tr>
+    <tr><td>4</td><td>67</td><td>89,43,56,78</td><td><strong>4</strong></td></tr>
+    <tr><td>5</td><td>89</td><td>43,56,78</td><td><strong>3</strong></td></tr>
+    <tr><td>6</td><td>43</td><td>56,78</td><td><strong>2</strong></td></tr>
+    <tr><td>7</td><td>56</td><td>78</td><td><strong>1</strong></td></tr>
+    <tr><td>8（最后一个）</td><td>78</td><td>（无）</td><td><strong>0</strong></td></tr>
+  </table>
+
+  <div class="tip">
+    <strong>💡 规律总结：</strong><br>
+    • 删除位置越靠前 → 移动元素越多（最多 n−1 个）<br>
+    • 删除位置越靠后 → 移动元素越少（最少 0 个）<br>
+    • <strong>平均移动次数</strong> = (n−1)/2（等概率删除情况下）
+  </div>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、伪代码实现</h2>
+  <div class="card">
+    <h3>顺序表删除算法</h3>
+    <pre><span class="cm">/* 删除顺序表L中第i个元素（1≤i≤L.length） */</span>
+<span class="type">bool</span> <span class="fn">ListDelete</span>(<span class="type">SeqList</span> &amp;L, <span class="type">int</span> i, <span class="type">ElemType</span> &amp;e) {
+    <span class="kw">if</span> (i &lt; <span class="num">1</span> || i &gt; L.length)     <span class="cm">// 位置非法</span>
+        <span class="kw">return</span> <span class="num">false</span>;
+    e = L.data[i<span class="num">-1</span>];               <span class="cm">// 保存被删元素</span>
+    <span class="kw">for</span> (<span class="type">int</span> j = i; j &lt; L.length; j++) <span class="cm">// 从第i+1个开始前移</span>
+        L.data[j<span class="num">-1</span>] = L.data[j];    <span class="cm">// 每个元素前移一位</span>
+    L.length--;                        <span class="cm">// 表长减1</span>
+    <span class="kw">return</span> <span class="num">true</span>;
+}</pre>
+  </div>
+
+  <div class="card">
+    <h3>📊 循环次数分析</h3>
+    <p><code>j</code> 从 <code>i</code> 到 <code>L.length-1</code>（即 n−1），共循环 <code>(n−1) − i + 1 = <strong>n − i</strong></code> 次。每次循环移动一个元素。这与公式完全一致。</p>
+  </div>
+</div>
+
+<!-- ============ 第5节 ============ -->
+<div class="section">
+  <h2>五、与插入操作的对比</h2>
+  <table>
+    <tr><th>操作</th><th>移动元素个数</th><th>最好情况</th><th>最坏情况</th><th>平均</th></tr>
+    <tr>
+      <td><strong>插入</strong>第i个位置</td>
+      <td>n − i + 1</td>
+      <td>0（插末尾）</td>
+      <td>n（插开头）</td>
+      <td>n/2</td>
+    </tr>
+    <tr>
+      <td><strong>删除</strong>第i个元素</td>
+      <td><strong>n − i</strong></td>
+      <td>0（删末尾）</td>
+      <td>n−1（删开头）</td>
+      <td>(n−1)/2</td>
+    </tr>
+  </table>
+
+  <div class="danger">
+    <strong>⚠️ 常考易错：</strong>插入移动 n−i+1 个，删除移动 n−i 个。两者差1！因为插入时空位后面的所有元素（包括原先在第i位的）都要后移；而删除时只有第i个<strong>后面</strong>的元素需要前移，第i个本身被删除了。
+  </div>
+
+  <div class="tip">
+    <strong>🎯 记忆口诀：</strong><br>
+    "插入移 n−i+1，删除移 n−i"<br>
+    "插入多一个，因为原位置也要让路"
+  </div>
+</div>
+
+</div>
+</body>
+</html>

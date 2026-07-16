@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第1题 · 时间复杂度 O(log n)</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525; --card-hl: #182d45;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 20% 10%, rgba(226,176,74,.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(74,144,217,.05) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  /* ===== HEADER ===== */
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag {
+    font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .header h1 {
+    font-size: 2rem; font-weight: 800; color: #fff; margin: 8px 0;
+    text-shadow: 0 0 20px rgba(226,176,74,.3);
+  }
+  .header .q-box {
+    display: inline-block; text-align: left;
+    background: rgba(10,21,37,.6); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.8rem; font-size: 1.05rem; margin-top: 0.8rem;
+    color: #c8d6e5;
+  }
+  .header .q-box code {
+    background: #0a1525; color: var(--cyan); padding: 2px 8px; border-radius: 3px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .95em;
+  }
+
+  /* ===== ANSWER ===== */
+  .answer {
+    text-align: center; padding: 1.2rem;
+    border: 2px solid var(--gold); border-radius: 12px;
+    background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  /* ===== SECTION ===== */
+  .section { margin: 2.5rem 0; }
+  .section h2 {
+    font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold);
+    padding-left: 14px; margin-bottom: 1rem;
+  }
+  .section h3 {
+    font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan);
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: #2a4a6a; }
+
+  /* ===== TIP / DANGER / INFO ===== */
+  .tip {
+    background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25);
+    border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0;
+    padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a;
+  }
+  .danger {
+    background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25);
+    border-left: 4px solid var(--red); border-radius: 0 10px 10px 0;
+    padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a;
+  }
+  .info {
+    background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25);
+    border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0;
+    padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8;
+  }
+
+  /* ===== CODE ===== */
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  /* ===== DARK CODE BLOCK ===== */
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1rem 0;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .9rem; line-height: 1.75; overflow-x: auto;
+    white-space: pre; color: #c8d6e5;
+  }
+  .code-block .kw { color: #c084fc; font-weight: 700; }
+  .code-block .fn { color: #6ee7b7; }
+  .code-block .cmt { color: #6b7280; font-style: italic; }
+  .code-block .num { color: #fbbf24; }
+  .code-block .blank { color: #e0556a; text-decoration: underline; text-underline-offset: 4px; }
+  .code-block .op  { color: #e2b04a; }
+
+  /* ===== STEP NUMBER CIRCLE ===== */
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row {
+    display: flex; align-items: flex-start; gap: 12px; margin: 0.8rem 0;
+  }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  /* ===== ASCII ART ===== */
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.5; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  /* ===== TABLE ===== */
+  table {
+    width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem;
+  }
+  th {
+    background: #1a3350; color: var(--gold); padding: 10px 14px;
+    text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold);
+  }
+  td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad  { color: var(--red); }
+
+  /* ===== COMPARISON GRID ===== */
+  .vs-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0;
+  }
+  .vs-card {
+    padding: 1.5rem 1rem; border-radius: 12px; text-align: center;
+    border: 2px solid var(--border);
+  }
+  .vs-card.logn { border-color: var(--green); background: rgba(60,184,120,.06); }
+  .vs-card.lin  { border-color: var(--blue); background: rgba(74,144,217,.06); }
+  .vs-card.n2   { border-color: var(--red); background: rgba(224,85,106,.06); }
+  .vs-card .big-o {
+    font-size: 2rem; font-weight: 900; font-family: 'Cascadia Code',monospace;
+  }
+  .vs-card.logn .big-o { color: var(--green); }
+  .vs-card.lin  .big-o { color: var(--blue); }
+  .vs-card.n2   .big-o { color: var(--red); }
+
+  /* ===== GROWTH CHART ===== */
+  .growth-table td { font-family: 'Cascadia Code',monospace; }
+  .growth-table .highlight { background: rgba(226,176,74,.1) !important; }
+
+  /* ===== MISC ===== */
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+  .tag-sm {
+    display: inline-block; font-size: .7rem; padding: 2px 8px; border-radius: 10px;
+    font-weight: 700; letter-spacing: 1px; margin-left: 6px;
+  }
+  .tag-sm.g { background: rgba(60,184,120,.2); color: var(--green); }
+  .tag-sm.r { background: rgba(224,85,106,.2); color: var(--red); }
+  .tag-sm.b { background: rgba(74,144,217,.2); color: var(--blue); }
+
+  /* ===== FOOTER ===== */
+  .footer-note {
+    text-align: center; color: var(--muted); font-size: .85rem;
+    margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 700px) {
+    .vs-grid { grid-template-columns: 1fr; }
+    .container { padding: 1.5rem 0.8rem; }
+    .header { padding: 1.5rem 1rem; }
+    .header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第1题</div>
+  <h1>⏱️ 时间复杂度分析：O(log n)</h1>
+  <div class="q-box">
+    下面代码的时间复杂度为（　）。<br><br>
+    <code>int x = 1;</code><br>
+    <code>while (n &gt;= x * x) &nbsp; x *= 2;</code>
+  </div>
+</div>
+
+<!-- ==================== ANSWER ==================== -->
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">O(log n)</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">对数时间复杂度 —— x 每次翻倍增长</div>
+</div>
+
+<!-- ==================== 1: INTUITION ==================== -->
+<div class="section">
+  <h2>一、直觉理解：x 翻倍的速度有多快？</h2>
+  <div class="card">
+    <p>想象你有一张纸，厚度为 <strong>1 毫米</strong>。你每次对折，厚度翻倍：</p>
+
+    <table class="growth-table">
+      <tr><th>次数 k</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>... </th><th class="highlight">k</th></tr>
+      <tr><td>x 的值</td><td>1</td><td>2</td><td>4</td><td>8</td><td>16</td><td>32</td><td>64</td><td>128</td><td>... </td><td class="highlight">2<sup>k</sup></td></tr>
+    </table>
+
+    <p>循环停止条件是 <code>n &gt;= x²</code>，即 <code>x² ≤ n</code>，也就是 <code>x ≤ √n</code>。</p>
+    <p>而 <code>x = 2<sup>k</sup></code>（k 是循环次数），所以条件变为：</p>
+
+    <div style="text-align:center;font-size:1.2rem;margin:1rem 0;font-weight:700;color:var(--gold)">
+      2<sup>k</sup> ≤ √n &nbsp;&nbsp;→&nbsp;&nbsp; 2<sup>k</sup> ≤ n<sup>1/2</sup>
+    </div>
+
+    <p>取对数：<code>k ≤ log₂(√n) = (1/2)·log₂ n</code></p>
+    <p>所以循环执行大约 <strong class="hl">(1/2)·log₂ n</strong> 次，时间复杂度为 <strong style="color:var(--gold);font-size:1.1rem">O(log n)</strong>。</p>
+  </div>
+</div>
+
+<!-- ==================== 2: STEP-BY-STEP ==================== -->
+<div class="section">
+  <h2>二、逐步推导（手算全过程）</h2>
+  <div class="card">
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content">
+        <strong>初始化：</strong><code>x = 1</code>，循环次数 <code>k = 0</code>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content">
+        <strong>每次迭代：</strong><code>x *= 2</code> → <code>x</code> 变成原来的 2 倍。<br>
+        第 1 次后 <code>x = 2</code>，第 2 次后 <code>x = 4</code>，第 3 次后 <code>x = 8</code>，…，第 k 次后 <code>x = 2<sup>k</sup></code>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content">
+        <strong>退出条件：</strong><code>n &lt; x²</code>，即 <code>x² &gt; n</code>，也即 <code>x &gt; √n</code>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">4</span>
+      <div class="step-content">
+        <strong>代换：</strong><code>2<sup>k</sup> &gt; √n</code> → 取对数 → <code>k &gt; log₂(√n) = ½·log₂ n</code>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">5</span>
+      <div class="step-content">
+        <strong>结论：</strong>循环大约执行 <code>½·log₂ n</code> 次 → <strong style="color:var(--gold)">O(log n)</strong>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== 3: CODE ANALYSIS ==================== -->
+<div class="section">
+  <h2>三、代码逐行分析</h2>
+  <div class="card">
+    <div class="code-block"><span class="cmt">/* 初始化：x = 1，即 2^0 */</span>
+<span class="kw">int</span> x = <span class="num">1</span>;
+
+<span class="cmt">/* 循环条件：n >= x*x，即 x² ≤ n */</span>
+<span class="cmt">/* 每次迭代：x *= 2，即 x 翻倍      */</span>
+<span class="kw">while</span> (n >= x * x)
+    x *= <span class="num">2</span>;
+
+<span class="cmt">/* 循环次数 k 满足：2^k ≤ √n  */</span>
+<span class="cmt">/* 即：k = O(log n)           */</span></div>
+
+    <div class="tip">
+      <strong>💡 关键洞察：</strong>循环变量 <code>x</code> 以 <strong>指数速度</strong>（2<sup>k</sup>）增长，而退出条件用的是 <code>x²</code>（也是指数，只是指数是 2k）。指数增长 → 对数时间。这是识别 O(log n) 的核心模式。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 4: COMPARISON TABLE ==================== -->
+<div class="section">
+  <h2>四、时间复杂度对比：O(log n) vs O(n) vs O(n²)</h2>
+  <div class="card">
+
+    <div class="vs-grid">
+      <div class="vs-card logn">
+        <div class="big-o">O(log n)</div>
+        <div style="color:var(--green);font-weight:700;margin:6px 0">对数时间</div>
+        <div style="font-size:.85rem;color:var(--muted)">
+          每次操作后数据量<br>按比例缩小（如折半）<br>→ 本题：x 翻倍增长
+        </div>
+        <div style="margin-top:8px"><span class="tag-sm g">最优</span></div>
+      </div>
+      <div class="vs-card lin">
+        <div class="big-o">O(n)</div>
+        <div style="color:var(--blue);font-weight:700;margin:6px 0">线性时间</div>
+        <div style="font-size:.85rem;color:var(--muted)">
+          每个元素处理一次<br>如：单层 for 循环<br>遍历数组
+        </div>
+        <div style="margin-top:8px"><span class="tag-sm b">中等</span></div>
+      </div>
+      <div class="vs-card n2">
+        <div class="big-o">O(n²)</div>
+        <div style="color:var(--red);font-weight:700;margin:6px 0">平方时间</div>
+        <div style="font-size:.85rem;color:var(--muted)">
+          嵌套两层循环<br>如：冒泡排序<br>每个元素与其他元素比较
+        </div>
+        <div style="margin-top:8px"><span class="tag-sm r">最慢</span></div>
+      </div>
+    </div>
+
+    <h3>数据量增长时的对比</h3>
+    <table>
+      <tr><th>n 的大小</th><th>O(log n) ≈ log₂ n</th><th>O(n)</th><th>O(n²)</th></tr>
+      <tr><td>n = 10</td><td class="good">≈ 3</td><td>10</td><td class="bad">100</td></tr>
+      <tr><td>n = 100</td><td class="good">≈ 7</td><td>100</td><td class="bad">10,000</td></tr>
+      <tr><td>n = 1,000</td><td class="good">≈ 10</td><td>1,000</td><td class="bad">1,000,000</td></tr>
+      <tr><td>n = 10,000</td><td class="good">≈ 13</td><td>10,000</td><td class="bad">100,000,000</td></tr>
+      <tr><td>n = 100,000</td><td class="good">≈ 17</td><td>100,000</td><td class="bad">10,000,000,000</td></tr>
+    </table>
+
+    <p style="margin-top:1rem;text-align:center;color:var(--muted);font-size:.9rem">
+      当 n = 10 万时，O(log n) 只需约 17 次操作，而 O(n²) 需要 100 亿次！
+    </p>
+  </div>
+</div>
+
+<!-- ==================== 5: COMMON O(log n) PATTERNS ==================== -->
+<div class="section">
+  <h2>五、识别 O(log n) 的常见模式</h2>
+  <div class="card">
+    <table>
+      <tr><th>模式</th><th>代码特征</th><th>示例</th></tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">翻倍增长</td>
+        <td><code>x *= 2</code> 或 <code>x = x * 2</code></td>
+        <td>本题：while(n >= x*x) x*=2</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">折半缩小</td>
+        <td><code>n /= 2</code> 或 <code>n = n / 2</code></td>
+        <td>二分查找：while(low <= high) mid=(low+high)/2</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">指数增长变量</td>
+        <td><code>i = i * k</code>（k > 1）</td>
+        <td>for(i=1; i<n; i*=3) → O(log₃ n)</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">几何缩小变量</td>
+        <td><code>i = i / k</code>（k > 1）</td>
+        <td>for(i=n; i>0; i/=2) → O(log n)</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>🎯 记忆技巧：</strong>看到循环变量以"<strong>乘以某个大于1的数</strong>"或"<strong>除以某个大于1的数</strong>"的方式变化 → 八九不离十是 O(log n)。因为这种变化意味着达到阈值所需的步数是对数级别。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: ASYMPTOTIC GRAPH ==================== -->
+<div class="section">
+  <h2>六、渐近增长直观对比（ASCII示意图）</h2>
+  <div class="card">
+    <div class="ascii-box">
+<span class="c">操作次数
+  ↑
+  |
+  |                              O(n²)  ── 抛物线，飞快上升
+  |                            ／
+  |                          ／
+  |                        ／
+  |              O(n)  ──／──── 直线，匀速增长
+  |                  ／
+  |                ／
+  |              ／
+  |  O(log n) ──────────────────── 几乎持平，增长极慢
+  |
+  +──────────────────────────────────────────→ 数据规模 n</span>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:.85rem;margin-top:.5rem">
+      O(log n) 几乎是一条水平线 —— 数据量翻倍，它只多走一步。这就是对数时间的美妙之处。
+    </p>
+  </div>
+</div>
+
+<!-- ==================== 7: TRICKY POINTS ==================== -->
+<div class="section">
+  <h2>七、考试易错点</h2>
+  <div class="card">
+    <div class="danger">
+      <strong>⚠️ 陷阱1：</strong>看到 <code>x * x</code> 就以为是 O(n²)？<br>
+      → 错！<code>x*x</code> 是<strong>循环条件中的表达式</strong>，不是嵌套循环。循环体内 <code>x *= 2</code> 才决定时间复杂度。
+    </div>
+
+    <div class="danger">
+      <strong>⚠️ 陷阱2：</strong>把 <code>O(log n)</code> 和 <code>O(√n)</code> 搞混？<br>
+      → 条件是 <code>x² ≤ n</code>，但 x 本身是 2<sup>k</sup>。所以 2<sup>2k</sup> ≤ n → k ≤ ½·log₂ n。<br>
+      → 虽然出现了 √n，但最终复杂度是 O(log n)，因为 x 的增长是<strong>指数级别</strong>。
+    </div>
+
+    <div class="danger">
+      <strong>⚠️ 陷阱3：</strong>log 的底数不重要？<br>
+      → 对！O(log₂ n)、O(log₁₀ n)、O(ln n) 都是等价的，因为换底公式只差一个常数因子：log<sub>a</sub> n = log<sub>a</sub> b · log<sub>b</sub> n。所以一律写成 O(log n)。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 8: QUICK QUIZ ==================== -->
+<div class="section">
+  <h2>八、举一反三：快速判断练习</h2>
+  <div class="card">
+    <table>
+      <tr><th>代码片段</th><th>时间复杂度</th><th>原因</th></tr>
+      <tr>
+        <td style="font-family:monospace">for(i=1; i&lt;n; i*=2)</td>
+        <td class="good">O(log n)</td>
+        <td>i 每次翻倍</td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace">for(i=n; i&gt;0; i/=2)</td>
+        <td class="good">O(log n)</td>
+        <td>i 每次折半</td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace">while(n&gt;1) n/=3;</td>
+        <td class="good">O(log₃ n) = O(log n)</td>
+        <td>n 每次除以3</td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace">for(i=1; i&lt;n; i++)</td>
+        <td style="color:var(--blue)">O(n)</td>
+        <td>i 每次加1 → 线性</td>
+      </tr>
+      <tr>
+        <td style="font-family:monospace">for(i=1; i&lt;n; i*=2)<br>&nbsp;&nbsp;for(j=0; j&lt;n; j++)</td>
+        <td style="color:var(--red)">O(n log n)</td>
+        <td>外层 log n × 内层 n</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>🎯 一句话总结：</strong>循环变量以<strong>乘法/除法</strong>方式变化 → O(log n)；以<strong>加法/减法</strong>方式变化 → O(n)。本题中 <code>x *= 2</code> 是乘法 → O(log n)。
+</div>
+
+<div class="footer-note">
+  📖 时间复杂度分析是数据结构第一章的核心内容，也是每年必考的基础题型。掌握"乘法→对数、加法→线性"的直觉即可快速判断。
+</div>
+
+</div>
+</body>
+</html>

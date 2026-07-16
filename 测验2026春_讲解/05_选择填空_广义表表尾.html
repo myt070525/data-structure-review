@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第5题 · 广义表表尾运算</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 2rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+.header .q-box code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; color: var(--orange-dark); }
+
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 1.8rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 8em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 6px;
+}
+
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+.ascii-box {
+  background: #faf8f5; border: 1px dashed #d4c8b0; border-radius: 10px;
+  padding: 1.2rem 1.5rem; margin: 1rem 0;
+  font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85rem;
+  line-height: 1.65; white-space: pre; overflow-x: auto;
+}
+.ascii-box .hl-onion { color: var(--orange-dark); font-weight: 700; }
+.ascii-box .hl-drop { color: var(--red); text-decoration: line-through; }
+.ascii-box .hl-keep { color: var(--green); font-weight: 700; }
+
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;
+}
+table.data th {
+  background: #fff7ed; padding: 10px 12px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center;
+}
+table.data td.left { text-align: left; font-family: 'Cascadia Code',monospace; }
+
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+.onion-grid { display: grid; gap: 0.8rem; margin: 1rem 0; }
+.onion-step {
+  display: flex; gap: 1rem; align-items: center; padding: 0.8rem 1rem;
+  background: #fffbeb; border-radius: 8px; border: 1px solid #fcd34d;
+}
+.onion-step .layer-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--orange);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
+}
+.onion-step .layer-body { font-family: 'Cascadia Code',monospace; font-size: 0.9rem; }
+.onion-step .layer-body .rm { color: var(--red); text-decoration: line-through; }
+.onion-step .layer-body .add { color: var(--green); font-weight: 700; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第5题</div>
+  <h1>🧅 广义表表尾 — 剥洋葱式求解</h1>
+  <div class="q-box">
+    广义表 <code>L = ((a,b), (a,(c,d)))</code><br>
+    则 <code>Tail(L)</code> 的结果是？
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big">Tail(L) = <span class="blank">((a,(c,d)))</span></div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    即去掉第一个元素 (a,b)，剩下的元素组成新表
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、先看清广义表 L 的结构</h2>
+  <div class="card">
+    <p>广义表是线性表的推广，元素可以是<strong>原子</strong>（单个数据）或<strong>子表</strong>（又是一个表）。</p>
+    <div class="ascii-box">
+L = ( (a,b) , (a,(c,d)) )
+      └─┬──┘   └───┬────┘
+        │          │
+    元素1(Elem₁)  元素2(Elem₂)
+    是一个子表     也是一个子表
+    里面是a和b     里面是a和(c,d)
+
+通俗地看：
+L 是一个有两样东西的"大盒子"：
+  · 第1个格子里 → 一个小盒子装 a 和 b
+  · 第2个格子里 → 一个小盒子装 a 和 另一个更小的盒子(c,d)
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、Head 与 Tail 的核心定义</h2>
+  <div class="card">
+    <h3>📌 Head（表头）— 取第一个元素</h3>
+    <p>取广义表的<strong>第一个元素</strong>，原样返回。如果第一个元素是子表，就返回那个子表（保留括号）。</p>
+    <div class="code-block">
+<span class="cmt">// 例子</span>
+<span class="kw">Head</span>( ((a,b), (a,(c,d))) ) = <span class="blank">(a,b)</span>    <span class="cmt">// 第一个元素是子表(a,b)</span>
+<span class="kw">Head</span>( (a, b, c) )           = a        <span class="cmt">// 第一个元素是原子a</span>
+    </div>
+
+    <h3>📌 Tail（表尾）— 去掉第一个，剩下的包一层括号</h3>
+    <p>去掉第一个元素后，<span class="hl">剩余所有元素组成一个新表</span>。<strong>Tail 永远返回一个表（有外层括号）！</strong></p>
+    <div class="code-block">
+<span class="cmt">// 例子</span>
+<span class="kw">Tail</span>( ((a,b), (a,(c,d))) ) = <span class="blank">((a,(c,d)))</span>  <span class="cmt">// 去掉(a,b)，剩下(a,(c,d))，包成表</span>
+<span class="kw">Tail</span>( (a, b, c) )           = (b, c)      <span class="cmt">// 去掉a，b和c组成表(b,c)</span>
+<span class="kw">Tail</span>( (a) )                 = ()          <span class="cmt">// 去掉a，没剩东西 → 空表</span>
+    </div>
+
+    <div class="danger-box">
+      <strong>⚠️ 最容易错的地方：Tail 多一层括号！</strong><br>
+      <code>Tail((a,b))</code> = <code>(b)</code>，不是 <code>b</code>。<br>
+      因为 Tail 返回的是"剩余元素组成的<strong>表</strong>"，即使只剩一个元素也要包括号。
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、剥洋葱 —— 逐层可视化</h2>
+  <div class="card">
+    <h3>本题：Tail(L)，只有一步</h3>
+    <div class="onion-grid">
+      <div class="onion-step">
+        <div class="layer-num">原</div>
+        <div class="layer-body">
+          L = <span class="add">(</span> <span class="rm">(a,b)</span> , <span class="add">(a,(c,d))</span> <span class="add">)</span>
+        </div>
+      </div>
+      <div class="onion-step">
+        <div class="layer-num" style="background:var(--red);">砍</div>
+        <div class="layer-body">
+          砍掉第一个元素 <span class="rm">(a,b)</span>，剩余 <span class="add">(a,(c,d))</span>
+        </div>
+      </div>
+      <div class="onion-step">
+        <div class="layer-num" style="background:var(--green);">包</div>
+        <div class="layer-body">
+          剩余元素组成新表 → <span class="add">( (a,(c,d)) )</span>
+          <span style="color:var(--muted);">← 注意这层外层括号！</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;font-size:1.2rem;">
+      ✅ <strong>Tail(L) = <span style="color:var(--green);font-family:'Cascadia Code',monospace;">((a,(c,d)))</span></strong>
+    </div>
+  </div>
+
+  <!-- 更详细的洋葱图 -->
+  <div class="card">
+    <h3>洋葱透视：看清每一层括号的作用</h3>
+    <div class="ascii-box">
+<span class="hl-onion">═══ 逐层剥洋葱：Tail(L) ═══</span>
+
+原始表 L：
+┌─────────────────────────────────────┐
+│  (  (a,b)  ,  (a,(c,d))  )         │
+│   ↑           ↑                     │
+│   元素1       元素2                  │
+│   第1块洋葱   第2块洋葱              │
+└─────────────────────────────────────┘
+
+Tail 操作 = 剥掉第1块洋葱皮（元素1），剩下的包起来：
+
+┌──────────────────────┐
+│  (  (a,(c,d))  )     │  ← 新表
+│   └──┬──────┘  │     │
+│      │         │     │
+│   唯一的元素   外层括号│
+│   (一个子表)  (Tail加的)│
+└──────────────────────┘
+
+最终结果：((a,(c,d)))
+  · 最外层括号 → Tail 加的（因为它返回一个"表"）
+  · 内层括号 → 元素2本身就是一个子表
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、深入探究 L 的内部结构</h2>
+  <div class="card">
+    <h3>元素1：(a,b)</h3>
+    <div class="ascii-box">
+(a,b)
+ ├── a  (原子)
+ └── b  (原子)
+    </div>
+    <p>Head((a,b)) = <code>a</code>；Tail((a,b)) = <code>(b)</code></p>
+
+    <h3>元素2：(a, (c,d))</h3>
+    <div class="ascii-box">
+(a, (c,d))
+ ├── a      (原子)
+ └── (c,d)  (子表)
+      ├── c  (原子)
+      └── d  (原子)
+    </div>
+    <p>Head((a,(c,d))) = <code>a</code>；Tail((a,(c,d))) = <code>((c,d))</code></p>
+
+    <h3>Tail(L) 的结果 ((a,(c,d))) 进一步操作：</h3>
+    <p>Head(Tail(L)) = Head(((a,(c,d)))) = <code>(a,(c,d))</code></p>
+    <p>Tail(Tail(L)) = Tail(((a,(c,d)))) = <code>()</code>（空表！因为只有一个元素，去掉就空了）</p>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、完整对比表</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>表达式</th><th>结果</th><th>说明</th></tr>
+      <tr><td class="left">Head(L)</td><td class="left">(a,b)</td><td class="left">取第一个元素</td></tr>
+      <tr class="hl-row"><td class="left"><strong>Tail(L)</strong></td><td class="left"><strong>((a,(c,d)))</strong></td><td class="left"><strong>去掉第一个，剩余包括号 ← 本题答案</strong></td></tr>
+      <tr><td class="left">Head(Head(L))</td><td class="left">a</td><td class="left">对(a,b)取Head → a</td></tr>
+      <tr><td class="left">Tail(Head(L))</td><td class="left">(b)</td><td class="left">对(a,b)取Tail → (b)</td></tr>
+      <tr><td class="left">Head(Tail(L))</td><td class="left">(a,(c,d))</td><td class="left">对((a,(c,d)))取Head</td></tr>
+      <tr><td class="left">Tail(Tail(L))</td><td class="left">()</td><td class="left">去掉唯一元素 → 空表</td></tr>
+      <tr><td class="left">Head(Head(Tail(L)))</td><td class="left">a</td><td class="left">深入元素2的第一个</td></tr>
+      <tr><td class="left">Tail(Head(Tail(L)))</td><td class="left">((c,d))</td><td class="left">深入元素2的剩余</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、防踩坑指南</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>坑位</th><th>错误做法</th><th>正确做法</th></tr>
+      <tr>
+        <td>坑①</td>
+        <td class="left">Tail((a,b))写成<code>b</code></td>
+        <td class="left">正确是<code>(b)</code>，Tail永远加括号</td>
+      </tr>
+      <tr>
+        <td>坑②</td>
+        <td class="left">Head((a))写成<code>(a)</code></td>
+        <td class="left">正确是<code>a</code>，Head不加额外括号</td>
+      </tr>
+      <tr>
+        <td>坑③</td>
+        <td class="left">忘了数括号层数</td>
+        <td class="left">每做一步，写下结果，数清楚括号匹配</td>
+      </tr>
+      <tr>
+        <td>坑④</td>
+        <td class="left">Tail(L)写成<code>(a,(c,d))</code></td>
+        <td class="left">少了一层外层括号！应是<code>((a,(c,d)))</code></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="tip-box">
+    <strong>🧠 记忆口诀：</strong><br>
+    • <strong>Head</strong> = "取第一个，原样返还"（不加不减括号）<br>
+    • <strong>Tail</strong> = "砍第一个，剩的包一层"（永远多一层外层括号）<br>
+    • <strong>嵌套表达式</strong> = "从内往外剥，一次做一步"
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、同类题自测</h2>
+  <div class="card">
+    <p>以本题为基础，请计算以下表达式：</p>
+    <ol>
+      <li><code>Head(L)</code> = <span class="blank" style="display:inline-block;min-width:5em;">(a,b)</span></li>
+      <li><code>Tail(L)</code> = <span class="blank" style="display:inline-block;min-width:12em;">((a,(c,d)))</span> ← 本题</li>
+      <li><code>Head(Tail(L))</code> = <span class="blank" style="display:inline-block;min-width:10em;">(a,(c,d))</span></li>
+      <li><code>Tail(Tail(L))</code> = <span class="blank" style="display:inline-block;min-width:3em;">()</span></li>
+    </ol>
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 广义表的 Head/Tail 是第5章的基础操作，关键记住：Head不加括号，Tail加一层括号。
+</div>
+
+</div>
+</body>
+</html>

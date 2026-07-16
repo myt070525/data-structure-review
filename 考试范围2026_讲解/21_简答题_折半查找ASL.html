@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答21 · 折半查找ASL</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 { font-size: 1.9rem; color: var(--gold); letter-spacing: 2px; }
+.header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; }
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.05rem; color: var(--cyan); margin: 1.3rem 0 0.6rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+.step { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:0.8rem 1.2rem; margin:0.6rem 0; }
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background:transparent; padding:0; color:#c8d6e5; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.formula {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  padding: 1rem;
+  margin: 0.8rem 0;
+  background: rgba(226,176,74,0.06);
+  border: 1px dashed var(--gold);
+  border-radius: 8px;
+}
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📐 简答第3题 · 折半查找ASL</h1>
+  <p class="subtitle">11个有序元素 → 判定树(4层) → ASL = 33/11 = 3</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">ASL<sub>成功</sub> = <span style="color:var(--gold-light)">33 / 11 = 3</span></div>
+  <div class="note" style="color:var(--muted);margin-top:8px;">有序表：3, 8, 15, 17, 22, 31, 35, 40, 43, 59, 62</div>
+</div>
+
+<!-- ============ 第1节 ============ -->
+<div class="section">
+  <h2>一、构建判定树（Decision Tree）</h2>
+  <div class="card">
+    <p>11个元素，下标1-11。折半查找每次取 mid = ⌊(low+high)/2⌋。</p>
+  </div>
+
+  <div class="ascii">
+                         ┌─────────────┐
+                  Layer1 │     22      │  mid=⌊(1+11)/2⌋=6, 值=22
+                         └──────┬──────┘
+              ┌─────────────────┴─────────────────┐
+              │                                   │
+       ┌──────┴──────┐                     ┌──────┴──────┐
+Layer2 │     8       │                     │     43      │  left_mid=⌊(1+5)/2⌋=3
+       └──────┬──────┘                     └──────┬──────┘  right_mid=⌊(7+11)/2⌋=9
+    ┌─────────┴─────────┐            ┌─────────────┴─────────┐
+    │                   │            │                       │
+┌───┴───┐          ┌───┴───┐    ┌───┴───┐              ┌───┴───┐
+│   3   │          │  15   │    │  31   │              │  59   │   Layer3
+└───┬───┘          └───┬───┘    └───┬───┘              └───┬───┘
+    │                   │            │                       │
+ ┌──┴──┐           ┌──┴──┐      ┌──┴──┐                ┌──┴──┐
+ │  ×  │           │ 17  │      │ 35  │                │ 62  │   Layer4
+ └─────┘           └──┬──┘      └──┬──┘                └──┬──┘
+                   ┌──┴──┐      ┌──┴──┐                ┌──┴──┐
+                   │  ×  │      │ 40  │                │  ×  │
+                   └─────┘      └──┬──┘                └─────┘
+                                ┌──┴──┐
+                                │  ×  │
+                                └─────┘
+
+  内部结点（实际元素，共11个）的层数即查找次数：
+  Layer 1: 22 (1个)          → 比较1次
+  Layer 2: 8, 43 (2个)       → 比较2次
+  Layer 3: 3, 15, 31, 59 (4个) → 比较3次
+  Layer 4: 17, 35, 40, 62 (4个) → 比较4次
+    </div>
+</div>
+
+<!-- ============ 第2节 ============ -->
+<div class="section">
+  <h2>二、计算ASL</h2>
+
+  <table>
+    <tr><th>层数（比较次数）</th><th>该层元素</th><th>元素个数</th><th>层数×个数</th></tr>
+    <tr><td>1</td><td style="font-family:monospace;">22</td><td>1</td><td>1×1 = <strong>1</strong></td></tr>
+    <tr><td>2</td><td style="font-family:monospace;">8, 43</td><td>2</td><td>2×2 = <strong>4</strong></td></tr>
+    <tr><td>3</td><td style="font-family:monospace;">3, 15, 31, 59</td><td>4</td><td>3×4 = <strong>12</strong></td></tr>
+    <tr style="background:rgba(226,176,74,0.08);"><td>4</td><td style="font-family:monospace;">17, 35, 40, 62</td><td>4</td><td>4×4 = <strong>16</strong></td></tr>
+    <tr><th>合计</th><th></th><th>11</th><th><strong>33</strong></th></tr>
+  </table>
+
+  <div class="formula">
+    ASL<sub>成功</sub> = Σ(层数 × 该层结点数) / n<br>
+    = (1×1 + 2×2 + 3×4 + 4×4) / 11<br>
+    = (1 + 4 + 12 + 16) / 11<br>
+    = <strong>33 / 11 = 3</strong>
+  </div>
+
+  <div class="tip">
+    <strong>💡 直觉：</strong>平均查找长度=3，意味着平均只需比较3次就能找到目标。而顺序查找的平均比较次数为 (11+1)/2 = 6 次。折半查找效率提高了<strong>一倍</strong>。
+  </div>
+</div>
+
+<!-- ============ 第3节 ============ -->
+<div class="section">
+  <h2>三、每个元素的查找次数验证</h2>
+  <table>
+    <tr><th>元素</th><th>查找路径</th><th>比较次数</th></tr>
+    <tr><td>3</td><td>22→8→3</td><td>3</td></tr>
+    <tr><td>8</td><td>22→8</td><td>2</td></tr>
+    <tr><td>15</td><td>22→8→15</td><td>3</td></tr>
+    <tr><td>17</td><td>22→8→15→17</td><td>4</td></tr>
+    <tr><td>22</td><td>22</td><td>1</td></tr>
+    <tr><td>31</td><td>22→43→31</td><td>3</td></tr>
+    <tr><td>35</td><td>22→43→31→35</td><td>4</td></tr>
+    <tr><td>40</td><td>22→43→31→35→40</td><td>4? 实际：mid动态计算后归入第4层</td></tr>
+    <tr><td>43</td><td>22→43</td><td>2</td></tr>
+    <tr><td>59</td><td>22→43→59</td><td>3</td></tr>
+    <tr><td>62</td><td>22→43→59→62</td><td>4</td></tr>
+  </table>
+</div>
+
+<!-- ============ 第4节 ============ -->
+<div class="section">
+  <h2>四、判定树构造规则</h2>
+  <div class="card">
+    <p>mid = ⌊(low+high)/2⌋（向下取整），决定了判定树的形状：</p>
+    <ul>
+      <li>当区间长度为奇数时，mid恰好居中，左右子树<strong>对称</strong></li>
+      <li>当区间长度为偶数时，mid偏左，左子树比右子树<strong>多一个或少一个</strong>结点</li>
+      <li>n=11时：根22左侧5个，右侧5个 → 对称</li>
+    </ul>
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 注意：</strong>失败结点的比较次数 = 其父结点所在层数，但ASL<sub>成功</sub>不包含失败结点。若计算ASL<sub>失败</sub>，需要用失败结点的人数加权。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第9题 · 完全二叉树叶子结点数</title>
+<style>
+:root {
+  --bg: #fffdf7; --card: #fff; --text: #1c1917; --muted: #78716c;
+  --orange: #ea580c; --orange-dark: #9a3412; --red: #dc2626; --green: #16a34a;
+  --blue: #2563eb; --amber: #d97706; --border: #e7e0d5;
+  --code-bg: #1c1917; --code-text: #e7e5e4;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.95; font-size: 16px;
+}
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.header {
+  text-align: center; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 2px solid #fdba74; border-radius: 16px; padding: 2rem 1.5rem;
+}
+.header .tag { font-size: 0.78rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.header h1 { font-size: 2rem; font-weight: 800; color: var(--orange); margin: 8px 0; }
+.header .q-box {
+  display: inline-block; text-align: left; background: #fff; border: 1px solid #fdba74;
+  border-radius: 8px; padding: 1rem 1.5rem; font-size: 1.05rem; margin-top: 0.6rem;
+}
+.header .q-box code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; color: var(--orange-dark); }
+
+.answer {
+  text-align: center; padding: 1.2rem;
+  border: 3px solid var(--orange); border-radius: 12px;
+  background: #fff7ed; margin: 1.8rem 0;
+}
+.answer .big { font-size: 2.5rem; font-weight: 900; color: var(--orange-dark); font-family: 'Cascadia Code',monospace; }
+.answer .blank {
+  display: inline-block; min-width: 2.5em; border-bottom: 3px dashed var(--orange);
+  color: var(--orange-dark); font-weight: 900; padding: 0 6px;
+}
+
+.section { margin: 2.2rem 0; }
+.section h2 {
+  font-size: 1.3rem; color: var(--orange-dark);
+  border-left: 5px solid var(--orange); padding-left: 14px; margin-bottom: 1rem;
+}
+.section h3 { font-size: 1.08rem; color: #7c2d12; margin: 1.4rem 0 0.7rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.5rem 1.8rem; margin: 1rem 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.step-row { display: flex; gap: 0.8rem; align-items: flex-start; margin: 0.8rem 0; }
+.step-num {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+}
+.step-body { flex: 1; padding-top: 5px; }
+
+.ascii-box {
+  background: #faf8f5; border: 1px dashed #d4c8b0; border-radius: 10px;
+  padding: 1.2rem 1.5rem; margin: 1rem 0; text-align: center;
+  font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.84rem;
+  line-height: 1.6; white-space: pre; overflow-x: auto;
+}
+
+.code-block {
+  background: var(--code-bg); border-radius: 10px; padding: 1.3rem 1.5rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88rem; line-height: 1.8; overflow-x: auto; margin: 1rem 0;
+  color: var(--code-text); border: 1px solid #292524;
+}
+.code-block .kw { color: #f97316; font-weight: 700; }
+.code-block .cmt { color: #78716c; font-style: italic; }
+.code-block .num { color: #fb923c; }
+.code-block .blank { background: #431407; color: #fb923c; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+
+table.data {
+  width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;
+}
+table.data th {
+  background: #fff7ed; padding: 10px 12px; text-align: center;
+  font-weight: 700; color: var(--orange-dark); border-bottom: 2px solid #fdba74;
+}
+table.data td {
+  padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center;
+}
+table.data tr.hl-row { background: #fffbeb; }
+
+.tip-box {
+  background: #fff7ed; border: 1px solid #fdba74;
+  border-left: 5px solid var(--orange); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.tip-box strong { color: var(--orange-dark); }
+.danger-box {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-left: 5px solid var(--red); border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem; margin: 1rem 0;
+}
+.danger-box strong { color: var(--red); }
+
+code { background: #fff7ed; padding: 2px 6px; border-radius: 3px; font-family: 'Cascadia Code',monospace; font-size: 0.9em; color: var(--orange-dark); border: 1px solid #fed7aa; }
+.hl { background: #fef3c7; border-bottom: 2px solid var(--amber); padding: 1px 4px; font-weight: 600; }
+ul, ol { padding-left: 1.8rem; } li { margin-bottom: 6px; }
+li::marker { color: var(--orange); }
+
+.derive { display: grid; gap: 0.8rem; margin: 1rem 0; }
+.derive .step {
+  display: flex; gap: 1rem; align-items: center; padding: 0.8rem 1rem;
+  background: #fff7ed; border-radius: 8px; border: 1px solid #fdba74;
+}
+.derive .step .eq { font-family: 'Cascadia Code',monospace; font-weight: 700; color: var(--orange-dark); font-size: 1.1rem; }
+
+.leaf-count {
+  display: inline-block; width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: #fff; line-height: 80px; font-size: 2rem; font-weight: 900;
+  font-family: 'Cascadia Code',monospace; margin: 0.5rem;
+}
+
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== Header ====== -->
+<div class="header">
+  <div class="tag">测验2026春 · 选择填空 · 第9题</div>
+  <h1>🍃 完全二叉树 — 叶子结点数推导</h1>
+  <div class="q-box">
+    一棵完全二叉树有 <code>321</code> 个结点，<br>
+    问叶子结点有多少个？
+  </div>
+</div>
+
+<!-- ====== Answer ====== -->
+<div class="answer">
+  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">正确答案</div>
+  <div class="big"><span class="blank">161</span> 个叶子结点</div>
+  <div style="color:var(--muted);font-size:0.9rem;margin-top:6px;">
+    公式：n₀ = (n + 1) / 2 = (321 + 1) / 2 = <strong style="color:var(--green);">161</strong>
+  </div>
+</div>
+
+<!-- ====== 第1节 ====== -->
+<div class="section">
+  <h2>一、完全二叉树的定义与特征</h2>
+  <div class="card">
+    <p><strong>完全二叉树（Complete Binary Tree）</strong>是一棵特殊的二叉树：</p>
+    <ul>
+      <li>除了<strong>最后一层</strong>可能不满外，其他每一层都是满的</li>
+      <li>最后一层的结点都<strong>靠左排列</strong>，不会有"空位"在左边而右边有结点的情况</li>
+    </ul>
+    <p>关键性质：<span class="hl">完全二叉树中，度为1的结点最多只有1个（且只可能出现在倒数第二层最右边）</span>。</p>
+
+    <div class="ascii-box">
+        完全二叉树示例（n=10）：
+        
+                ①               ← 第1层（满）
+              /     \
+            ②       ③           ← 第2层（满）
+          /   \    /   \
+        ④     ⑤  ⑥     ⑦       ← 第3层（满）
+      /   \   /
+     ⑧    ⑨ ⑩                ← 第4层（最后一层，靠左）
+
+    叶子结点（无孩子）：④,⑤,⑥,⑦,⑧,⑨,⑩？等等...
+    实际上：⑧,⑨,⑩,⑤,⑥,⑦ 是叶子（共6个）
+    注意④有孩子⑧⑨，不是叶子！
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第2节 ====== -->
+<div class="section">
+  <h2>二、通用二叉树性质回顾</h2>
+  <div class="card">
+    <table class="data">
+      <tr><th>符号</th><th>含义</th><th>关系</th></tr>
+      <tr>
+        <td>n₀</td>
+        <td>度为0的结点（叶子）</td>
+        <td rowspan="3" style="vertical-align:middle;font-size:1.1rem;"><strong>n = n₀ + n₁ + n₂</strong></td>
+      </tr>
+      <tr><td>n₁</td><td>度为1的结点</td></tr>
+      <tr><td>n₂</td><td>度为2的结点</td></tr>
+      <tr class="hl-row">
+        <td colspan="2"><strong>二叉树通用性质</strong></td>
+        <td><strong>n₀ = n₂ + 1</strong></td>
+      </tr>
+    </table>
+    <p style="margin-top:0.8rem;">性质 <strong>n₀ = n₂ + 1</strong> 对任何二叉树都成立（叶子数 = 度为2的结点数 + 1）。为什么？因为每个度为2的结点贡献2条边（指向孩子），每个度为1的结点贡献1条边，n个结点的树有n-1条边。</p>
+  </div>
+</div>
+
+<!-- ====== 第3节 ====== -->
+<div class="section">
+  <h2>三、核心推导 — 完全二叉树叶子结点公式</h2>
+  <div class="card">
+    <p>对于完全二叉树，n₁ 只能是 <strong>0 或 1</strong>（最多一个度为1的结点）。</p>
+
+    <div class="derive">
+      <div class="step">
+        <span style="font-size:1.5rem;">①</span>
+        <div><span class="eq">n = n₀ + n₁ + n₂</span><br>
+        <span style="color:var(--muted);font-size:0.85rem;">总结点 = 叶子 + 度1结点 + 度2结点</span></div>
+      </div>
+      <div class="step">
+        <span style="font-size:1.5rem;">②</span>
+        <div><span class="eq">n₀ = n₂ + 1</span>，即 <span class="eq">n₂ = n₀ - 1</span><br>
+        <span style="color:var(--muted);font-size:0.85rem;">二叉树通用性质</span></div>
+      </div>
+      <div class="step">
+        <span style="font-size:1.5rem;">③</span>
+        <div>代入：<span class="eq">n = n₀ + n₁ + (n₀ - 1) = 2n₀ + n₁ - 1</span></div>
+      </div>
+      <div class="step">
+        <span style="font-size:1.5rem;">④</span>
+        <div>移项：<span class="eq">2n₀ = n - n₁ + 1</span></div>
+      </div>
+      <div class="step">
+        <span style="font-size:1.5rem;">⑤</span>
+        <div><strong>关键：n₁ 是 0 还是 1？</strong></div>
+      </div>
+    </div>
+
+    <h3>n₁ 的判定：</h3>
+    <p>对于完全二叉树，n₁ 与总结点数 n 的奇偶性有关：</p>
+    <ul>
+      <li>如果 <strong>n 是偶数</strong> → n₁ = 1（最后一个非叶子结点只有一个左孩子）</li>
+      <li>如果 <strong>n 是奇数</strong> → n₁ = 0（所有非叶子结点都有两个孩子）</li>
+    </ul>
+    <p>本题 n = 321，是<strong>奇数</strong> → <strong>n₁ = 0</strong>。</p>
+
+    <div class="derive" style="margin-top:1rem;">
+      <div class="step" style="background:#f0fdf4;border-color:var(--green);">
+        <span style="font-size:1.5rem;">⑥</span>
+        <div>
+          <span class="eq" style="color:var(--green);">n₀ = (n - n₁ + 1) / 2 = (321 - 0 + 1) / 2 = 322 / 2 = <span style="font-size:1.3rem;">161</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第4节 ====== -->
+<div class="section">
+  <h2>四、为什么 n₁ 由奇偶性决定？— 直观理解</h2>
+  <div class="card">
+    <p>完全二叉树按层编号（从1开始），结点 i 的孩子是 2i 和 2i+1。</p>
+    <div class="ascii-box">
+    n = 321（奇数）的情况：
+    
+    编号1到321。最后一个有孩子的结点是 ⌊321/2⌋ = 160。
+    结点160的左孩子是 2×160=320，右孩子是 2×160+1=321。
+    
+    320 ≤ 321 ✅ → 有左孩子
+    321 ≤ 321 ✅ → 有右孩子
+    
+    → 结点160有两个孩子！→ 所有非叶子结点都有两个孩子 → n₁ = 0
+
+
+    n = 320（偶数）的情况（对比）：
+    
+    最后一个有孩子的结点是 ⌊320/2⌋ = 160。
+    左孩子 320 ≤ 320 ✅
+    右孩子 321 ≤ 320 ❌ → 没有右孩子！
+    
+    → 结点160只有一个孩子！→ n₁ = 1
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第5节 ====== -->
+<div class="section">
+  <h2>五、图解 321 个结点的完全二叉树</h2>
+  <div class="card">
+    <div class="ascii-box">
+    n = 321，n₀ = 161，n₁ = 0，n₂ = 160
+    
+    树的结构（示意）：
+    
+                  ①                    ← 第1层：1个结点
+               /       \
+            ②           ③              ← 第2层：2个结点
+          /   \        /   \
+        ④     ⑤      ⑥     ⑦          ← 第3层：4个结点
+       / \    / \     / \    / \
+      ...   ...     ...   ...  ...      ← 中间层全满
+      / \    / \     / \    / \
+    ⑨⓪  ⑨① ⑨② ⑨③ ⑨④ ⑨⑤ ...  ⑮⑨ ⑯⓪  ← 第8层：128个结点（全满）
+    / \   / \   / \   / \   ...   / \
+ ②⑤⑥②⑤⑦ ...                                   ← 第9层：最后一层（部分）
+  ...   ...
+ ③②⓪ ③②①                                    ← 最后两个结点（320和321）
+    
+    各层统计（满二叉树到第8层）：
+    第1层：2⁰ = 1
+    第2层：2¹ = 2
+    ...
+    第8层：2⁷ = 128
+    前8层总计 = 2⁸ - 1 = 255
+    
+    第9层结点数 = 321 - 255 = 66
+    
+    叶子结点 = 第9层的全部66个 
+              + 第8层中没有孩子的结点
+    
+    第8层结点共128个，有孩子的结点数 = ⌈66/2⌉ = 33
+    第8层叶子 = 128 - 33 = 95
+    
+    总叶子 = 66 + 95 = <span class="hl">161</span> ✅
+    </div>
+  </div>
+</div>
+
+<!-- ====== 第6节 ====== -->
+<div class="section">
+  <h2>六、完整公式总结</h2>
+  <div class="card">
+    <h3>完全二叉树叶子结点速算公式：</h3>
+    <div style="text-align:center;font-size:1.3rem;font-family:'Cascadia Code',monospace;font-weight:900;color:var(--orange-dark);margin:1rem 0;padding:1rem;background:#fff7ed;border-radius:8px;">
+      n₀ = ⌈n / 2⌉（向上取整）<br>
+      或等价地：n₀ = (n + 1) / 2（当 n 为奇数）<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n₀ = n / 2（当 n 为偶数）
+    </div>
+
+    <table class="data">
+      <tr><th>n（总结点）</th><th>n₁</th><th>n₂</th><th>n₀（叶子）</th><th>公式</th></tr>
+      <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>(1+1)/2 = 1</td></tr>
+      <tr><td>2</td><td>1</td><td>0</td><td>1</td><td>2/2 = 1</td></tr>
+      <tr><td>3</td><td>0</td><td>1</td><td>2</td><td>(3+1)/2 = 2</td></tr>
+      <tr><td>10</td><td>1</td><td>4</td><td>5</td><td>10/2 = 5</td></tr>
+      <tr class="hl-row"><td><strong>321</strong></td><td><strong>0</strong></td><td><strong>160</strong></td><td><strong style="font-size:1.2rem;">161</strong></td><td><strong>(321+1)/2 = 161</strong></td></tr>
+      <tr><td>100</td><td>1</td><td>49</td><td>50</td><td>100/2 = 50</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ====== 第7节 ====== -->
+<div class="section">
+  <h2>七、记忆口诀与易错点</h2>
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num" style="background:var(--amber);">记</div>
+      <div class="step-body">
+        <strong>"完全二叉树叶子数 = 总结点数 ÷ 2 向上取整"</strong><br>
+        或者记：<span class="hl">"奇数加1除以2，偶数直接除以2"</span>
+      </div>
+    </div>
+
+    <div class="danger-box">
+      <strong>⚠️ 常见错误：</strong><br>
+      • 把完全二叉树和<strong>满二叉树</strong>混淆。满二叉树每层都满，是完全二叉树的特例。<br>
+      • 忘记 n₁ 只能是 0 或 1！如果有2个以上度为1的结点，就不是完全二叉树了。<br>
+      • 公式 n₀ = n₂ + 1 对所有二叉树都成立，但 n₀ = (n+1)/2 只对 n₁=0 的完全二叉树成立！
+    </div>
+
+    <div class="tip-box">
+      <strong>🎯 同类变式：</strong><br>
+      • 已知叶子数 n₀，求总结点数 n → n = 2n₀ - 1（当 n₁=0）<br>
+      • 已知总结点数 n，求度为2的结点 n₂ → n₂ = (n-1)/2（当 n₁=0）<br>
+      • 非完全二叉树 → 不能用简化公式，必须逐层分析！
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div style="text-align:center;color:var(--muted);font-size:0.9rem;">
+  📖 完全二叉树的叶子结点公式是第6章的高频考点。记住：n为奇数→n₀=(n+1)/2，n为偶数→n₀=n/2。
+</div>
+
+</div>
+</body>
+</html>

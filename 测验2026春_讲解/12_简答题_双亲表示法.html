@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简答题：双亲表示法 - 树存储结构对比</title>
+<style>
+    :root {
+        --bg: #fff7ed;
+        --fg: #3e2723;
+        --accent: #ea580c;
+        --accent2: #7c3aed;
+        --green: #059669;
+        --blue: #0f766e;
+        --card-bg: #ffffff;
+        --border: #f0d9c8;
+        --shadow: 0 2px 14px rgba(234,88,12,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #fff7ed 0%, #fef0e6 40%, #fde8d8 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #9a3412, #ea580c);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(154,52,18,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.purple { border-left-color: var(--accent2); }
+    .card.blue   { border-left-color: var(--blue); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #f0d9c8;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #7c2d12; }
+    p { margin: 0.6rem 0; text-indent: 2em; }
+    p.ni { text-indent: 0; }
+    .code-block {
+        background: #1c1917; color: #e7e5e4; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre;
+    }
+    .code-block .kw { color: #fb923c; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #78716c; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.5;
+        background: #faf7f5; padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #e7d6c8;
+        margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #fff7ed; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .root-row { background: #e8f5e9 !important; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid #d97706;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #f0d9c8;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .ascii-art { font-size: 0.7rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🏛️ 简答题：双亲表示法</h1>
+    <div class="subtitle">第12题 · 根据双亲表示法表格还原树结构，并转化为孩子兄弟表示法</div>
+    <div class="answer-badge">
+        ✅ 根结点：B &nbsp;|&nbsp; 树高：4层 &nbsp;|&nbsp; 叶子：C, F, D, G, H
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目回顾</h2>
+
+<h3>1.1 已知双亲表示法表格</h3>
+<p class="ni">下表给出了9个结点的双亲表示法存储结构，其中 <b>parent</b> 表示该结点的双亲在数组中的下标（下标从0开始），parent = −1 表示该结点是根。</p>
+
+<table>
+    <tr><th>下标</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+    <tr><td><b>data</b></td><td>A</td><td class="root-row"><b>B</b></td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td></tr>
+    <tr><td><b>parent</b></td><td>1</td><td class="root-row"><b>−1</b></td><td>4</td><td>8</td><td>0</td><td>0</td><td>8</td><td>8</td><td>0</td></tr>
+</table>
+
+<h3>1.2 解读方式</h3>
+<p>每个结点的parent值告诉我们"谁是我的双亲"。例如：</p>
+<ul style="margin-left:2rem; line-height:2.2;">
+    <li>A的parent=1 → A的双亲是下标1的结点，即<b>B</b></li>
+    <li>B的parent=−1 → B没有双亲，B是<b>根结点</b></li>
+    <li>C的parent=4 → C的双亲是下标4的结点，即<b>E</b></li>
+    <li>D的parent=8 → D的双亲是下标8的结点，即<b>I</b></li>
+    <li>E的parent=0 → E的双亲是下标0的结点，即<b>A</b></li>
+    <li>F的parent=0 → F的双亲是<b>A</b></li>
+    <li>G的parent=8 → G的双亲是<b>I</b></li>
+    <li>H的parent=8 → H的双亲是<b>I</b></li>
+    <li>I的parent=0 → I的双亲是<b>A</b></li>
+</ul>
+</div>
+
+<!-- ============ TREE ============ -->
+<div class="card green">
+<h2>二、还原树结构（双亲→树形）</h2>
+
+<h3>2.1 逐层构建</h3>
+<p>从根B开始，按"谁是我的孩子"自顶向下构建：</p>
+
+<table>
+    <tr><th>步骤</th><th>操作</th><th>结果</th></tr>
+    <tr>
+        <td><span class="step-num">1</span></td>
+        <td>找到parent=−1的结点 → <b>B是根</b></td>
+        <td>根 = B</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">2</span></td>
+        <td>找parent=1（B的下标）的结点 → <b>A</b></td>
+        <td>B的孩子 = {A}</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">3</span></td>
+        <td>找parent=0（A的下标）的结点 → <b>E, F, I</b></td>
+        <td>A的孩子 = {E, F, I}</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">4</span></td>
+        <td>找parent=4（E的下标）的结点 → <b>C</b><br>找parent=8（I的下标）的结点 → <b>D, G, H</b></td>
+        <td>E的孩子 = {C}<br>I的孩子 = {D, G, H}</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">5</span></td>
+        <td>找parent=2,3,5,6,7 → 均无子结点（叶子）</td>
+        <td>C, D, F, G, H 是叶子</td>
+    </tr>
+</table>
+
+<h3>2.2 最终树形</h3>
+<div class="ascii-art">
+                    双亲表示法对应的原树：
+
+                          ┌───┐
+                          │ B │  ← 根（parent=−1）
+                          └─┬─┘
+                            │
+                          ┌─┴─┐
+                          │ A │  ← parent=1（B）
+                          └─┬─┘
+                 ┌─────┬────┼─────┬─────┐
+                 │     │    │     │     │
+              ┌──┴──┐ ┌┴─┐ ┌┴─┐   │     │
+              │  E  │ │ F │ │ I │   │     │
+              └──┬──┘ └──┘ └─┬─┘   │     │
+                 │           │      │     │
+              ┌──┴──┐    ┌──┼──┐   │     │
+              │  C  │    │  │  │   │     │
+              └─────┘   ┌┴─┐┌┴─┐┌┴─┐   │
+                        │D ││G ││H │   │
+                        └──┘└──┘└──┘   │
+               ↑         ↑              ↑
+             E的孩子    I的三个孩子      F是叶子
+            （只有C）  （D, G, H）
+
+    结点统计：
+    · 根：B
+    · 分支结点：A, E, I
+    · 叶子（无孩子）：C, D, F, G, H（共5个）
+    · 树高：4层（B→A→E→C 或 B→A→I→D/G/H）
+</div>
+</div>
+
+<!-- ============ CHILD-SIBLING ============ -->
+<div class="card purple">
+<h2>三、孩子兄弟表示法转换</h2>
+
+<h3>3.1 什么是孩子兄弟表示法？</h3>
+<p>孩子兄弟表示法（又叫<strong>二叉链表表示法</strong>或<strong>左孩子右兄弟</strong>表示法）是树的另一种存储方式。每个结点有两个指针：</p>
+<ul style="margin-left:2rem; line-height:2.2;">
+    <li><b>Left（FirstChild）</b>：指向该结点的<b>第一个孩子</b></li>
+    <li><b>Right（NextSibling）</b>：指向该结点的<b>下一个兄弟</b></li>
+</ul>
+<p>这样任意一棵树都可以转化为一棵<strong>二叉树</strong>！转化规则：<b>左指针连孩子，右指针连兄弟</b>。</p>
+
+<h3>3.2 转换过程</h3>
+<table>
+    <tr><th>结点</th><th>孩子列表</th><th>FirstChild →</th><th>兄弟链（NextSibling）</th></tr>
+    <tr><td>B</td><td>{A}</td><td>A</td><td>A.NextSibling = NULL（独生子）</td></tr>
+    <tr><td>A</td><td>{E, F, I}</td><td>E</td><td>E→F→I→NULL</td></tr>
+    <tr><td>E</td><td>{C}</td><td>C</td><td>C.NextSibling = NULL</td></tr>
+    <tr><td>F</td><td>{}（叶子）</td><td>NULL</td><td>—</td></tr>
+    <tr><td>I</td><td>{D, G, H}</td><td>D</td><td>D→G→H→NULL</td></tr>
+    <tr><td>C</td><td>{}（叶子）</td><td>NULL</td><td>—</td></tr>
+    <tr><td>D</td><td>{}（叶子）</td><td>NULL</td><td>—</td></tr>
+    <tr><td>G</td><td>{}（叶子）</td><td>NULL</td><td>—</td></tr>
+    <tr><td>H</td><td>{}（叶子）</td><td>NULL</td><td>—</td></tr>
+</table>
+
+<h3>3.3 孩子兄弟表示法的二叉树形态</h3>
+<div class="ascii-art">
+    原树（左孩子右兄弟表示法转化后的二叉树）：
+
+              ┌───┐
+              │ B │
+              └─┬─┘
+                │ (FirstChild)
+              ┌─┴─┐
+              │ A │ ───→ NULL (NextSibling: 独生子)
+              └─┬─┘
+                │ (FirstChild)
+              ┌─┴─┐
+              │ E │ ───→ F ───→ I ───→ NULL
+              └─┬─┘       (无孩)   └─┬─┘
+                │                   │ (FirstChild)
+              ┌─┴─┐              ┌──┴──┐
+              │ C │              │  D  │ ───→ G ───→ H ───→ NULL
+              └───┘              └─────┘
+
+    说明：
+    · 实线（↓）= FirstChild 指针
+    · 虚线（→）= NextSibling 指针
+    · 原树中"兄弟关系"变成了二叉树中的"右链"
+    · 原树中"父子关系"变成了二叉树中的"左链"
+</div>
+
+<div class="tip-box">
+    💡 <b>关键对应：</b>原树中，A有三个孩子E、F、I。在孩子兄弟表示法中，A的FirstChild=E，然后E→F→I通过NextSibling串联。原树中I有三个孩子D、G、H，同理：I的FirstChild=D，D→G→H通过NextSibling串联。
+</div>
+</div>
+
+<!-- ============ THREE REPRESENTATIONS ============ -->
+<div class="card blue">
+<h2>四、三种表示法对比</h2>
+
+<table>
+    <tr><th>表示法</th><th>存储结构</th><th>找双亲</th><th>找孩子</th><th>找兄弟</th><th>空间</th><th>适用场景</th></tr>
+    <tr>
+        <td><b>双亲表示法</b></td>
+        <td>一维数组，每个元素存data+parent下标</td>
+        <td style="color:var(--green);font-weight:700;">O(1) ✓</td>
+        <td style="color:#dc2626;">O(n) ✗</td>
+        <td style="color:#dc2626;">O(n) ✗</td>
+        <td>O(n)</td>
+        <td>并查集、频繁找双亲</td>
+    </tr>
+    <tr>
+        <td><b>孩子链表法</b></td>
+        <td>数组+链表，每个结点挂一个孩子链表</td>
+        <td style="color:#dc2626;">O(n) ✗</td>
+        <td style="color:var(--green);font-weight:700;">O(1) ✓</td>
+        <td style="color:#d97706;">O(k)</td>
+        <td>O(n+e)</td>
+        <td>频繁找孩子</td>
+    </tr>
+    <tr>
+        <td><b>孩子兄弟法</b></td>
+        <td>二叉链表（left=孩子, right=兄弟）</td>
+        <td style="color:#dc2626;">O(n) ✗</td>
+        <td style="color:var(--green);font-weight:700;">O(1) ✓</td>
+        <td style="color:var(--green);font-weight:700;">O(1) ✓</td>
+        <td>O(n)</td>
+        <td>通用、可转二叉树</td>
+    </tr>
+</table>
+
+<h3>4.1 双亲表示法的结构定义</h3>
+<div class="code-block">
+<span class="cmt">/* 双亲表示法 —— 顺序存储 */</span>
+<span class="kw">#define</span> MAX_SIZE 100
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">char</span> Data;              <span class="cmt">// 结点数据</span>
+    <span class="type">int</span>  Parent;           <span class="cmt">// 双亲在数组中的下标，-1表示根</span>
+} <span class="type">PTNode</span>;
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="type">PTNode</span> nodes[MAX_SIZE];
+    <span class="type">int</span>    n;               <span class="cmt">// 结点总数</span>
+} <span class="type">PTree</span>;
+</div>
+
+<h3>4.2 孩子兄弟表示法的结构定义</h3>
+<div class="code-block">
+<span class="cmt">/* 孩子兄弟表示法 —— 链式存储（二叉链表） */</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">CSNode</span> {
+    <span class="type">char</span> Data;
+    <span class="kw">struct</span> <span class="type">CSNode</span> *FirstChild;   <span class="cmt">// 指向第一个孩子</span>
+    <span class="kw">struct</span> <span class="type">CSNode</span> *NextSibling;  <span class="cmt">// 指向下一个兄弟</span>
+} <span class="type">CSNode</span>, *<span class="type">CSTree</span>;
+</div>
+
+<h3>4.3 操作复杂度对比</h3>
+<table>
+    <tr><th>操作</th><th>双亲表示法</th><th>孩子链表法</th><th>孩子兄弟法</th></tr>
+    <tr><td>查找双亲</td><td style="color:var(--green);">O(1)</td><td style="color:#dc2626;">O(n)</td><td style="color:#dc2626;">O(n)</td></tr>
+    <tr><td>查找所有孩子</td><td style="color:#dc2626;">O(n)</td><td style="color:var(--green);">O(孩子数)</td><td style="color:var(--green);">O(孩子数)</td></tr>
+    <tr><td>查找兄弟</td><td style="color:#dc2626;">O(n)</td><td style="color:#d97706;">O(孩子数)</td><td style="color:var(--green);">O(兄弟数)</td></tr>
+    <tr><td>插入结点</td><td style="color:var(--green);">O(1)</td><td style="color:var(--green);">O(1)</td><td style="color:var(--green);">O(1)</td></tr>
+    <tr><td>遍历整棵树</td><td style="color:#dc2626;">困难</td><td style="color:var(--green);">方便</td><td style="color:var(--green);">方便</td></tr>
+</table>
+</div>
+
+<!-- ============ VISUAL COMPARISON ============ -->
+<div class="card">
+<h2>五、双亲→树形→孩子兄弟 完整转换流程</h2>
+
+<div class="ascii-art">
+  ┌──────────────────────────────────────────────────────────────┐
+  │                    三种表示法对照图                            │
+  ├──────────────────────────────────────────────────────────────┤
+  │                                                               │
+  │  【双亲表示法（数组）】                                        │
+  │  idx:  0   1   2   3   4   5   6   7   8                      │
+  │  data: A   B   C   D   E   F   G   H   I                      │
+  │  par:  1  -1   4   8   0   0   8   8   0                      │
+  │                                                               │
+  │         ↓ 还原 ↓                                              │
+  │                                                               │
+  │  【原树（树形）】                   【孩子兄弟表示法（二叉树）】│
+  │                                                               │
+  │       B                               B                       │
+  │       │                               │                       │
+  │       A                               A → NULL                │
+  │     / | \                             │                       │
+  │    E  F  I              →             E → F → I → NULL        │
+  │   /     /|\                           │       │               │
+  │  C     D G H                          C       D → G → H →NULL │
+  │                                                               │
+  └──────────────────────────────────────────────────────────────┘
+</div>
+
+<div class="tip-box">
+    💡 <b>核心变换规则：</b>原树的"父子关系"变为二叉树的"左孩子"，原树的"兄弟关系"变为二叉树的"右孩子"。任何一棵树都可以通过这个规则唯一映射为一棵二叉树（根没有兄弟，所以根的右指针恒为NULL）。
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card green">
+<h2>六、常见错误 &amp; 考点提醒</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：双亲表示法的下标搞混。</b>parent存储的是<b>数组下标</b>，不是数据本身。A的parent=1表示双亲是nodes[1]=B；而E的parent=0表示双亲是nodes[0]=A。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：还原树时漏掉多孩子。</b>一个结点可能是多个结点的双亲（如A是E、F、I的双亲）。还原时必须找出所有parent等于该结点下标的结点。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：孩子兄弟法中兄弟链顺序错。</b>兄弟链必须按某种顺序（如从左到右）。本题中A的三个孩子按E→F→I的顺序串联，不要写成F→E→I。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：混淆"结点的度"和"树的度"。</b>结点A的度=3（3个孩子），结点E的度=1，结点I的度=3。树的度=max(各结点的度)=3。
+</div>
+
+<div class="tip-box">
+    💡 <b>考点本质：</b>双亲表示法是并查集的基础存储结构；孩子兄弟表示法是将树转化为二叉树的关键桥梁。掌握二者的相互转换是考试重点。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测验2026春 · 双亲表示法与树存储结构 · 第12题详解
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第6题 · 矩阵的压缩存储</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(139,111,192,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1rem 0;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .88rem; line-height: 1.75; overflow-x: auto;
+    white-space: pre; color: #c8d6e5;
+  }
+  .code-block .kw { color: #c084fc; font-weight: 700; }
+  .code-block .fn { color: #6ee7b7; }
+  .code-block .cmt { color: #6b7280; font-style: italic; }
+  .code-block .num { color: #fbbf24; }
+  .code-block .blank { color: #e0556a; text-decoration: underline; text-underline-offset: 4px; }
+
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  .ascii-box {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    font-size: .82rem; line-height: 1.45; white-space: pre;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.5rem; overflow-x: auto;
+    margin: 1rem 0; color: #bcc8d8;
+  }
+  .ascii-box .hl { color: var(--gold); font-weight: 700; }
+  .ascii-box .g  { color: var(--green); }
+  .ascii-box .r  { color: var(--red); }
+  .ascii-box .b  { color: var(--blue); }
+  .ascii-box .c  { color: var(--cyan); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第6题</div>
+  <h1>📐 矩阵的压缩存储</h1>
+  <div class="q-box">
+    下列矩阵中，<strong>可以</strong>进行压缩存储的是（　）。<br><br>
+    A. 对称矩阵 &nbsp;&nbsp; B. 三角矩阵 &nbsp;&nbsp; C. 对角矩阵 &nbsp;&nbsp; <strong>D. 以上都可以</strong>
+  </div>
+</div>
+
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">D — 以上都可以</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">对称矩阵、三角矩阵、对角矩阵都能压缩存储</div>
+</div>
+
+<!-- ==================== 1: WHY COMPRESS ==================== -->
+<div class="section">
+  <h2>一、为什么要压缩存储？</h2>
+  <div class="card">
+    <p>很多特殊矩阵有大量<strong>重复元素</strong>或<strong>零元素</strong>。如果按普通二维数组存储，会浪费大量空间。</p>
+    <p>压缩存储的核心思想：<span class="hl">只存储有用的（非零/不重复的）元素</span>，通过公式计算位置。</p>
+
+    <table>
+      <tr><th>矩阵类型</th><th>n×n矩阵的元素总数</th><th>压缩后存储量</th><th>节省比例</th></tr>
+      <tr><td>普通矩阵</td><td>n²</td><td>n²</td><td>0%</td></tr>
+      <tr><td>对称矩阵</td><td>n²</td><td>n(n+1)/2</td><td>≈ 50%</td></tr>
+      <tr><td>三角矩阵</td><td>n²</td><td>n(n+1)/2 + 1</td><td>≈ 50%</td></tr>
+      <tr><td>三对角矩阵</td><td>n²</td><td>3n-2</td><td>≈ 1 - 3/n</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 2: SYMMETRIC MATRIX ==================== -->
+<div class="section">
+  <h2>二、对称矩阵 —— 以对角线为轴，两边对称</h2>
+  <div class="card">
+    <p><strong>定义：</strong>a<sub>ij</sub> = a<sub>ji</sub>，即关于主对角线对称。存储时可以<strong>只存下三角（或上三角）</strong>。</p>
+
+    <div class="ascii-box">
+<span class="hl">对称矩阵（4×4）</span>
+    列: 0    1    2    3
+  行 ┌────┬────┬────┬────┐
+  0  │ <span class="g">1</span>  │ <span class="b">2</span>  │ <span class="c">3</span>  │ <span class="r">4</span>  │
+    ├────┼────┼────┼────┤
+  1  │ <span class="b">2</span>  │ <span class="g">5</span>  │ <span class="c">6</span>  │ <span class="r">7</span>  │     ← 注意：a[0][1]=2, a[1][0]=2 (相等!)
+    ├────┼────┼────┼────┤
+  2  │ <span class="c">3</span>  │ <span class="c">6</span>  │ <span class="g">8</span>  │ <span class="r">9</span>  │
+    ├────┼────┼────┼────┤
+  3  │ <span class="r">4</span>  │ <span class="r">7</span>  │ <span class="r">9</span>  │ <span class="g">10</span> │
+    └────┴────┴────┴────┘
+
+<span class="hl">压缩存储（只存下三角，按行优先）</span>
+  一维数组 B[k]：<span class="g">[1, 2, 5, 3, 6, 8, 4, 7, 9, 10]</span>
+  元素个数 = n(n+1)/2 = 4×5/2 = <span class="hl">10个</span>（原始16个→节省37.5%）
+
+<span class="hl">地址映射公式（下三角，行优先，i≥j）：</span>
+  k = i(i+1)/2 + j    （0-based下标）</div>
+
+    <div class="code-block"><span class="cmt">// 访问对称矩阵元素 a[i][j]</span>
+<span class="kw">int</span> <span class="fn">getSym</span>(<span class="kw">int</span> B[], <span class="kw">int</span> i, <span class="kw">int</span> j) {
+    <span class="kw">if</span> (i >= j)
+        <span class="kw">return</span> B[i*(i+<span class="num">1</span>)/<span class="num">2</span> + j];  <span class="cmt">// 下三角</span>
+    <span class="kw">else</span>
+        <span class="kw">return</span> B[j*(j+<span class="num">1</span>)/<span class="num">2</span> + i];  <span class="cmt">// 利用对称性，转置访问</span>
+}</div>
+  </div>
+</div>
+
+<!-- ==================== 3: TRIANGULAR MATRIX ==================== -->
+<div class="section">
+  <h2>三、三角矩阵 —— 对角线一侧全是同一个常数</h2>
+  <div class="card">
+    <p><strong>定义：</strong>对角线以上（或以下）全是同一个常数（通常是0）。上三角矩阵：下三角全为常数；下三角矩阵：上三角全为常数。</p>
+
+    <div class="ascii-box">
+<span class="hl">下三角矩阵（4×4），上三角全为0</span>
+    列: 0    1    2    3
+  行 ┌────┬────┬────┬────┐
+  0  │ <span class="g">1</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │
+    ├────┼────┼────┼────┤
+  1  │ <span class="b">2</span>  │ <span class="g">5</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │     
+    ├────┼────┼────┼────┤
+  2  │ <span class="c">3</span>  │ <span class="c">6</span>  │ <span class="g">8</span>  │ <span class="r">0</span>  │
+    ├────┼────┼────┼────┤
+  3  │ <span class="r">4</span>  │ <span class="r">7</span>  │ <span class="r">9</span>  │ <span class="g">10</span> │
+    └────┴────┴────┴────┘
+
+<span class="hl">压缩存储：下三角 n(n+1)/2 个元素 + 1个常数</span>
+  一维数组 B[k]：<span class="g">[1, 2, 5, 3, 6, 8, 4, 7, 9, 10,</span> <span class="r">0</span><span class="g">]</span>
+  元素个数 = n(n+1)/2 + 1 = <span class="hl">11个</span></div>
+  </div>
+</div>
+
+<!-- ==================== 4: DIAGONAL MATRIX ==================== -->
+<div class="section">
+  <h2>四、对角矩阵 —— 只有对角线附近有非零元素</h2>
+  <div class="card">
+    <p><strong>定义：</strong>所有非零元素集中在主对角线及其两侧若干条对角线上。最常见的是<strong>三对角矩阵</strong>。</p>
+
+    <div class="ascii-box">
+<span class="hl">三对角矩阵（5×5）—— 只有3条对角线有非零元素</span>
+    列: 0    1    2    3    4
+  行 ┌────┬────┬────┬────┬────┐
+  0  │ <span class="g">a</span>  │ <span class="b">b</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │
+    ├────┼────┼────┼────┼────┤
+  1  │ <span class="c">c</span>  │ <span class="g">d</span>  │ <span class="b">e</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │     
+    ├────┼────┼────┼────┼────┤
+  2  │ <span class="r">0</span>  │ <span class="c">f</span>  │ <span class="g">g</span>  │ <span class="b">h</span>  │ <span class="r">0</span>  │
+    ├────┼────┼────┼────┼────┤
+  3  │ <span class="r">0</span>  │ <span class="r">0</span>  │ <span class="c">i</span>  │ <span class="g">j</span>  │ <span class="b">k</span>  │
+    ├────┼────┼────┼────┼────┤
+  4  │ <span class="r">0</span>  │ <span class="r">0</span>  │ <span class="r">0</span>  │ <span class="c">l</span>  │ <span class="g">m</span>  │
+    └────┴────┴────┴────┴────┘
+
+<span class="hl">压缩存储（按行优先，只存3条对角线）</span>
+  一维数组 B[k]：<span class="g">[a,b,</span> <span class="b">c,d,e,</span> <span class="c">f,g,h,</span> <span class="hl">i,j,k,</span> <span class="r">l,m</span><span class="g">]</span>
+  元素个数 = 3n - 2 = 3×5 - 2 = <span class="hl">13个</span>（原始25个→节省48%）
+
+<span class="hl">地址映射公式（三对角，行优先，|i-j|≤1）：</span>
+  k = 2i + j    （简化公式，第0行特殊处理）</div>
+  </div>
+</div>
+
+<!-- ==================== 5: COMPARISON TABLE ==================== -->
+<div class="section">
+  <h2>五、三种压缩矩阵对比汇总</h2>
+  <div class="card">
+    <table>
+      <tr><th>矩阵类型</th><th>特点</th><th>压缩后元素数</th><th>压缩条件</th></tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">对称矩阵</td>
+        <td>a<sub>ij</sub> = a<sub>ji</sub></td>
+        <td>n(n+1)/2</td>
+        <td>只存上三角或下三角</td>
+      </tr>
+      <tr>
+        <td style="color:var(--gold);font-weight:700">三角矩阵</td>
+        <td>上/下三角全为常数c</td>
+        <td>n(n+1)/2 + 1</td>
+        <td>存非三角部分+常数c</td>
+      </tr>
+      <tr>
+        <td style="color:var(--purple);font-weight:700">对角矩阵</td>
+        <td>仅对角线附近非零</td>
+        <td>3n-2（三对角）</td>
+        <td>只存对角线带</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>🔑 共同点：</strong>这三种矩阵都有<strong>冗余信息</strong>（重复值或零值），因此都可以压缩存储。压缩的本质是<strong>用空间换时间</strong>的反向操作——<strong>用计算时间换存储空间</strong>。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: OPTIONS ==================== -->
+<div class="section">
+  <h2>六、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>矩阵类型</th><th>可压缩？</th><th>压缩方式</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">A</td>
+        <td>对称矩阵</td>
+        <td class="good">✅ 可以</td>
+        <td>只存上三角或下三角</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td>三角矩阵</td>
+        <td class="good">✅ 可以</td>
+        <td>存非三角区+常数</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">C</td>
+        <td>对角矩阵</td>
+        <td class="good">✅ 可以</td>
+        <td>只存对角线带</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--gold)">D</td>
+        <td><strong>以上都可以</strong></td>
+        <td class="good" style="font-size:1.1rem">✅ 全部可以！</td>
+        <td>三种都是经典压缩存储场景</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 7: FORMULA SUMMARY ==================== -->
+<div class="section">
+  <h2>七、地址映射公式速查</h2>
+  <div class="card">
+    <table>
+      <tr><th>矩阵类型</th><th>存储方式</th><th>下标k = ?（0-based，行优先）</th></tr>
+      <tr>
+        <td>对称矩阵（下三角）</td>
+        <td>i ≥ j 时存，否则用a<sub>ji</sub></td>
+        <td style="font-family:monospace">k = i(i+1)/2 + j</td>
+      </tr>
+      <tr>
+        <td>下三角矩阵</td>
+        <td>i ≥ j 存具体值；i < j 存常数c</td>
+        <td style="font-family:monospace">k = i(i+1)/2 + j（i≥j）<br>最后位置存c</td>
+      </tr>
+      <tr>
+        <td>三对角矩阵</td>
+        <td>|i-j| ≤ 1 存值，否则不存</td>
+        <td style="font-family:monospace">k = 2i + j（i=0时k=j）</td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <strong>🎯 考试重点：</strong>对称矩阵的下标计算公式 <code>k = i(i+1)/2 + j</code> 是高频考点，务必记住！推导思路：第 i 行前面有 i 行（0到i-1），共 i(i+1)/2 个元素，加上本行偏移 j。
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 矩阵压缩存储是第4章数组部分的扩展内容。理解"冗余→压缩"的思想，掌握下标计算公式即可。
+</div>
+
+</div>
+</body>
+</html>

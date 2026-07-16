@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>填空11 · 算法五特性</title>
+<style>
+:root {
+  --bg: #0d1b2a;
+  --card: #112233;
+  --text: #c8d6e5;
+  --muted: #6b7d95;
+  --gold: #e2b04a;
+  --gold-light: #f0d078;
+  --cyan: #4dc9f6;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --pink: #fd79a8;
+  --border: #1a3350;
+  --code-bg: #0a1525;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 16px;
+}
+.container { max-width: 920px; margin:0 auto; padding:2.5rem 1.5rem; }
+
+/* 彩色header */
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #0a1628 0%, #152238 50%, #0a1628 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 2rem;
+}
+.header h1 {
+  font-size: 2rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.header .subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* 答案框 */
+.answer-box {
+  text-align: center;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: rgba(226,176,74,0.08);
+  margin: 1.5rem 0;
+}
+.answer-box .big {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  font-family: 'Cascadia Code','Consolas',monospace;
+}
+.answer-box .note {
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+/* 章节 */
+.section { margin: 2rem 0; }
+.section h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 1rem;
+}
+.section h3 {
+  font-size: 1.05rem;
+  color: var(--cyan);
+  margin: 1.3rem 0 0.6rem;
+}
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.8rem;
+  margin: 1rem 0;
+}
+
+/* step圆圈 */
+.step {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  margin: 0.6rem 0;
+}
+.step-num {
+  display: inline-block;
+  width: 34px; height: 34px;
+  line-height: 34px;
+  text-align: center;
+  background: var(--gold);
+  color: #0d1b2a;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* 深色代码块 */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+code {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  background: #0a1525;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+pre code { background: transparent; padding: 0; color: #c8d6e5; }
+
+/* 语法高亮 */
+.kw { color: #c792ea; }        /* keyword */
+.fn { color: #82aaff; }        /* function */
+.str { color: #c3e88d; }      /* string */
+.num { color: #f78c6c; }      /* number */
+.cm { color: #546e7a; }       /* comment */
+.op { color: #89ddff; }       /* operator */
+.type { color: #ffcb6b; }     /* type */
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th {
+  background: #152238;
+  color: var(--gold);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gold);
+  text-align: center;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  background: var(--card);
+}
+tr.hl td { background: rgba(226,176,74,0.1); }
+
+/* ASCII art */
+.ascii {
+  font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  color: #c8d6e5;
+}
+
+/* tip / danger */
+.tip {
+  background: rgba(226,176,74,0.08);
+  border: 1px solid rgba(226,176,74,0.3);
+  border-left: 5px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+.danger {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-left: 5px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+}
+
+/* 语法高亮着色span */
+.hl-gold { color: var(--gold-light); font-weight: 700; }
+.hl-cyan { color: var(--cyan); }
+.hl-red { color: var(--red); }
+.hl-green { color: var(--green); }
+.hl-pink { color: var(--pink); }
+
+ul, ol { padding-left: 1.8rem; }
+li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📝 填空第1题 · 算法的五大特性</h1>
+  <p class="subtitle">算法五特性缺"有穷性" —— 用菜谱类比理解</p>
+</div>
+
+<div class="answer-box">
+  <div class="big">缺失特性：<span style="color:var(--gold-light)">有穷性（Finiteness）</span></div>
+  <div class="note">算法必须在执行有限步之后终止 —— 不能是"死循环"</div>
+</div>
+
+<!-- ============ 第1节：五大特性 ============ -->
+<div class="section">
+  <h2>一、算法的五大特性总览</h2>
+  <div class="card">
+    <p>算法（Algorithm）是对特定问题求解步骤的一种描述，是指令的有限序列。一个合格的算法必须同时满足以下<strong>五个特性</strong>：</p>
+  </div>
+
+  <table>
+    <tr><th style="width:15%">序号</th><th style="width:22%">特性</th><th style="width:18%">英文</th><th>含义</th></tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">1</span></td>
+      <td><strong>有穷性</strong></td>
+      <td>Finiteness</td>
+      <td style="text-align:left">算法必须在执行<strong>有限步骤</strong>之后终止，不能无限循环下去。每一步也必须在有限时间内完成。</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">2</span></td>
+      <td><strong>确定性</strong></td>
+      <td>Definiteness</td>
+      <td style="text-align:left">每一条指令必须有确切的含义，<strong>不能有二义性</strong>。同样的输入必须得到同样的输出。</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">3</span></td>
+      <td><strong>可行性</strong></td>
+      <td>Effectiveness</td>
+      <td style="text-align:left">每一条操作都是<strong>基本的、可执行的</strong>。通过已实现的基本运算执行有限次来实现。</td>
+    </tr>
+    <tr>
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;">4</span></td>
+      <td><strong>输入</strong></td>
+      <td>Input</td>
+      <td style="text-align:left">算法有<strong>零个或多个</strong>输入。输入取自某个特定对象的集合。</td>
+    </tr>
+    <tr class="hl">
+      <td><span class="step-num" style="width:28px;height:28px;line-height:28px;font-size:0.8rem;background:var(--red);">★</span></td>
+      <td><strong>输出</strong></td>
+      <td>Output</td>
+      <td style="text-align:left">算法至少有一个<strong>输出</strong>。没有输出的算法是没有意义的。</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ 第2节：有穷性 ============ -->
+<div class="section">
+  <h2>二、重点：有穷性（Finiteness）—— 最容易被遗漏的特性</h2>
+  <div class="card">
+    <h3>🔑 什么是有穷性？</h3>
+    <p><strong>有穷性</strong>要求算法在执行了<strong>有限步</strong>之后必须结束。注意与"确定性"和"可行性"的区分：</p>
+    <ul>
+      <li><span class="hl-cyan">确定性</span> = 每一步做什么是明确的</li>
+      <li><span class="hl-cyan">可行性</span> = 每一步能够做到</li>
+      <li><span class="hl-gold">有穷性</span> = 总步数是有限的，最终会停下来</li>
+    </ul>
+  </div>
+
+  <h3>🥘 菜谱类比法（帮助记忆）</h3>
+  <div class="card">
+    <div class="ascii">
+┌─────────────────────────────────────────────────────────┐
+│                    算法五特性  vs  菜谱五要素              │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  📋 有穷性   = 菜谱有"最后一步"（出锅装盘）              │
+│                → 不能是"翻炒至永远"的死循环               │
+│                                                         │
+│  📋 确定性   = 每步写清楚：盐少许 → ❌ / 盐5克 → ✅      │
+│                → "少许"有歧义，"5克"确定                  │
+│                                                         │
+│  📋 可行性   = 每步都能做到：切菜、翻炒、加水             │
+│                → 不能出现"用激光切割葱花"                 │
+│                                                         │
+│  📋 输入     = 食材（可以有0种，比如煮白开水）            │
+│                                                         │
+│  📋 输出     = 成品菜（必须得有！不能空手进厨房）          │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+    </div>
+  </div>
+
+  <h3>⚠️ 有穷性 vs 程序的区别</h3>
+  <div class="danger">
+    <strong>重要区分：</strong>程序（Program）可以不满足有穷性。例如操作系统是一个程序，它设计成"永远运行"（死循环等待用户输入）。但<strong>算法必须终止</strong>。所以：<strong>算法是满足有穷性的程序</strong>，但并非所有程序都是算法。
+  </div>
+</div>
+
+<!-- ============ 第3节：五个特性逐一详解 ============ -->
+<div class="section">
+  <h2>三、五大特性逐一详解</h2>
+
+  <div class="card">
+    <h3><span class="step-num">1</span> 有穷性（Finiteness）</h3>
+    <p>对任何合法输入，算法在执行了<strong>有穷步</strong>操作之后必须终止，且每一步都在<strong>有穷时间</strong>内完成。这是算法与一般计算过程的本质区别。</p>
+    <pre><span class="cm">// ❌ 不满足有穷性 —— 这不是算法</span>
+<span class="kw">while</span> (<span class="num">true</span>) {
+    <span class="fn">printf</span>(<span class="str">"我永远运行..."</span>);
+}
+
+<span class="cm">// ✅ 满足有穷性 —— 这是算法</span>
+<span class="kw">for</span> (<span class="type">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+    <span class="fn">printf</span>(<span class="str">"执行%d次后终止"</span>, i);
+}</pre>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">2</span> 确定性（Definiteness）</h3>
+    <p>算法的每一条指令都必须有<strong>确切的、无歧义</strong>的含义。在任何条件下，对于相同的输入，算法<strong>只有唯一的一条执行路径</strong>，即相同的输出。</p>
+    <pre><span class="cm">// ❌ 有歧义：arr[不确定的索引]</span>
+<span class="type">int</span> x = arr[<span class="fn">random</span>() % n];
+
+<span class="cm">// ✅ 确定：每次取arr[0]</span>
+<span class="type">int</span> x = arr[<span class="num">0</span>];</pre>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">3</span> 可行性（Effectiveness）</h3>
+    <p>算法中描述的操作都是可以通过已经实现的<strong>基本运算</strong>执行<strong>有限次</strong>来实现的。不能出现"算一下这个积分"这种模糊操作。</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">4</span> 输入（Input）</h3>
+    <p>算法可以接受<strong>零个或多个</strong>输入。零输入的例子：打印"Hello World"。多个输入的例子：排序算法需要传入一个数组。</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="step-num">5</span> 输出（Output）</h3>
+    <p>算法<strong>至少有一个</strong>输出 —— 它是算法对输入进行加工处理后的结果。没有输出的"算法"等于白忙活，没有意义。输出不一定是打印到屏幕，也可以是返回值、文件写入等。</p>
+  </div>
+</div>
+
+<!-- ============ 第4节：记忆口诀 ============ -->
+<div class="section">
+  <h2>四、记忆口诀 & 常见考题陷阱</h2>
+  <div class="card">
+    <div style="text-align:center;font-size:1.3rem;color:var(--gold-light);padding:1rem;font-weight:700;">
+      "有穷确定可行，输入可有可无，输出至少一个"
+    </div>
+    <p style="text-align:center;color:var(--muted);margin-top:0.5rem;">五个一组：有穷→确定→可行→输入→输出</p>
+  </div>
+
+  <div class="danger">
+    <strong>⚠️ 考试容易混淆的点：</strong><br><br>
+    <strong>① "算法 = 程序"？</strong> → ❌ 错！程序可以不满足有穷性（如操作系统），但算法必须满足。算法是有穷的程序。<br><br>
+    <strong>② "算法可以没有输入"？</strong> → ✅ 对！允许零个输入。<br><br>
+    <strong>③ "算法可以没有输出"？</strong> → ❌ 错！必须至少有一个输出，否则算法无意义。<br><br>
+    <strong>④ 经常漏掉的是哪一特性？</strong> → <span class="hl-gold">有穷性</span>！其他四个容易想到，有穷性容易被忽略。
+  </div>
+
+  <div class="tip">
+    <strong>🎯 练习建议：</strong>用菜谱类比法，对每一个算法问题（排序、查找等），在脑中过一遍五特性检查清单。做到"五特性脱口而出"。
+  </div>
+</div>
+
+</div>
+</body>
+</html>

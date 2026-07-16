@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编程题：双向链表删除头结点</title>
+<style>
+    :root {
+        --bg: #fff7ed;
+        --fg: #3e2723;
+        --accent: #ea580c;
+        --accent2: #7c3aed;
+        --green: #059669;
+        --blue: #0f766e;
+        --card-bg: #ffffff;
+        --border: #f0d9c8;
+        --shadow: 0 2px 14px rgba(234,88,12,0.07);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: "Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+        background: linear-gradient(160deg, #fff7ed 0%, #fef0e6 40%, #fde8d8 100%);
+        color: var(--fg);
+        line-height: 1.85;
+        min-height: 100vh;
+    }
+    .container { max-width: 980px; margin:0 auto; padding: 2rem 1.5rem; }
+    header {
+        text-align: center; padding: 2.5rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #9a3412, #ea580c);
+        color: #fff; border-radius: 0 0 24px 24px;
+        box-shadow: 0 6px 24px rgba(154,52,18,0.3);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 1px; }
+    header .subtitle { font-size: 1.05rem; opacity: 0.85; margin-top: 0.4rem; }
+    .answer-badge {
+        display: inline-block; background: #facc15; color: #1a1a2e;
+        font-weight: 700; padding: 0.35rem 1.2rem; border-radius: 20px;
+        margin-top: 0.8rem; font-size: 1rem;
+    }
+    .card {
+        background: var(--card-bg); border-radius: 14px;
+        padding: 1.8rem 2rem; margin: 1.5rem 0;
+        box-shadow: var(--shadow); border-left: 5px solid var(--accent);
+    }
+    .card.green  { border-left-color: var(--green); }
+    .card.purple { border-left-color: var(--accent2); }
+    .card.blue   { border-left-color: var(--blue); }
+    h2 {
+        font-size: 1.45rem; margin-bottom: 0.8rem;
+        color: var(--accent); border-bottom: 2px dashed #f0d9c8;
+        padding-bottom: 0.4rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1rem 0 0.5rem; color: #7c2d12; }
+    p { margin: 0.6rem 0; text-indent: 2em; }
+    p.ni { text-indent: 0; }
+    .code-block {
+        background: #1c1917; color: #e7e5e4; border-radius: 10px;
+        padding: 1.2rem 1.5rem; font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.75; overflow-x: auto; margin: 1rem 0;
+        white-space: pre;
+    }
+    .code-block .kw { color: #fb923c; }
+    .code-block .type { color: #c084fc; }
+    .code-block .fn { color: #4ade80; }
+    .code-block .cmt { color: #78716c; }
+    .code-block .num { color: #fca5a5; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .blank { background: #facc15; color: #1c1917; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .code-block .blank2 { background: #4ade80; color: #1c1917; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .code-block .blank3 { background: #c084fc; color: #1c1917; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+    .ascii-art {
+        font-family: "Fira Code","Cascadia Code","Consolas",monospace;
+        font-size: 0.9rem; line-height: 1.5;
+        background: #faf7f5; padding: 1.2rem 1.5rem;
+        border-radius: 10px; overflow-x: auto;
+        white-space: pre; border: 2px solid #e7d6c8;
+        margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+    }
+    th, td {
+        border: 1px solid #ddd; padding: 0.55rem 0.8rem;
+        text-align: center; font-size: 0.95rem;
+    }
+    th { background: var(--accent); color: #fff; font-weight: 600; }
+    tr:nth-child(even) td { background: #fff7ed; }
+    .highlight { background: #fef3c7 !important; font-weight: 700; }
+    .del-row { background: #fde8e8 !important; }
+    .tip-box {
+        background: #ecfdf5; border-left: 4px solid var(--green);
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .warn-box {
+        background: #fef3c7; border-left: 4px solid #d97706;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .dang-box {
+        background: #fde8e8; border-left: 4px solid #dc2626;
+        padding: 1rem 1.3rem; border-radius: 0 10px 10px 0; margin: 1.2rem 0;
+    }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; background: var(--accent); color: #fff;
+        border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    footer {
+        text-align: center; color: #999; font-size: 0.85rem;
+        margin-top: 2rem; padding: 1rem 0; border-top: 1px solid #f0d9c8;
+    }
+    @media (max-width:600px) {
+        .container { padding: 1rem 0.6rem; }
+        .card { padding: 1rem 1.2rem; }
+        header h1 { font-size: 1.3rem; }
+        .code-block { font-size: 0.75rem; padding: 0.8rem; }
+        .ascii-art { font-size: 0.7rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🔗 编程题：双向链表删除头结点</h1>
+    <div class="subtitle">第13题 · 补全Delete_head函数，删除带头双向链表的第一结点</div>
+    <div class="answer-badge">
+        ✅ 填空：(1) L-&gt;Next==NULL &nbsp; (2) q=L-&gt;Next &nbsp; (3) q-&gt;Next-&gt;Previous=L
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ============ PROBLEM ============ -->
+<div class="card">
+<h2>一、题目回顾：原题代码框架</h2>
+
+<h3>1.1 数据结构定义</h3>
+<div class="code-block">
+<span class="kw">struct</span> <span class="type">DNode</span> {
+    <span class="type">ElementType</span> Data;
+    <span class="kw">struct</span> <span class="type">Node</span> *Next, *Previous;   <span class="cmt">// 后继指针 + 前驱指针</span>
+};
+</div>
+
+<h3>1.2 待补全函数</h3>
+<div class="code-block">
+<span class="kw">void</span> <span class="fn">Delete_head</span>(<span class="kw">struct</span> <span class="type">DNode</span> *L) {
+    <span class="kw">struct</span> <span class="type">DNode</span> *q;
+
+    <span class="kw">if</span> (<span class="blank">                    </span>)   <span class="cmt">// ─── 填空①：判断链表L是否空表</span>
+        <span class="kw">return</span>;
+
+    <span class="blank2">                         </span>;  <span class="cmt">// ─── 填空②：让q指向要删除的结点</span>
+
+    L-&gt;Next = q-&gt;Next;                    <span class="cmt">// ─── ④ 头结点跳过q</span>
+
+    <span class="kw">if</span> (q-&gt;Next != <span class="kw">NULL</span>)
+        <span class="blank3">                                    </span>;  <span class="cmt">// ─── 填空③：后继结点的前驱回指L</span>
+
+    <span class="fn">free</span>(q);                              <span class="cmt">// ─── ⑥ 释放被删结点</span>
+}
+</div>
+</div>
+
+<!-- ============ LIST STRUCTURE ============ -->
+<div class="card green">
+<h2>二、带头双向链表的结构</h2>
+
+<h3>2.1 什么是"带头结点的双向链表"？</h3>
+<p>头结点（Header / Dummy Node）是一个<strong>不存储实际数据</strong>的结点，它的存在使得链表的边界操作（如在头部插入/删除）与中间操作统一，无需特殊处理。</p>
+
+<div class="ascii-art">
+    带头结点的双向链表（删除前）：
+
+       ┌─ L（头结点/哑结点）────────────────────────────────────┐
+       │                                                        │
+       ▼                                                        │
+    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+    │  HEADER  │◄───│  Data:   │◄───│  Data:   │◄───│  Data:   │
+    │  (L)     │    │  Node₁   │    │  Node₂   │    │  Node₃   │
+    │          │───▶│  (第1个) │───▶│  (第2个) │───▶│  (第3个) │───▶ NULL
+    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+         ▲               ▲               ▲               ▲
+         │               │               │               │
+      L->Next         q->Next        Node₂.Next     Node₃.Next
+      (指向Node₁)    (指向Node₂)
+
+    指针约定：
+    · 每个结点有两个指针：Next（→后继）和 Previous（←前驱）
+    · 头结点L的Previous通常为NULL（或指向尾结点形成循环链表，本题为NULL）
+    · 最后一个结点的Next为NULL
+    · 空表：L->Next == NULL（头结点后面没有实际结点）
+</div>
+
+<h3>2.2 关键指针关系</h3>
+<table>
+    <tr><th>表达式</th><th>含义</th><th>删除前示例值</th></tr>
+    <tr><td><code>L</code></td><td>头结点指针（函数参数）</td><td>指向Header</td></tr>
+    <tr><td><code>L-&gt;Next</code></td><td>第一个实际结点（或NULL）</td><td>指向Node₁</td></tr>
+    <tr><td><code>q</code></td><td>待删除结点指针（填空②设置）</td><td>L-&gt;Next = Node₁</td></tr>
+    <tr><td><code>q-&gt;Next</code></td><td>待删结点的后继</td><td>指向Node₂</td></tr>
+    <tr><td><code>q-&gt;Next-&gt;Previous</code></td><td>后继结点的前驱指针</td><td>原指向Node₁(q)，需改为L</td></tr>
+</table>
+</div>
+
+<!-- ============ DELETE PROCESS ============ -->
+<div class="card purple">
+<h2>三、删除过程：逐步图解</h2>
+
+<h3>3.1 删除前 → 删除后 对比</h3>
+<div class="ascii-art">
+  ╔══════════════════════════════════════════════════════════════╗
+  ║                     删 除 前                                ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                                                              ║
+  ║      L ──→ ┌──────┐    ┌──────┐    ┌──────┐                ║
+  ║            │Header│◄───│Node₁ │◄───│Node₂ │──→ ...          ║
+  ║            │  L   │───▶│  q   │───▶│      │                ║
+  ║            └──────┘    └──────┘    └──────┘                ║
+  ║                           ↑ 要删除的                        ║
+  ║                                                              ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                     删 除 后                                ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                                                              ║
+  ║      L ──→ ┌──────┐              ┌──────┐                  ║
+  ║            │Header│◄─────────────│Node₂ │──→ ...            ║
+  ║            │  L   │─────────────▶│      │                  ║
+  ║            └──────┘              └──────┘                  ║
+  ║                                                              ║
+  ║      Node₁ 已被 free(q) 释放                                 ║
+  ╚══════════════════════════════════════════════════════════════╝
+</div>
+
+<h3>3.2 逐步操作详解</h3>
+
+<table>
+    <tr><th>步骤</th><th>代码</th><th>操作说明</th><th>示意图</th></tr>
+    <tr>
+        <td><span class="step-num">①</span></td>
+        <td><code>if (L-&gt;Next == NULL) return;</code></td>
+        <td><b>判空：</b>如果头结点后面没有结点，直接返回</td>
+        <td>L.Next → NULL（空表）</td>
+    </tr>
+    <tr class="highlight">
+        <td><span class="step-num">②</span></td>
+        <td><code>q = L-&gt;Next;</code></td>
+        <td><b>定位：</b>q指向第一个实际结点（待删除）</td>
+        <td>q → Node₁</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">④</span></td>
+        <td><code>L-&gt;Next = q-&gt;Next;</code></td>
+        <td><b>前向 bypass：</b>头结点的Next跳过q，直接指向q的后继</td>
+        <td>L.Next → Node₂</td>
+    </tr>
+    <tr>
+        <td><span class="step-num">⑤</span></td>
+        <td><code>if (q-&gt;Next != NULL)<br>&nbsp;&nbsp;&nbsp;&nbsp;q-&gt;Next-&gt;Previous = L;</code></td>
+        <td><b>后向 bypass：</b>后继结点的Previous回指头结点L<br>需先判断q-&gt;Next是否为NULL（q可能是最后一个结点）</td>
+        <td>Node₂.Prev → L</td>
+    </tr>
+    <tr class="del-row">
+        <td><span class="step-num">⑥</span></td>
+        <td><code>free(q);</code></td>
+        <td><b>释放：</b>释放q指向的结点内存</td>
+        <td>Node₁ 被回收</td>
+    </tr>
+</table>
+
+<div class="dang-box">
+    🔴 <b>关键：④⑤顺序为什么不能反？</b><br><br>
+    如果先执行⑤ <code>q-&gt;Next-&gt;Previous = L</code>，再执行④ <code>L-&gt;Next = q-&gt;Next</code>：<br>
+    · 步骤⑤中，q-&gt;Next还是有效的（因为q还没被free，q-&gt;Next仍指向Node₂）——<b>可以正常工作</b>。<br>
+    · 步骤④中，L-&gt;Next被改为q-&gt;Next——也正常。<br><br>
+    <b>那为什么强调顺序？</b> 因为这是"先改前向指针，再改后向指针"的标准范式。在一般的双向链表删除中（不仅限于头结点），如果操作涉及 q->Previous->Next 和 q->Next->Previous，<b>一旦先修改了 q->Next 或 q->Previous 中的一个，就可能影响另一个操作所需的原始值</b>。养成"④→⑤"的习惯能避免在复杂场景中犯错。<br><br>
+    <b>更准确地说：</b>本题中④和⑤操作的是不同字段（L->Next 和 q->Next->Previous），顺序在本题中不影响正确性。但考试中如果问"顺序能否互换"，建议回答<b>"建议④在⑤之前，以保证代码可读性和通用性"</b>。
+</div>
+</div>
+
+<!-- ============ FILL-IN REASONING ============ -->
+<div class="card blue">
+<h2>四、逐空推理：为什么这样填？</h2>
+
+<h3>填空①：<code>L-&gt;Next == NULL</code></h3>
+<p>
+<b>考察点：</b>空表的判定条件。<br>
+带头结点的双向链表中，头结点L始终存在。如果链表为空（没有任何实际数据结点），则头结点的Next指针为NULL。因此 <code>L-&gt;Next == NULL</code> 是判空条件。<br>
+<b>易错：</b>不要写成 <code>L == NULL</code>——头结点L本身一定存在（调用者传入），NULL的只可能是L->Next。也不要写成 <code>q == NULL</code>——此时q还没有被赋值。
+</p>
+
+<h3>填空②：<code>q = L-&gt;Next</code></h3>
+<p>
+<b>考察点：</b>定位待删除结点。<br>
+要删除的是第一个实际结点，它就在头结点L的后面。因此 <code>q = L-&gt;Next</code> 即可让q指向它。<br>
+<b>易错：</b>不要写成 <code>q = L</code>（会删头结点本身！），也不要写成 <code>q = L-&gt;Next-&gt;Next</code>（会跳过第一个结点）。
+</p>
+
+<h3>填空③：<code>q-&gt;Next-&gt;Previous = L</code></h3>
+<p>
+<b>考察点：</b>双向链表的"后向重连"。<br>
+q被删除后，q的后继结点（q-&gt;Next）的前驱指针不再指向q，而应指向L。<br>
+<b>易错：</b>①忘记判空——如果q是最后一个结点（q-&gt;Next == NULL），则q-&gt;Next-&gt;Previous会引发空指针异常。题目已给出if保护。②写成 <code>q-&gt;Previous-&gt;Next = q-&gt;Next</code>——这是删除"中间结点"的写法，但本题q的前驱就是L，所以q-&gt;Previous-&gt;Next就是L-&gt;Next，与④重复但也可行。
+</p>
+</div>
+
+<!-- ============ BOUNDARY CASES ============ -->
+<div class="card">
+<h2>五、边界情况分析</h2>
+
+<table>
+    <tr><th>情况</th><th>链表状态</th><th>L-&gt;Next</th><th>q-&gt;Next</th><th>行为</th></tr>
+    <tr>
+        <td><b>空表</b></td>
+        <td>只有头结点L</td>
+        <td>NULL</td>
+        <td>—</td>
+        <td>填空①检测到NULL，直接return ✓</td>
+    </tr>
+    <tr>
+        <td><b>仅1个结点</b></td>
+        <td>L ⇄ Node₁</td>
+        <td>Node₁</td>
+        <td>NULL</td>
+        <td>④L-&gt;Next=NULL；⑤跳过（q-&gt;Next==NULL）；⑥free(q)。删除后变空表 ✓</td>
+    </tr>
+    <tr>
+        <td><b>≥2个结点</b></td>
+        <td>L ⇄ Node₁ ⇄ Node₂ ⇄ ...</td>
+        <td>Node₁</td>
+        <td>Node₂</td>
+        <td>④L-&gt;Next=Node₂；⑤Node₂-&gt;Previous=L；⑥free(q)。正常删除 ✓</td>
+    </tr>
+</table>
+
+<h3>5.1 单结点删除的详细过程</h3>
+<div class="ascii-art">
+  删除前（仅1个实际结点）：         删除后（空表）：
+  ┌──────┐    ┌──────┐            ┌──────┐
+  │  L   │◄───│Node₁ │            │  L   │
+  │      │───▶│  q   │            │      │───▶ NULL
+  └──────┘    └──────┘            └──────┘
+
+  ④ L-&gt;Next = q-&gt;Next (= NULL)   → L的Next变NULL
+  ⑤ q-&gt;Next == NULL，跳过if体     → 无需处理前驱
+  ⑥ free(q)                       → Node₁被释放
+</div>
+</div>
+
+<!-- ============ COMPLETE TEST ============ -->
+<div class="card purple">
+<h2>六、完整可运行代码（含测试）</h2>
+<div class="code-block">
+<span class="cmt">/* 完整示例：带头双向链表 + Delete_head */</span>
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="type">DNode</span> {
+    <span class="type">int</span> Data;
+    <span class="kw">struct</span> <span class="type">DNode</span> *Next, *Previous;
+} <span class="type">DNode</span>;
+
+<span class="cmt">/* 删除第一个实际结点 */</span>
+<span class="kw">void</span> <span class="fn">Delete_head</span>(<span class="type">DNode</span> *L) {
+    <span class="type">DNode</span> *q;
+    <span class="kw">if</span> (L-&gt;Next == <span class="kw">NULL</span>)        <span class="cmt">// ① 判空</span>
+        <span class="kw">return</span>;
+    q = L-&gt;Next;                 <span class="cmt">// ② q指向第一个结点</span>
+    L-&gt;Next = q-&gt;Next;           <span class="cmt">// ④ 头结点跳过q</span>
+    <span class="kw">if</span> (q-&gt;Next != <span class="kw">NULL</span>)         <span class="cmt">// ⑤ 如果q后面还有结点</span>
+        q-&gt;Next-&gt;Previous = L;   <span class="cmt">//    后继结点的前驱回指L</span>
+    <span class="fn">free</span>(q);                     <span class="cmt">// ⑥ 释放q</span>
+}
+
+<span class="cmt">/* 测试：创建 头⇄10⇄20⇄30 并依次删除 */</span>
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">DNode</span> *L = (<span class="type">DNode</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DNode</span>));
+    L-&gt;Previous = <span class="kw">NULL</span>;
+
+    <span class="cmt">// 插入30, 20, 10（头插法）</span>
+    <span class="kw">for</span> (<span class="type">int</span> v = <span class="num">30</span>; v &gt;= <span class="num">10</span>; v -= <span class="num">10</span>) {
+        <span class="type">DNode</span> *n = (<span class="type">DNode</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="type">DNode</span>));
+        n-&gt;Data = v;
+        n-&gt;Next = L-&gt;Next;
+        n-&gt;Previous = L;
+        <span class="kw">if</span> (L-&gt;Next) L-&gt;Next-&gt;Previous = n;
+        L-&gt;Next = n;
+    }
+    <span class="cmt">// 链表：L ⇄ 10 ⇄ 20 ⇄ 30</span>
+
+    <span class="fn">Delete_head</span>(L);  <span class="cmt">// 删除10 → L ⇄ 20 ⇄ 30</span>
+    <span class="fn">Delete_head</span>(L);  <span class="cmt">// 删除20 → L ⇄ 30</span>
+    <span class="fn">Delete_head</span>(L);  <span class="cmt">// 删除30 → L（空表）</span>
+    <span class="fn">Delete_head</span>(L);  <span class="cmt">// 空表，直接return</span>
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+</div>
+</div>
+
+<!-- ============ COMMON MISTAKES ============ -->
+<div class="card green">
+<h2>七、常见错误 &amp; 考点总结</h2>
+
+<div class="warn-box">
+    ⚠️ <b>错误1：判空条件写成 L==NULL。</b>L是头结点指针，由调用者保证非空。真正的空表条件是<b>头结点后面没有结点</b>，即L-&gt;Next==NULL。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误2：填空③忘记判空保护。</b>如果q是最后一个结点（q-&gt;Next==NULL），直接写q-&gt;Next-&gt;Previous会<b>段错误</b>！题目已给出if保护，填空③只需写操作本身。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误3：填空②写成 q=L。</b>这样会删除头结点本身，导致整个链表结构被破坏。头结点不应该被删除。
+</div>
+
+<div class="warn-box">
+    ⚠️ <b>错误4：混淆Next和Previous的方向。</b>双向链表中，"Next=后继"、"Previous=前驱"。删除时要同时修复<b>前驱的Next</b>（跳过q）和<b>后继的Previous</b>（回指L）。
+</div>
+
+<div class="tip-box">
+    💡 <b>考点本质：</b>三道填空分别考察——①带头链表空表判定；②定位待删结点；③双向链表删除的后向指针修复。核心是理解"头结点是哨兵，不存数据，简化边界"这一设计思想。
+</div>
+
+<div class="tip-box">
+    💡 <b>记忆口诀：</b>"一判空、二定位、三跳前、四回指、五释放"。一二三（Next）是正向链，四（Previous）是反向链——双向链表删除 = 正向反向都绕过被删结点。
+</div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+    数据结构测验2026春 · 双向链表删除头结点 · 第13题详解
+</footer>
+
+</body>
+</html>

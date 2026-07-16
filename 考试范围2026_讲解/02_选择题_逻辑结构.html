@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>第2题 · 逻辑结构分类</title>
+<style>
+  :root {
+    --bg: #0d1b2a; --card: #132238; --text: #d0d9e4; --muted: #8a9bb5;
+    --gold: #e2b04a; --blue: #4a90d9; --cyan: #3ccfcf; --red: #e0556a;
+    --green: #3cb878; --purple: #8b6fc0; --border: #1e3350;
+    --code-bg: #0a1525;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.9; font-size: 16px;
+    min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 15% 15%, rgba(226,176,74,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 85%, rgba(74,144,217,.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; position: relative; z-index: 1; }
+
+  /* HEADER */
+  .header {
+    text-align: center; margin-bottom: 2rem;
+    background: linear-gradient(135deg, #1a3350 0%, #0f2840 50%, #162d45 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c060, var(--gold));
+  }
+  .header .tag { font-size: .75rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: .5rem; }
+  .header h1 { font-size: 2rem; font-weight: 800; color: #fff; margin: 8px 0; text-shadow: 0 0 20px rgba(226,176,74,.3); }
+  .header .q-box {
+    display: inline-block; text-align: left; background: rgba(10,21,37,.6);
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.8rem;
+    font-size: 1.05rem; margin-top: .8rem; color: #c8d6e5;
+  }
+
+  /* ANSWER */
+  .answer {
+    text-align: center; padding: 1.2rem; border: 2px solid var(--gold);
+    border-radius: 12px; background: rgba(226,176,74,.08); margin: 1.5rem 0;
+  }
+  .answer .big {
+    font-size: 2.4rem; font-weight: 900; color: var(--gold);
+    font-family: 'Cascadia Code','Fira Code',monospace;
+  }
+
+  /* SECTION */
+  .section { margin: 2.5rem 0; }
+  .section h2 { font-size: 1.35rem; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 14px; margin-bottom: 1rem; }
+  .section h3 { font-size: 1.1rem; margin: 1.5rem 0 .8rem; color: var(--cyan); }
+
+  /* CARD */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.6rem 1.8rem; margin: 1rem 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+
+  /* TIP / DANGER / INFO */
+  .tip { background: rgba(226,176,74,.06); border: 1px solid rgba(226,176,74,.25); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #e8cc7a; }
+  .danger { background: rgba(224,85,106,.06); border: 1px solid rgba(224,85,106,.25); border-left: 4px solid var(--red); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #f0909a; }
+  .info { background: rgba(74,144,217,.06); border: 1px solid rgba(74,144,217,.25); border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0; padding: 1rem 1.5rem; margin: 1rem 0; color: #90b8e8; }
+
+  /* CODE */
+  code {
+    background: rgba(10,21,37,.7); padding: 2px 7px; border-radius: 4px;
+    font-family: 'Cascadia Code','Fira Code',monospace; font-size: .9em;
+    color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  /* STEP NUMBER */
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; min-width: 36px;
+    background: linear-gradient(135deg, var(--gold), #c99430);
+    color: #0d1b2a; border-radius: 50%; font-weight: 800;
+    font-size: .85rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226,176,74,.3);
+  }
+  .step-row { display: flex; align-items: flex-start; gap: 12px; margin: .8rem 0; }
+  .step-row .step-content { flex: 1; padding-top: 4px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  th { background: #1a3350; color: var(--gold); padding: 10px 14px; text-align: center; font-weight: 700; border-bottom: 2px solid var(--gold); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  tr:hover td { background: rgba(226,176,74,.05); }
+  td.good { color: var(--green); font-weight: 700; }
+  td.bad { color: var(--red); }
+
+  /* LAYER BOXES */
+  .layer-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1.2rem 0; }
+  .lbox {
+    border-radius: 14px; padding: 1.4rem 1.2rem; text-align: center;
+    flex: 1; min-width: 130px; font-weight: 700; border: 2px solid;
+  }
+  .lbox.set   { border-color: var(--blue); background: rgba(74,144,217,.08); color: #90c8f8; }
+  .lbox.linear{ border-color: var(--cyan); background: rgba(60,207,207,.08); color: #60e8e8; }
+  .lbox.tree  { border-color: var(--green); background: rgba(60,184,120,.08); color: #60d898; }
+  .lbox.graph { border-color: var(--purple); background: rgba(139,111,192,.08); color: #a890e8; }
+  .lbox.hash  { border-color: var(--red); background: rgba(224,85,106,.08); color: #f0909a; }
+
+  /* VS GRID */
+  .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  .vs-box { padding: 1.5rem; border-radius: 14px; text-align: center; }
+  .vs-box.logic { border: 2px solid var(--cyan); background: rgba(60,207,207,.06); }
+  .vs-box.store { border: 2px dashed var(--purple); background: rgba(139,111,192,.06); }
+
+  .hl { background: rgba(226,176,74,.15); border-bottom: 2px solid var(--gold); padding: 1px 4px; font-weight: 600; }
+  ul, ol { padding-left: 1.8rem; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--gold); }
+
+  .footer-note { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .vs-grid { grid-template-columns: 1fr; }
+    .layer-row { flex-direction: column; }
+    .container { padding: 1.5rem .8rem; }
+    .header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="tag">考试范围2026 · 选择题 · 第2题</div>
+  <h1>🧠 数据的逻辑结构</h1>
+  <div class="q-box">
+    下列结构中，<strong>不属于</strong>数据基本逻辑结构的是（　）。<br><br>
+    A. 线性结构 &nbsp;&nbsp; B. 树形结构 &nbsp;&nbsp; C. 图形结构 &nbsp;&nbsp; <strong>D. 哈希结构</strong>
+  </div>
+</div>
+
+<!-- ==================== ANSWER ==================== -->
+<div class="answer">
+  <div style="font-size:.8rem;color:var(--muted)">正确答案</div>
+  <div class="big">D — 哈希结构</div>
+  <div style="color:var(--muted);font-size:.9rem;margin-top:4px">哈希结构属于<strong>存储结构</strong>，而非逻辑结构</div>
+</div>
+
+<!-- ==================== 1: FOUR LOGICAL STRUCTURES ==================== -->
+<div class="section">
+  <h2>一、四大基本逻辑结构</h2>
+  <div class="card">
+    <p>逻辑结构描述的是<strong>数据元素之间</strong>的抽象关系，与"怎么存在计算机里"无关。就像人际关系：你们是朋友（逻辑关系），但你们各自住在哪里（存储位置）是另一回事。</p>
+
+    <div class="layer-row">
+      <div class="lbox set">
+        <div style="font-size:2rem">📦</div>
+        <div style="font-size:1.1rem">集合</div>
+        <small style="color:var(--muted)">元素之间<br>"没关系"</small>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--muted)">同属一个整体</div>
+      </div>
+      <div class="lbox linear">
+        <div style="font-size:2rem">🔗</div>
+        <div style="font-size:1.1rem">线性结构</div>
+        <small style="color:var(--muted)">一对一<br>前驱+后继</small>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--muted)">数组、链表、栈、队列</div>
+      </div>
+      <div class="lbox tree">
+        <div style="font-size:2rem">🌳</div>
+        <div style="font-size:1.1rem">树形结构</div>
+        <small style="color:var(--muted)">一对多<br>层次关系</small>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--muted)">二叉树、B树、堆</div>
+      </div>
+      <div class="lbox graph">
+        <div style="font-size:2rem">🕸️</div>
+        <div style="font-size:1.1rem">图形结构</div>
+        <small style="color:var(--muted)">多对多<br>任意连接</small>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--muted)">有向图、无向图</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 2: WHY HASH IS NOT LOGICAL ==================== -->
+<div class="section">
+  <h2>二、为什么"哈希结构"不是逻辑结构？</h2>
+  <div class="card">
+    <p>哈希（Hash）的核心是：<strong>通过哈希函数将关键字映射到存储地址</strong>。这是关于"数据怎么存、怎么找"的问题——属于<strong>存储结构</strong>的范畴。</p>
+
+    <div class="layer-row">
+      <div class="lbox hash">
+        <div style="font-size:2rem">🔑</div>
+        <div style="font-size:1.1rem">哈希 ≠ 逻辑结构！</div>
+        <small style="color:var(--muted)">哈希函数<br>↓<br>存储地址</small>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--red)">这是"怎么存"的问题</div>
+      </div>
+    </div>
+
+    <p style="margin-top:1rem">通俗理解：逻辑结构说"A 和 B 是朋友关系"，哈希说"A 住在 3 号房间，B 住在 7 号房间"。哈希解决的是<strong>住址问题</strong>，不是<strong>关系问题</strong>。</p>
+  </div>
+</div>
+
+<!-- ==================== 3: LOGIC VS STORAGE ==================== -->
+<div class="section">
+  <h2>三、逻辑结构 vs 存储结构 —— 最容易混淆的概念对</h2>
+  <div class="card">
+    <div class="vs-grid">
+      <div class="vs-box logic">
+        <div style="font-size:2rem">🧠</div>
+        <h3 style="color:var(--cyan)">逻辑结构</h3>
+        <ul style="text-align:left;font-size:.9rem">
+          <li>✅ 集合（没关系）</li>
+          <li>✅ 线性结构（一对一）</li>
+          <li>✅ 树形结构（一对多）</li>
+          <li>✅ 图形结构（多对多）</li>
+        </ul>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:.5rem">→ 描述数据<strong>之间</strong>的关系</p>
+      </div>
+      <div class="vs-box store">
+        <div style="font-size:2rem">💿</div>
+        <h3 style="color:var(--purple)">存储结构</h3>
+        <ul style="text-align:left;font-size:.9rem">
+          <li>顺序存储（数组）</li>
+          <li>链式存储（指针）</li>
+          <li>索引存储</li>
+          <li><strong style="color:var(--red)">散列存储（哈希）← 本题答案</strong></li>
+        </ul>
+        <p style="font-size:.8rem;color:var(--red);margin-top:.5rem">→ 描述数据<strong>在内存中</strong>怎么放</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 4: TABLE ==================== -->
+<div class="section">
+  <h2>四、逐项排查</h2>
+  <div class="card">
+    <table>
+      <tr><th>选项</th><th>内容</th><th>判断</th><th>原因</th></tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">A</td>
+        <td>线性结构</td>
+        <td class="good">✅ 是逻辑结构</td>
+        <td>元素之间一对一关系，如线性表</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">B</td>
+        <td>树形结构</td>
+        <td class="good">✅ 是逻辑结构</td>
+        <td>元素之间一对多关系，如二叉树</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--green)">C</td>
+        <td>图形结构</td>
+        <td class="good">✅ 是逻辑结构</td>
+        <td>元素之间多对多关系，如有向图</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;color:var(--red)">D</td>
+        <td>哈希结构</td>
+        <td class="bad">❌ 不是逻辑结构</td>
+        <td>哈希是<strong>存储结构</strong>，属于散列存储方式</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 5: STORAGE STRUCTURES ==================== -->
+<div class="section">
+  <h2>五、四种存储结构的对比</h2>
+  <div class="card">
+    <table>
+      <tr><th>存储结构</th><th>实现方式</th><th>特点</th><th>典型应用</th></tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">顺序存储</td>
+        <td>连续内存空间</td>
+        <td>随机访问O(1)，插入删除O(n)</td>
+        <td>数组</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">链式存储</td>
+        <td>结点+指针</td>
+        <td>插入删除O(1)，访问O(n)</td>
+        <td>链表</td>
+      </tr>
+      <tr>
+        <td style="color:var(--cyan);font-weight:700">索引存储</td>
+        <td>索引表+数据表</td>
+        <td>通过索引快速定位</td>
+        <td>数据库索引</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red);font-weight:700">散列存储</td>
+        <td>哈希函数计算地址</td>
+        <td>平均O(1)查找</td>
+        <td>哈希表、HashMap</td>
+      </tr>
+    </table>
+
+    <div class="info">
+      <strong>🔑 关键区分：</strong>一种逻辑结构可以用<strong>多种</strong>存储结构来实现。例如线性表既可以用<strong>顺序存储</strong>（数组）实现，也可以用<strong>链式存储</strong>（链表）实现。逻辑结构是"蓝图"，存储结构是"施工方案"。
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6: HIERARCHY ==================== -->
+<div class="section">
+  <h2>六、数据结构层次体系（ASCII示意图）</h2>
+  <div class="card">
+    <div class="ascii-box">
+<span class="hl">┌─────────────────────────────────────────────────┐
+│              数  据  结  构                        │
+├──────────────────────┬──────────────────────────┤
+│    逻辑结构 (抽象)     │    存储结构 (物理)         │
+│    "什么关系？"        │    "怎么存放？"            │
+├──────────────────────┼──────────────────────────┤
+│  · 集合 (无关系)      │  · 顺序存储                │
+│  · 线性结构 (1:1)     │  · 链式存储                │
+│  · 树形结构 (1:N)     │  · 索引存储                │
+│  · 图形结构 (M:N)     │  · 散列存储 ← 哈希在这里！  │
+├──────────────────────┴──────────────────────────┤
+│              运算 (操作)                            │
+│    插入 · 删除 · 查找 · 修改 · 遍历 · 排序          │
+└─────────────────────────────────────────────────┘</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 7: MEMORY MNEMONIC ==================== -->
+<div class="section">
+  <h2>七、记忆口诀与考试技巧</h2>
+  <div class="card">
+    <div class="tip">
+      <strong>🎯 记忆口诀：</strong>"<strong>集线树图</strong>"——集合、线性、树、图 = 四大逻辑结构。<br>
+      "<strong>顺链索散</strong>"——顺序、链式、索引、散列 = 四大存储结构。<br>
+      哈希（散列）在"存储"里，不在"逻辑"里！
+    </div>
+
+    <div class="danger">
+      <strong>⚠️ 考试陷阱：</strong>题目问"<strong>不</strong>属于逻辑结构"，很容易一紧张选反了。看到"哈希"就要立刻反应：这是<strong>存储</strong>，不是<strong>逻辑</strong>。这个知识点每年都考，换个问法反复考！
+    </div>
+
+    <div class="step-row">
+      <span class="step-num">1</span>
+      <div class="step-content"><strong>先判断：</strong>这个东西描述的是"数据之间关系"还是"数据怎么存"？</div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">2</span>
+      <div class="step-content"><strong>关系 → 逻辑结构</strong>（集合/线性/树/图）；<strong>存储 → 存储结构</strong>（顺序/链式/索引/散列）</div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">3</span>
+      <div class="step-content"><strong>哈希 = 散列存储 → 属于存储结构</strong>，永远不是逻辑结构</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  📖 逻辑结构与存储结构的区分是第1章最基础也最重要的概念，几乎所有后续章节都会涉及。牢记"集线树图"四字即可。
+</div>
+
+</div>
+</body>
+</html>

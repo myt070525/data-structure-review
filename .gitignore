@@ -2,5 +2,12 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
-
-~
+*.doc
+*.docx
+*.txt
+extracted_images/
+unpacked_test/
+~*
+~$*
+.reasonix/
+.claude/
