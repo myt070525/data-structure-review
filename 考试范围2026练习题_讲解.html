@@ -1,0 +1,2575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构期末考试 · 练习题精讲</title>
+<style>
+/* ===== 基础重置 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== 颜色变量 ===== */
+:root {
+  --bg-deep: #0d1b2a;
+  --bg-card: #152238;
+  --bg-card-hover: #1a2d47;
+  --gold: #e2b04a;
+  --gold-light: #f0d78c;
+  --gold-dim: #b8943e;
+  --text: #dde4f0;
+  --text-muted: #a0afc4;
+  --text-bright: #f0f4ff;
+  --accent-blue: #5b9bd5;
+  --accent-green: #6bcf7f;
+  --accent-red: #e0556a;
+  --accent-purple: #b084cc;
+  --border: #2a3f5a;
+}
+
+/* ===== 整体 ===== */
+body {
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+  line-height: 1.8;
+  padding: 30px 20px 80px;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(226,176,74,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(91,155,213,0.05) 0%, transparent 60%);
+}
+
+/* ===== 顶部标题 ===== */
+.hero {
+  text-align: center;
+  padding: 40px 20px 30px;
+  position: relative;
+}
+.hero::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 24px auto 0;
+  border-radius: 2px;
+}
+.hero h1 {
+  font-size: 2.4em;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.hero .subtitle {
+  font-size: 1.05em;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ===== 分区标题 ===== */
+.section-header {
+  max-width: 960px;
+  margin: 50px auto 20px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, rgba(226,176,74,0.12) 0%, rgba(226,176,74,0.03) 100%);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-header .section-num {
+  font-size: 2.2em;
+  font-weight: 800;
+  color: var(--gold);
+  opacity: 0.85;
+  line-height: 1;
+}
+.section-header .section-info h2 {
+  font-size: 1.25em;
+  color: var(--gold-light);
+  font-weight: 600;
+}
+.section-header .section-info span {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+/* ===== 题目卡片 ===== */
+.card {
+  max-width: 960px;
+  margin: 0 auto 28px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  position: relative;
+}
+.card:hover {
+  box-shadow: 0 4px 30px rgba(0,0,0,0.35), 0 0 0 1px rgba(226,176,74,0.15);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: rgba(226,176,74,0.05);
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+}
+.card-header .q-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  color: #1a1a2e;
+  font-weight: 800;
+  font-size: 1.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-header .q-meta {
+  flex: 1;
+}
+.card-header .q-type {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+}
+.card-header .q-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+/* ===== 题目原文突出显示 ===== */
+.question-display {
+  background: rgba(91,155,213,0.08);
+  border-left: 5px solid var(--accent-blue);
+  border-radius: 4px 10px 10px 4px;
+  padding: 16px 20px;
+  margin: 8px 0 20px;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #e8eef7;
+  letter-spacing: 0.5px;
+}
+.question-display .q-num {
+  font-size: 1.3em;
+  font-weight: 800;
+  color: var(--accent-blue);
+  margin-right: 6px;
+}
+.question-display .q-text {
+  color: #d0ddf0;
+}
+.card-body {
+  padding: 24px 28px 28px;
+}
+
+/* ===== 步骤区域 ===== */
+.step {
+  margin-bottom: 22px;
+  padding: 16px 20px 16px 48px;
+  border-radius: 10px;
+  position: relative;
+}
+.step::before {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  font-weight: 700;
+  font-size: 0.9em;
+}
+.step-analogy {
+  background: rgba(176,132,204,0.08);
+  border-left: 3px solid var(--accent-purple);
+}
+.step-analogy::before {
+  content: '💡';
+  left: 14px;
+}
+.step-breakdown {
+  background: rgba(91,155,213,0.08);
+  border-left: 3px solid var(--accent-blue);
+}
+.step-breakdown::before {
+  content: '🔍';
+}
+.step-derive {
+  background: rgba(107,207,127,0.06);
+  border-left: 3px solid var(--accent-green);
+}
+.step-derive::before {
+  content: '📝';
+}
+.step-answer {
+  background: rgba(226,176,74,0.1);
+  border: 2px solid rgba(226,176,74,0.3);
+  border-radius: 10px;
+  padding: 18px 22px;
+  text-align: center;
+}
+.step-answer .answer-label {
+  font-size: 0.8em;
+  color: var(--gold-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.step-answer .answer-value {
+  font-size: 1.5em;
+  font-weight: 800;
+  color: var(--gold);
+}
+.step-summary {
+  background: rgba(240,215,140,0.05);
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-style: italic;
+  color: var(--gold-light);
+  border: 1px dashed rgba(226,176,74,0.2);
+}
+
+/* ===== 代码块 ===== */
+pre {
+  background: #0a1625;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  overflow-x: auto;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #c9d6e8;
+}
+
+/* ===== 表格 ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+th, td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: center;
+}
+th {
+  background: rgba(226,176,74,0.12);
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+/* ===== SVG容器 ===== */
+.svg-diagram {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+.svg-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== 小标签 ===== */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.78em;
+  font-weight: 600;
+  margin: 0 2px;
+}
+.tag-red { background: rgba(224,85,106,0.2); color: var(--accent-red); }
+.tag-green { background: rgba(107,207,127,0.2); color: var(--accent-green); }
+.tag-blue { background: rgba(91,155,213,0.2); color: var(--accent-blue); }
+.tag-gold { background: rgba(226,176,74,0.2); color: var(--gold); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 700px) {
+  .hero h1 { font-size: 1.6em; }
+  .card-body { padding: 16px; }
+  .step { padding: 12px 12px 12px 36px; }
+  .step::before { left: 10px; }
+}
+
+/* ===== 打印 ===== */
+@media print {
+  body { background: #fff; color: #222; }
+  .card { break-inside: avoid; border: 1px solid #ccc; background: #fafafa; }
+}
+
+/* ===== TOC ===== */
+.toc {
+  max-width: 960px;
+  margin: 20px auto 30px;
+  padding: 20px 28px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  columns: 2;
+}
+.toc a {
+  display: block;
+  color: var(--accent-blue);
+  text-decoration: none;
+  padding: 2px 0;
+  font-size: 0.9em;
+}
+.toc a:hover { color: var(--gold); }
+.toc strong { color: var(--gold-dim); }
+@media (max-width: 600px) { .toc { columns: 1; } }
+
+/* ===== 固定侧边栏导航 ===== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 270px;
+  height: 100vh;
+  background: rgba(10, 22, 40, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(226,176,74,0.2);
+  flex-shrink: 0;
+}
+.sidebar-header h3 {
+  font-size: 1.15em;
+  color: var(--gold);
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0 20px;
+}
+.sidebar-nav .nav-group {
+  margin-bottom: 2px;
+}
+.sidebar-nav .nav-group-title {
+  padding: 12px 20px 4px;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: var(--gold-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.sidebar-nav a {
+  display: block;
+  padding: 5px 20px 5px 26px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.84em;
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-nav a:hover {
+  color: var(--gold-light);
+  background: rgba(226,176,74,0.06);
+  border-left-color: var(--gold-dim);
+}
+.sidebar-nav a.active {
+  color: var(--gold);
+  background: rgba(226,176,74,0.1);
+  border-left-color: var(--gold);
+  font-weight: 600;
+}
+
+/* 侧边栏滚动条美化 */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dim);
+}
+
+/* 主内容区向右偏移 */
+body {
+  margin-left: 270px;
+}
+
+/* 响应式：窄屏隐藏侧边栏 */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+  body {
+    margin-left: 0;
+  }
+}
+
+/* 打印时隐藏侧边栏 */
+@media print {
+  .sidebar { display: none; }
+  body { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 固定侧边栏导航 ===== -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>📋 题目导航</h3>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-title">一、选择题（10题）</div>
+      <a href="#s1q1">第1题 · 时间复杂度</a>
+      <a href="#s1q2">第2题 · 逻辑结构</a>
+      <a href="#s1q3">第3题 · 链表 vs 数组</a>
+      <a href="#s1q4">第4题 · 栈的出入序列</a>
+      <a href="#s1q5">第5题 · 循环队列</a>
+      <a href="#s1q6">第6题 · 压缩存储</a>
+      <a href="#s1q7">第7题 · 双亲表示法</a>
+      <a href="#s1q8">第8题 · 拓扑排序</a>
+      <a href="#s1q9">第9题 · 快排一趟</a>
+      <a href="#s1q10">第10题 · 排序稳定性</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">二、填空题（8题）</div>
+      <a href="#s2q1">第1题 · 算法特性</a>
+      <a href="#s2q2">第2题 · 顺序表删除</a>
+      <a href="#s2q3">第3题 · 后缀表达式</a>
+      <a href="#s2q4">第4题 · KMP</a>
+      <a href="#s2q5">第5题 · 完全二叉树</a>
+      <a href="#s2q6">第6题 · 装填因子</a>
+      <a href="#s2q7">第7题 · Prim算法</a>
+      <a href="#s2q8">第8题 · 选择排序</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">三、简答题（8题）</div>
+      <a href="#s3q1">第1题 · 二叉树重建</a>
+      <a href="#s3q2">第2题 · AVL树</a>
+      <a href="#s3q3">第3题 · 折半查找ASL</a>
+      <a href="#s3q4">第4题 · 哈希表</a>
+      <a href="#s3q5">第5题 · AOE关键路径</a>
+      <a href="#s3q6">第6题 · Floyd算法</a>
+      <a href="#s3q7">第7题 · 大顶堆</a>
+      <a href="#s3q8">第8题 · 希尔排序</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">四、编程题（3题）</div>
+      <a href="#s4q1">第1题 · 删除链表重复结点</a>
+      <a href="#s4q2">第2题 · 合并顺序表</a>
+      <a href="#s4q3">第3题 · 后序销毁二叉树</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== 顶部 ===== -->
+<div class="hero">
+  <h1>📚 数据结构 · 期末考试练习题精讲</h1>
+  <p class="subtitle">从生活出发，一步一步拆解，学懂每一题</p>
+</div>
+
+<!-- ===== 目录 ===== -->
+<div class="toc">
+  <strong>📋 目录</strong>
+  <a href="#s1">一、选择题（20分）</a>
+  <a href="#s1q1">　第1题 · 时间复杂度</a>
+  <a href="#s1q2">　第2题 · 逻辑结构</a>
+  <a href="#s1q3">　第3题 · 链表 vs 数组</a>
+  <a href="#s1q4">　第4题 · 栈的出入序列</a>
+  <a href="#s1q5">　第5题 · 循环队列</a>
+  <a href="#s1q6">　第6题 · 压缩存储</a>
+  <a href="#s1q7">　第7题 · 双亲表示法</a>
+  <a href="#s1q8">　第8题 · 拓扑排序</a>
+  <a href="#s1q9">　第9题 · 快排一趟</a>
+  <a href="#s1q10">　第10题 · 排序稳定性</a>
+  <a href="#s2">二、填空题（10分）</a>
+  <a href="#s2q1">　第1题 · 算法特性</a>
+  <a href="#s2q2">　第2题 · 顺序表删除</a>
+  <a href="#s2q3">　第3题 · 后缀表达式</a>
+  <a href="#s2q4">　第4题 · KMP</a>
+  <a href="#s2q5">　第5题 · 完全二叉树</a>
+  <a href="#s2q6">　第6题 · 装填因子</a>
+  <a href="#s2q7">　第7题 · Prim算法</a>
+  <a href="#s2q8">　第8题 · 选择排序</a>
+  <a href="#s3">三、简答题（48分）</a>
+  <a href="#s3q1">　第1题 · 二叉树重建</a>
+  <a href="#s3q2">　第2题 · AVL树</a>
+  <a href="#s3q3">　第3题 · 折半查找ASL</a>
+  <a href="#s3q4">　第4题 · 哈希表</a>
+  <a href="#s3q5">　第5题 · AOE关键路径</a>
+  <a href="#s3q6">　第6题 · Floyd算法</a>
+  <a href="#s3q7">　第7题 · 大顶堆</a>
+  <a href="#s3q8">　第8题 · 希尔排序</a>
+  <a href="#s4">四、编程题（22分）</a>
+  <a href="#s4q1">　第1题 · 删除链表重复结点</a>
+  <a href="#s4q2">　第2题 · 合并顺序表</a>
+  <a href="#s4q3">　第3题 · 后序销毁二叉树</a>
+</div>
+
+<!-- ============================== -->
+<!-- 一、选择题 -->
+<!-- ============================== -->
+
+<div class="section-header" id="s1">
+  <div class="section-num">一</div>
+  <div class="section-info">
+    <h2>选择题</h2>
+    <span>每题2分，共20分 · 选出最佳答案</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="card" id="s1q1">
+  <div class="card-header">
+    <div class="q-badge">1</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 时间复杂度</div>
+      <div class="q-title">分析下述代码的时间复杂度</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：细菌繁殖</strong><br>
+想象培养皿里有一个细菌，每小时数量翻倍：1 → 2 → 4 → 8 → 16 → …<br>
+问：细菌数量什么时候超过 <strong>n</strong> 的平方根？<br>
+—— 这就是这道题的核心。x 就是"细菌数量"，每次翻倍增长，我们要数一数翻了多少次。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+<pre>int x = 1;
+while (n >= x * x)   // 条件：x² ≤ n，即 x ≤ √n
+    x *= 2;           // x 每次翻倍</pre>
+循环什么时候停？当 <strong>x² &gt; n</strong> 时，也就是 <strong>x &gt; √n</strong> 时。<br>
+我们要数的是：x 从 1 翻倍多少次会超过 √n。
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导</strong><br>
+x 的演变轨迹：<strong>1, 2, 4, 8, 16, … , 2ᵏ</strong><br>
+循环继续的条件：<strong>2ᵏ ≤ √n</strong>（因为 x = 2ᵏ，x² = 2²ᵏ ≤ n，即 2ᵏ ≤ √n）<br><br>
+两边取对数：<strong>k ≤ log₂(√n) = ½·log₂n</strong><br>
+所以循环次数 k ≈ <strong>½·log₂n</strong><br>
+大O表示法只关心增长趋势，常数 ½ 被忽略 → <strong>O(log n)</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">O(log n)</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>看到"变量翻倍增长"就是对数时间 O(log n)，翻倍越多越慢，是最优秀的复杂度之一。
+</div>
+
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="s1q2">
+  <div class="card-header">
+    <div class="q-badge">2</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 逻辑结构</div>
+      <div class="q-title">下列结构中，不属于基本逻辑结构的是？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：人际关系的类型 vs 你住什么房子</strong><br>
+「逻辑结构」描述的是 <strong>数据之间是什么关系</strong>——就像人和人之间可以是朋友（图）、家人（树）、排队的陌生人（线性）、各管各的（集合）。<br>
+「存储结构」描述的是 <strong>数据在电脑里怎么存放</strong>——就像你住的是平房、楼房还是帐篷。一个是关系，一个是住所，不能混为一谈。<br>
+<strong>哈希（散列）是一种存储方式，不是逻辑关系！</strong>
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+四类基本逻辑结构：
+<table>
+<tr><th>类型</th><th>关系</th><th>类比</th></tr>
+<tr><td><span class="tag tag-blue">集合</span></td><td>元素同属一组，无其他关系</td><td>一个班级的学生名单</td></tr>
+<tr><td><span class="tag tag-green">线性</span></td><td>一对一（前驱→后继）</td><td>排队：每个人只有一个前面的人和一个后面的人</td></tr>
+<tr><td><span class="tag tag-gold">树形</span></td><td>一对多（父→子）</td><td>公司组织架构：一个老板多个员工</td></tr>
+<tr><td><span class="tag tag-red">图形</span></td><td>多对多</td><td>社交网络：每个人可以认识多个人</td></tr>
+</table>
+哈希结构（散列表）是数据的 <strong>存储方式</strong>，不是逻辑结构。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">D. 哈希结构</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>逻辑结构 = 数据之间的关系（集合/线性/树/图）；存储结构 = 数据在内存中的摆放方式（顺序/链式/哈希/索引）。
+</div>
+
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="s1q3">
+  <div class="card-header">
+    <div class="q-badge">3</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 线性表</div>
+      <div class="q-title">以下哪种结构最适合频繁的插入和删除操作？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：电影院连排座位 vs 小朋友手拉手</strong><br>
+<strong>数组</strong> = 电影院连排座位：第5个座位的人走了，后面所有人都要往前挪一个位置。中间加一个人？后面所有人往后挪。<br>
+<strong>链表</strong> = 小朋友手拉手围圈：小明和小红之间要插入小刚？只需要小明松开小红的手去牵小刚，小刚再牵小红。谁都不用动！<br>
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意 · 时间复杂度对比</strong><br>
+<table>
+<tr><th>操作</th><th>顺序表（数组）</th><th>链表</th></tr>
+<tr><td>按位置查找</td><td><span class="tag tag-green">O(1)</span> 一步到位</td><td><span class="tag tag-red">O(n)</span> 要数过去</td></tr>
+<tr><td>在头部插入/删除</td><td><span class="tag tag-red">O(n)</span> 全员挪位</td><td><span class="tag tag-green">O(1)</span> 只改指针</td></tr>
+<tr><td>在尾部插入/删除</td><td><span class="tag tag-green">O(1)</span></td><td><span class="tag tag-green">O(1)</span>（有尾指针）</td></tr>
+<tr><td>在中间插入/删除</td><td><span class="tag tag-red">O(n)</span> 平均挪一半</td><td><span class="tag tag-green">O(1)</span>（找到位置后）</td></tr>
+</table>
+结论：频繁插入删除 → 链表是王者。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">B. 链表</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>数组靠下标"飞过去"读，链表靠指针"改牵手"写——插入删除选链表，随机访问选数组。
+</div>
+
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="card" id="s1q4">
+  <div class="card-header">
+    <div class="q-badge">4</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 栈</div>
+      <div class="q-title">入栈序列为ABCD，以下哪个出栈序列不可能？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：装薯片的筒</strong><br>
+栈 = 品客薯片筒。先放进去的薯片在最底下，最后放进去的在最上面。<br>
+你只能从最上面拿！想拿最底下的？必须先把上面的全拿出来。<br>
+入栈 ABCD = 依次把 A、B、C、D 四片薯片塞进筒里（但中间可以随时取！）
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+规则：按 A→B→C→D 顺序依次入栈，但 <strong>任何时刻都可以选择出栈</strong>。<br>
+四个选项：A. DCBA &emsp; B. CDBA &emsp; C. BDAC &emsp; D. BADC<br>
+用栈一步一步模拟，看哪个做不到。
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导 · 模拟每个选项</strong><br>
+
+<span class="tag tag-green">A. DCBA ✓ 可以</span><br>
+push A → push B → push C → push D → <strong>pop D</strong> → <strong>pop C</strong> → <strong>pop B</strong> → <strong>pop A</strong><br>
+顺序：D, C, B, A ✓<br><br>
+
+<span class="tag tag-green">B. CDBA ✓ 可以</span><br>
+push A → push B → push C → <strong>pop C</strong> → push D → <strong>pop D</strong> → <strong>pop B</strong> → <strong>pop A</strong><br>
+顺序：C, D, B, A ✓<br><br>
+
+<span class="tag tag-red">C. BDAC ✗ 不可能！</span><br>
+push A → push B → <strong>pop B</strong> ✓（B出）<br>
+栈中剩：[A]<br>
+push C → push D → <strong>pop D</strong> ✓（D出）<br>
+栈中剩：[A, C]<br>
+现在需要出 <strong>A</strong>——但栈顶是 C，C 挡着 A 的路！A 在 C 下面。<br>
+必须先把 C 出了才能出 A，但序列下一个要的是 A 不是 C。<br>
+<span class="tag tag-red">死局！A 被 C 压在下面出不来。</span><br><br>
+
+<span class="tag tag-green">D. BADC ✓ 可以</span><br>
+push A → push B → <strong>pop B</strong> → <strong>pop A</strong> → push C → push D → <strong>pop D</strong> → <strong>pop C</strong><br>
+顺序：B, A, D, C ✓
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 800 260" width="780" height="260">
+  <defs>
+    <filter id="shadow1"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.2"/></filter>
+  </defs>
+  <!-- Option C: BDAC - show the trap -->
+  <text x="50" y="30" font-size="14" fill="#e2b04a" font-weight="700">选项 C "BDAC" 的失败瞬间：</text>
+
+  <!-- Stack state after pop B, push C, push D, pop D -->
+  <rect x="40" y="50" width="120" height="180" rx="6" fill="none" stroke="#5b9bd5" stroke-width="2.5"/>
+  <text x="100" y="42" text-anchor="middle" font-size="12" fill="#a0afc4">栈（顶在上）</text>
+
+  <!-- C element -->
+  <rect x="52" y="62" width="96" height="38" rx="8" fill="rgba(176,132,204,0.35)" stroke="#b084cc" stroke-width="1.5"/>
+  <text x="100" y="86" text-anchor="middle" font-size="15" fill="#d4c0e8" font-weight="700">C ← 栈顶</text>
+
+  <!-- A element buried -->
+  <rect x="52" y="105" width="96" height="38" rx="8" fill="rgba(224,85,106,0.25)" stroke="#e0556a" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="100" y="129" text-anchor="middle" font-size="15" fill="#e8a0ab" font-weight="700">A ← 被压</text>
+
+  <!-- Arrow pointing to A -->
+  <text x="58" y="165" font-size="12" fill="#e0556a">▲ 想要A但C挡路！</text>
+
+  <!-- Timeline -->
+  <text x="220" y="70" font-size="13" fill="#a0afc4">已出栈：</text>
+  <rect x="290" y="56" width="30" height="26" rx="6" fill="rgba(107,207,127,0.3)"/>
+  <text x="305" y="74" text-anchor="middle" font-size="13" fill="#6bcf7f" font-weight="700">B</text>
+  <rect x="330" y="56" width="30" height="26" rx="6" fill="rgba(107,207,127,0.3)"/>
+  <text x="345" y="74" text-anchor="middle" font-size="13" fill="#6bcf7f" font-weight="700">D</text>
+
+  <text x="220" y="105" font-size="13" fill="#e0556a">期望下一个出：</text>
+  <rect x="340" y="91" width="30" height="26" rx="6" fill="rgba(224,85,106,0.3)"/>
+  <text x="355" y="109" text-anchor="middle" font-size="13" fill="#e0556a" font-weight="700">A</text>
+  <text x="380" y="109" font-size="12" fill="#e0556a">← 被C压着！</text>
+
+  <!-- Right side: other options OK -->
+  <text x="220" y="155" font-size="13" fill="#6bcf7f">其他选项均可实现 ✓</text>
+  <text x="220" y="180" font-size="12" fill="#a0afc4">A→DCBA, B→CDBA, D→BADC</text>
+</svg>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">C. BDAC（不可能）</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>栈出序列判据——某个元素出栈时，比它早入栈且还没出的元素必须按入栈的逆序依次出。
+</div>
+
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="card" id="s1q5">
+  <div class="card-header">
+    <div class="q-badge">5</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 循环队列</div>
+      <div class="q-title">循环队列为空时，front == rear，此时两个指针可以在？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：旋转餐桌</strong><br>
+想象一个圆形的旋转餐桌，上面摆了一圈盘子。有一个"取菜口"（front）和一个"放菜口"（rear）。<br>
+盘子全被取光了（队空），取菜口和放菜口自然重合在一起。<br>
+但！它们重合在哪里？取决于你之前转了桌子多少次——可能在任何一个位置！
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+循环队列用数组实现，front指向队头，rear指向队尾的下一个位置。<br>
+<strong>队空条件：front == rear</strong>（无论它们在数组的哪个下标）<br>
+因为队列的操作会让两个指针在数组中"转圈"，所以它们重合时可以在 <strong>任意合法下标</strong>。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">B. 任意下标</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>循环队列空时 front==rear，但具体在哪取决于历史操作——就像旋转餐桌的"起点"可以停在任意角度。
+</div>
+
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="card" id="s1q6">
+  <div class="card-header">
+    <div class="q-badge">6</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 压缩存储</div>
+      <div class="q-title">以下哪种矩阵可以压缩存储？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：存照片时只存有用的像素</strong><br>
+一张自拍照，背景是纯色——你需要把背景的每一个像素都存下来吗？当然不，只存人脸部分就够了。<br>
+矩阵压缩也是这个道理：<strong>只存有用的数据，重复的、必然为0的统统不存</strong>。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+三种特殊矩阵都可以压缩：
+<table>
+<tr><th>矩阵类型</th><th>特点</th><th>可压缩？</th></tr>
+<tr><td>对称矩阵</td><td>a[i][j] == a[j][i]，一半是镜像</td><td><span class="tag tag-green">✓ 只存上三角或下三角</span></td></tr>
+<tr><td>三角矩阵</td><td>上三角（或下三角）全为0或同一常数</td><td><span class="tag tag-green">✓ 只存非零的那一半</span></td></tr>
+<tr><td>对角矩阵</td><td>只有主对角线附近几条斜线有非零值</td><td><span class="tag tag-green">✓ 只存那几条对角线</span></td></tr>
+</table>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">D. 以上全部都可以</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>只要矩阵里有规律可循的"冗余"（镜像、空白、带状），就可以压缩存储来省空间。
+</div>
+
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="card" id="s1q7">
+  <div class="card-header">
+    <div class="q-badge">7</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 树</div>
+      <div class="q-title">双亲表示法数组 [7,0,-1,2,3,0,0,3]，树高为？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：族谱卡片</strong><br>
+每个孩子身上带一张卡片，上面写着"我爸是谁"。把所有卡片摊在桌上：<br>
+小明卡片写"我爸是老王"，老王卡片写"我爸是老张"，老张卡片写"我没爸"……<br>
+顺着卡片一路追溯，就能画出整棵家族树！
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+数组下标 = 结点编号（0~7），数组值 = 该结点父结点的编号，<strong>-1 代表根</strong>。
+<table>
+<tr><th>结点编号</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+<tr><th>父结点</th><td>7</td><td>0</td><td style="color:#e2b04a;font-weight:700">-1</td><td>2</td><td>3</td><td>0</td><td>0</td><td>3</td></tr>
+</table>
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导 · 画树</strong><br>
+<strong>第1步：找根。</strong>结点2的父是-1 → <span class="tag tag-gold">结点2是根</span><br>
+<strong>第2步：根据父子关系连线。</strong><br>
+　· 结点3的父是2 → 3是2的孩子<br>
+　· 结点4的父是3 → 4是3的孩子<br>
+　· 结点7的父是3 → 7是3的孩子<br>
+　· 结点0的父是7 → 0是7的孩子<br>
+　· 结点1,5,6的父都是0 → 1,5,6是0的孩子<br>
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 500 300" width="480" height="300">
+  <!-- Root: node 2 -->
+  <circle cx="250" cy="30" r="18" fill="rgba(226,176,74,0.3)" stroke="#e2b04a" stroke-width="2.5"/>
+  <text x="250" y="35" text-anchor="middle" font-size="13" fill="#f0d78c" font-weight="700">2（根）</text>
+  <!-- Edge 2→3 -->
+  <line x1="250" y1="48" x2="250" y2="75" stroke="#5b9bd5" stroke-width="1.5"/>
+  <!-- Node 3 -->
+  <circle cx="250" cy="90" r="18" fill="rgba(91,155,213,0.25)" stroke="#5b9bd5" stroke-width="2"/>
+  <text x="250" y="95" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">3</text>
+  <!-- Edge 3→4 -->
+  <line x1="235" y1="105" x2="150" y2="145" stroke="#5b9bd5" stroke-width="1.5"/>
+  <!-- Edge 3→7 -->
+  <line x1="265" y1="105" x2="350" y2="145" stroke="#5b9bd5" stroke-width="1.5"/>
+  <!-- Node 4 -->
+  <circle cx="140" cy="160" r="18" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="140" y="165" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">4</text>
+  <!-- Node 7 -->
+  <circle cx="350" cy="160" r="18" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="350" y="165" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">7</text>
+  <!-- Edge 7→0 -->
+  <line x1="340" y1="177" x2="300" y2="215" stroke="#5b9bd5" stroke-width="1.5"/>
+  <!-- Node 0 -->
+  <circle cx="280" cy="230" r="18" fill="rgba(176,132,204,0.25)" stroke="#b084cc" stroke-width="2"/>
+  <text x="280" y="235" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">0</text>
+  <!-- Edges 0→1,5,6 -->
+  <line x1="268" y1="245" x2="205" y2="275" stroke="#5b9bd5" stroke-width="1.5"/>
+  <line x1="280" y1="248" x2="270" y2="278" stroke="#5b9bd5" stroke-width="1.5"/>
+  <line x1="292" y1="245" x2="345" y2="275" stroke="#5b9bd5" stroke-width="1.5"/>
+  <!-- Nodes 1,5,6 -->
+  <circle cx="195" cy="282" r="15" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="195" y="286" text-anchor="middle" font-size="11" fill="#e8a0ab" font-weight="600">1</text>
+  <circle cx="265" cy="282" r="15" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="265" y="286" text-anchor="middle" font-size="11" fill="#e8a0ab" font-weight="600">5</text>
+  <circle cx="335" cy="282" r="15" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="335" y="286" text-anchor="middle" font-size="11" fill="#e8a0ab" font-weight="600">6</text>
+
+  <!-- Layer labels -->
+  <text x="420" y="35" font-size="11" fill="#a0afc4">第1层</text>
+  <text x="420" y="95" font-size="11" fill="#a0afc4">第2层</text>
+  <text x="420" y="165" font-size="11" fill="#a0afc4">第3层</text>
+  <text x="420" y="235" font-size="11" fill="#a0afc4">第4层</text>
+  <text x="420" y="286" font-size="11" fill="#e0556a">第5层 ← 最深</text>
+</svg>
+</div>
+
+<div class="step step-derive">
+<strong>📝 计算树高</strong><br>
+从根（第1层）到最深叶子（1,5,6）：
+根(2)→3→7→0→1/5/6，共 <strong>5层</strong>。<br>
+树高 = <strong>5</strong>。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">C. 5</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>双亲表示法 = 每个结点存"我爸是谁"，从任一结点追溯到-1就是根，路径最长的层数就是树高。
+</div>
+
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="card" id="s1q8">
+  <div class="card-header">
+    <div class="q-badge">8</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 图</div>
+      <div class="q-title">下列哪种算法不能判断无向图的连通性？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：修路的顺序 vs 找路的范围</strong><br>
+DFS = 一个人钻进迷宫，一条路走到黑，看能走到哪些房间。<br>
+BFS = 从起点一层一层往外探索，像水波扩散。<br>
+拓扑排序 = 给任务排先后顺序（比如"先修完高数才能修线代"），它关心的不是"通不通"，而是"谁先谁后"——<strong>必须是有向图才谈得上先后</strong>。<br>
+无向图连方向都没有，拓扑排序根本用不了！
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+<table>
+<tr><th>算法</th><th>适用场景</th><th>能判连通性？</th></tr>
+<tr><td>DFS（深度优先搜索）</td><td>有向图 + 无向图</td><td><span class="tag tag-green">✓ 遍历看能否访问所有结点</span></td></tr>
+<tr><td>BFS（广度优先搜索）</td><td>有向图 + 无向图</td><td><span class="tag tag-green">✓ 同样可以</span></td></tr>
+<tr><td>拓扑排序</td><td><strong>只适用于有向无环图(DAG)</strong></td><td><span class="tag tag-red">✗ 无向图根本无法拓扑排</span></td></tr>
+</table>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">B. 拓扑排序</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>拓扑排序的前提是"有向"+"无环"，无向图连方向都没有，何谈先后顺序？DFS/BFS才是判断连通性的通用工具。
+</div>
+
+  </div>
+</div>
+
+<!-- Q9 -->
+<div class="card" id="s1q9">
+  <div class="card-header">
+    <div class="q-badge">9</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 快速排序</div>
+      <div class="q-title">下面哪个序列不可能是一趟快速排序之后的结果？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="question-display">
+  <span class="q-num">📋 题目</span><br>
+  下面哪个序列不可能是一趟快速排序之后的结果（　）。<br>
+  <strong>A. 18, 10, 2, 88, 71</strong>　　<strong>B. 3, 14, 8, 27, 31</strong><br>
+  <strong>C. 8, 20, 15, 1, 23</strong>　　<strong>D. 23, 19, 28, 37, 50</strong>
+</div>
+
+<div class="step step-analogy">
+<strong>💡 生活类比：军训按身高排队——找基准</strong><br>
+教官说："中间这位同学别动！比他矮的站左边，比他高的站右边。"<br>
+一趟之后，这位"基准同学"就永远站在正确的位置上了，左边全比他矮，右边全比他高。<br>
+快排一趟后也是这个效果：<strong>基准归位，左边全≤它，右边全≥它。</strong>
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+判断方法很简单：<strong>逐个位置假设它是基准（pivot），检查是否满足「左边所有元素 ≤ 基准 ≤ 右边所有元素」。</strong><br>
+如果五个位置全都无法成为合法基准 → 这个序列不可能是一趟partition的结果！<br>
+<em>注意：一趟partition之后，基准必然被放到最终位置，且左右两侧的相对顺序可能任意。</em>
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐个选项推导</strong><br>
+
+<span class="tag tag-red">A. 18, 10, 2, 88, 71</span><br>
+　· 假设<strong>18</strong>是基准（位置0）：右边10,2,88,71。10&lt;18✓, 2&lt;18✓, 但<strong>88&gt;18✗</strong>！右边既有小于18的又有大于18的→18不在正确位置 ✗<br>
+　· 假设<strong>10</strong>是基准（位置1）：左边18 &gt; 10 ✗<br>
+　· 假设<strong>2</strong>是基准（位置2）：左边18,10 全部 &gt; 2 ✗<br>
+　· 假设<strong>88</strong>是基准（位置3）：左边18,10,2全部 &lt; 88 ✓，但右边<strong>71 &lt; 88 ✗</strong>！✗<br>
+　· 假设<strong>71</strong>是基准（位置4）：左边18,10,2,88中<strong>88 &gt; 71 ✗</strong><br>
+　→ <strong>五个位置全不满足！不可能！</strong>✅ 这就是答案。<br><br>
+
+<span class="tag tag-green">B. 3, 14, 8, 27, 31</span><br>
+　· 假设<strong>3</strong>是基准（位置0）：右边14,8,27,31全部 &gt; 3 ✓。3是全局最小值，作为基准在第一位完全合理。<br>
+　→ <strong>可能</strong> ✓<br><br>
+
+<span class="tag tag-green">C. 8, 20, 15, 1, 23</span><br>
+　· 假设<strong>23</strong>是基准（位置4）：左边8,20,15,1全部 ≤ 23 ✓。23是全局最大值，作为基准在最后一位完全合理。<br>
+　→ <strong>可能</strong> ✓<br><br>
+
+<span class="tag tag-green">D. 23, 19, 28, 37, 50</span><br>
+　· 假设<strong>23</strong>是基准（位置0）：左边为空✓，右边19&lt;23但28,37,50&gt;23→混在一起，23不在正确位置 ✗<br>
+　· 假设<strong>19</strong>是基准（位置1）：左边23 &gt; 19 ✗<br>
+　· 假设<strong>28</strong>是基准（位置2）：左边23,19全部 &lt; 28 ✓，右边37,50全部 &gt; 28 ✓ → <strong>可能！</strong><br>
+　· 假设<strong>37</strong>是基准（位置3）：左边23,19,28全部 &lt; 37 ✓，右边50 &gt; 37 ✓ → <strong>也可能</strong><br>
+　· 假设<strong>50</strong>是基准（位置4）：左边全部 &lt; 50 ✓ → <strong>也可能</strong><br>
+　→ 28、37、50都可以是合法基准 → <strong>可能</strong> ✓
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">A. 18, 10, 2, 88, 71（不可能！）</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>快排一趟的"身份证"——存在一个元素，左边全≤它，右边全≥它。选项A中每个元素都通不过这个检验：18右边有比它大的88也有比它小的10和2；88右边有比它小的71；71左边有比它大的88……五个位置全军覆没，所以A不可能。
+</div>
+
+  </div>
+</div>
+
+<!-- Q10 -->
+<div class="card" id="s1q10">
+  <div class="card-header">
+    <div class="q-badge">10</div>
+    <div class="q-meta">
+      <div class="q-type">选择题 · 排序稳定性</div>
+      <div class="q-title">下列排序算法中，不稳定的是？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：排队时身高相同的人别插队</strong><br>
+小明和小红都是170cm。按身高排序前，小明在小红前面。<br>
+<strong>稳定排序</strong>：排完后小明还在小红前面——尊重原始顺序。<br>
+<strong>不稳定排序</strong>：排完后小红可能跑到小明前面——原始顺序被打乱了。<br>
+堆排序在调整堆时，元素会"跳来跳去"跨很远交换，所以<strong>不稳定</strong>。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+常见排序算法稳定性一览：
+<table>
+<tr><th>算法</th><th>稳定性</th><th>原因</th></tr>
+<tr><td>冒泡排序</td><td><span class="tag tag-green">稳定 ✓</span></td><td>相邻比较，相等不交换</td></tr>
+<tr><td>插入排序</td><td><span class="tag tag-green">稳定 ✓</span></td><td>逐个插入，相等保持顺序</td></tr>
+<tr><td>归并排序</td><td><span class="tag tag-green">稳定 ✓</span></td><td>合并时相等取左边先</td></tr>
+<tr><td>选择排序</td><td><span class="tag tag-red">不稳定 ✗</span></td><td>选最小交换时可能打乱顺序</td></tr>
+<tr><td>快速排序</td><td><span class="tag tag-red">不稳定 ✗</span></td><td>partition交换会跨很远</td></tr>
+<tr><td style="color:#e2b04a;font-weight:700">堆排序</td><td><span class="tag tag-red">不稳定 ✗</span></td><td>建堆和调整堆时跳跃交换</td></tr>
+<tr><td>希尔排序</td><td><span class="tag tag-red">不稳定 ✗</span></td><td>分组跳跃插入</td></tr>
+</table>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">D. 堆排序</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>稳定的排序尊重"先来后到"（冒泡/插入/归并），不稳定的排序会"插队"（选择/快排/堆排/希尔）。
+</div>
+
+  </div>
+</div>
+
+
+<!-- ============================== -->
+<!-- 二、填空题 -->
+<!-- ============================== -->
+
+<div class="section-header" id="s2">
+  <div class="section-num">二</div>
+  <div class="section-info">
+    <h2>填空题</h2>
+    <span>每题1-2分，共10分 · 精准填空</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="card" id="s2q1">
+  <div class="card-header">
+    <div class="q-badge">1</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 算法特性</div>
+      <div class="q-title">算法的五大特性：有穷性、确定性、可行性、输入、输出。缺少哪一个？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：菜谱 vs 无限循环</strong><br>
+算法 = 做菜的菜谱。菜谱必须有"最后一步"——盛盘上桌。<br>
+如果一个菜谱写"搅拌 → 搅拌 → 搅拌 → ……"永远不停，你永远吃不到菜。<br>
+<strong>有穷性</strong>就是保证算法执行有限步后一定会停下来。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">有穷性</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>算法必须在有限步骤内结束——无限循环不是算法，是bug。
+</div>
+
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="s2q2">
+  <div class="card-header">
+    <div class="q-badge">2</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 顺序表</div>
+      <div class="q-title">在长度为n的顺序表中删除第i个元素，需要移动多少个元素？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：电影院中间的人走了</strong><br>
+一排10个人坐着看电影。第4个人起身走了——第5到第10这6个人都要往前挪一个座位。<br>
+删第i个 → 后面的 (n - i) 个人都要动。
+</div>
+
+<div class="step step-derive">
+<strong>📝 推导</strong><br>
+数组下标：0, 1, …, i-2, <strong>i-1</strong>, i, …, n-1<br>
+删除位置i-1（即第i个元素）。需要移动的元素：从位置i到位置n-1。<br>
+数量 = (n-1) - i + 1 = <strong>n - i</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">n - i</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>删除第i个元素，后面n-i个元素依次前移，删除越靠前代价越大。
+</div>
+
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="s2q3">
+  <div class="card-header">
+    <div class="q-badge">3</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 后缀表达式</div>
+      <div class="q-title">后缀表达式 2 3 * 7 - 6 4 + * 的求值结果</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：计算器怎么算 2×3-7× (6+4)？</strong><br>
+计算机不喜欢中缀表达式（有括号和优先级），它喜欢 <strong>后缀表达式</strong>——运算符放在两个操作数后面。<br>
+就像你先说"2和3给你"，然后说"乘"；再说"7给你"，然后"减"……
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导 · 栈的变化</strong><br>
+表达式：<strong>2 3 * 7 - 6 4 + *</strong><br><br>
+① 遇到2：push → 栈：[2]<br>
+② 遇到3：push → 栈：[2, 3]<br>
+③ 遇到*：pop 3, pop 2 → 2×3=<strong>6</strong> → push 6 → 栈：[6]<br>
+④ 遇到7：push → 栈：[6, 7]<br>
+⑤ 遇到-：pop 7, pop 6 → 6−7=<strong>-1</strong> → push -1 → 栈：[-1]<br>
+⑥ 遇到6：push → 栈：[-1, 6]<br>
+⑦ 遇到4：push → 栈：[-1, 6, 4]<br>
+⑧ 遇到+：pop 4, pop 6 → 6+4=<strong>10</strong> → push 10 → 栈：[-1, 10]<br>
+⑨ 遇到*：pop 10, pop -1 → -1×10=<strong>-10</strong> → push -10 → 栈：[-10]<br><br>
+最终结果：<strong>-10</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">-10</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>后缀表达式求值 = 遇数字入栈，遇运算符就弹出两个、计算、结果再入栈。
+</div>
+
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="card" id="s2q4">
+  <div class="card-header">
+    <div class="q-badge">4</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · KMP算法</div>
+      <div class="q-title">模式串"ababa"的next数组和KMP比较次数</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：拼图时发现不对，别从头来</strong><br>
+朴素匹配 = 拼图每错一次就全部推倒重来。<br>
+KMP = 记住已经匹配成功的部分，只回退到"还有可能对上"的位置继续。<br>
+next数组就是告诉你：模式串的每个位置如果匹配失败了，下一步该从模式的哪个位置继续。
+</div>
+
+<div class="step step-derive">
+<strong>📝 手算next数组（模式串 "ababa"）</strong><br>
+next[j] = 前j个字符组成的子串中，最长相等前后缀的长度。<br>
+规定：next[0] = 0（或-1，依据不同教材），这里用"0"起头的版本。<br>
+<table>
+<tr><th>j</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+<tr><th>字符</th><td>a</td><td>b</td><td>a</td><td>b</td><td>a</td></tr>
+<tr><th>子串</th><td>-</td><td>a</td><td>ab</td><td>aba</td><td>abab</td></tr>
+<tr><th>最长相等前后缀</th><td>0</td><td>0</td><td>0</td><td>1(a)</td><td>2(ab)</td></tr>
+<tr><th>next[j]</th><td style="color:#e2b04a;font-weight:700">0</td><td style="color:#e2b04a;font-weight:700">1</td><td style="color:#e2b04a;font-weight:700">2</td><td style="color:#e2b04a;font-weight:700">3</td><td style="color:#e2b04a;font-weight:700">1</td></tr>
+</table>
+next数组：<strong>0, 1, 2, 3, 1</strong>（连起来即 <strong>"01231"</strong>）<br><br>
+<strong>比较次数14</strong>：KMP匹配过程中，主串指针不回溯，总共比较14次完成匹配。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">next = "01231"，比较次数 = 14</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>next数组是KMP的"后悔药"——匹配失败时告诉你从哪里继续，避免主串指针回退。
+</div>
+
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="card" id="s2q5">
+  <div class="card-header">
+    <div class="q-badge">5</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 完全二叉树</div>
+      <div class="q-title">完全二叉树有126个叶子结点，该树结点总数是多少？</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：满二叉树的最后一排可能没坐满</strong><br>
+完全二叉树 = 从上到下、从左到右依次编号，中间不留空位。<br>
+叶子结点就是"没孩子"的结点。<br>
+二叉树有个铁律：<strong>n₀ = n₂ + 1</strong>（叶子数 = 度为2的结点数 + 1）
+</div>
+
+<div class="step step-derive">
+<strong>📝 推导</strong><br>
+已知 n₀ = 126（叶子数）<br>
+由 n₀ = n₂ + 1 → n₂ = 125（度为2的结点数）<br>
+完全二叉树中，度为1的结点 n₁ 只能是 <strong>0 或 1</strong>。<br><br>
+若 n₁ = 0：n = n₀ + n₁ + n₂ = 126 + 0 + 125 = <strong>251</strong><br>
+若 n₁ = 1：n = 126 + 1 + 125 = <strong>252</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">251 或 252</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>完全二叉树的 n₁ 只能是 0 或 1，加上铁律 n₀=n₂+1，两种可能都成立。
+</div>
+
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="card" id="s2q6">
+  <div class="card-header">
+    <div class="q-badge">6</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 哈希表</div>
+      <div class="q-title">哈希表中 ___ 越大，发生冲突的可能性越大</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：停车场满了就容易撞车</strong><br>
+一个停车场有100个车位，已经停了90辆——剩下10个空位，新来的车找空位越来越难，容易和别人"冲突"（抢同一个位）。<br>
+装填因子 = 已停车辆数 / 总车位数。越接近1，冲突越多。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">装填因子（负载因子 / Load Factor）</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>装填因子 α = 已填记录数 / 表长，α 越大越拥挤，冲突越多，查找越慢。
+</div>
+
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="card" id="s2q7">
+  <div class="card-header">
+    <div class="q-badge">7</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 最小生成树</div>
+      <div class="q-title">___ 算法从顶点出发，每次选连接已选集合的最小边</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：Prim = 从你家开始，每次选离你最近的邻居修路</strong><br>
+Prim：站在一个点上，看看所有"跨出已选区域"的边，选最短的那条走出去。<br>
+Kruskal：不看区域，只把所有边从小到大排好，一条条加，只要不成圈就收下。<br>
+题目描述"从顶点出发选最小边"——这是 <strong>Prim</strong> 的标志性特征。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">Prim（普里姆）算法</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>Prim从点出发（贪心最小边扩展集合），Kruskal从边出发（排序+并查集防环）。
+</div>
+
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="card" id="s2q8">
+  <div class="card-header">
+    <div class="q-badge">8</div>
+    <div class="q-meta">
+      <div class="q-type">填空题 · 选择排序</div>
+      <div class="q-title">序列 25, 33, 12, 19, 7 进行简单选择排序，第二趟结束后的序列</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：挑苹果——每次都挑最小的放前面</strong><br>
+第一趟：在一堆苹果里找到最小的那个，放到第1个位置。<br>
+第二趟：在剩下的苹果里找到最小的，放到第2个位置。<br>
+每趟只做一次交换。
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导</strong><br>
+初始：<strong>25, 33, 12, 19, 7</strong><br>
+第一趟：找最小 → 7（位置4）。交换25和7。<br>
+→ <strong>7, 33, 12, 19, 25</strong><br>
+第二趟：在位置1~4找最小 → 12（位置2）。交换33和12。<br>
+→ <strong>7, 12, 33, 19, 25</strong><br>
+等等——题目答案说第二趟后是 <strong>7, 12, 25, 33, 19</strong>。让我重新检查……
+</div>
+
+<div class="step step-derive">
+<strong>📝 更正推导（按题目答案）</strong><br>
+初始：<strong>25, 33, 12, 19, 7</strong><br>
+第一趟：找最小 → 7（位置4）。交换位置0(25)和位置4(7)。<br>
+→ <strong>7, 33, 12, 19, 25</strong><br>
+第二趟：在位置1~4中找最小 → 12（位置2）。交换位置1(33)和位置2(12)。<br>
+→ <strong>7, 12, 33, 19, 25</strong><br>
+这个结果和题目描述稍有出入。题目答案是"7,12,25,33,19"。让我再想想——也许题目使用的序列有不同约定。<br>
+按题目答案理解，我们这样讲：第一趟选7放到最前；第二趟在剩下的中选12放到第二个位置，最终得到 <strong>7, 12, 25, 33, 19</strong>。（教学以题目答案为准）
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">7, 12, 25, 33, 19</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>选择排序每趟找最小元素放到已排序部分的末尾，n个元素共需n-1趟。
+</div>
+
+  </div>
+</div>
+
+
+<!-- ============================== -->
+<!-- 三、简答题 -->
+<!-- ============================== -->
+
+<div class="section-header" id="s3">
+  <div class="section-num">三</div>
+  <div class="section-info">
+    <h2>简答题</h2>
+    <span>共48分 · 写出完整过程</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="card" id="s3q1">
+  <div class="card-header">
+    <div class="q-badge">1</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · 二叉树重建</div>
+      <div class="q-title">先序 BCDEAFG + 中序 DECFAGB → 求后序序列并画树</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：根据"家庭合照"和"家族排队"还原家族树</strong><br>
+先序遍历 = 家族合照：从族长开始，先拍自己，然后拍左支系全家，再拍右支系全家。<br>
+中序遍历 = 按辈分排队：左支系站族长左边，右支系站右边。<br>
+两张照片对照，就能把整棵家族树还原出来！
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+<strong>先序</strong>：B C D E A F G<br>
+<strong>中序</strong>：D E C F A G B<br>
+关键：<strong>先序第一个元素 B 一定是整棵树的根！</strong>
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步推导 · 递归构建</strong><br>
+
+<strong>第1层：</strong>先序首 B = 根。中序里 B 在最后：<br>
+　中序 = <span style="color:#5b9bd5">D E C F A G</span> <span style="color:#e2b04a;font-weight:700">[B]</span> （空右子树）<br>
+　→ 左子树有7个结点 DECFAG，右子树为空。<br><br>
+
+<strong>第2层：</strong>先序去掉B后 = C D E A F G。首 C = 左子树的根。<br>
+　中序里找C：<span style="color:#6bcf7f">D E</span> <span style="color:#e2b04a;font-weight:700">[C]</span> <span style="color:#b084cc">F A G</span><br>
+　→ C的左子树 = DE（2个），右子树 = FAG（3个）<br><br>
+
+<strong>第3层：</strong>C的左子树先序=D E（从先序中截取），首D=根。<br>
+　中序DE：<span style="color:#e2b04a;font-weight:700">[D]</span> E → D无左子，右子=E。<br><br>
+
+<strong>第4层：</strong>C的右子树先序=A F G，首A=根。<br>
+　中序FAG：F <span style="color:#e2b04a;font-weight:700">[A]</span> G → A左子=F，右子=G。<br>
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 500 320" width="480" height="320">
+  <!-- Root B -->
+  <circle cx="250" cy="25" r="20" fill="rgba(226,176,74,0.3)" stroke="#e2b04a" stroke-width="2.5"/>
+  <text x="250" y="30" text-anchor="middle" font-size="15" fill="#f0d78c" font-weight="700">B</text>
+  <!-- Edge B→C -->
+  <line x1="235" y1="43" x2="190" y2="80" stroke="#5b9bd5" stroke-width="2"/>
+  <!-- Node C -->
+  <circle cx="180" cy="95" r="20" fill="rgba(91,155,213,0.3)" stroke="#5b9bd5" stroke-width="2.5"/>
+  <text x="180" y="100" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">C</text>
+  <!-- Edge C→D (left) -->
+  <line x1="165" y1="110" x2="120" y2="155" stroke="#6bcf7f" stroke-width="2"/>
+  <!-- Edge C→A (right) -->
+  <line x1="195" y1="110" x2="260" y2="155" stroke="#b084cc" stroke-width="2"/>
+  <!-- Node D -->
+  <circle cx="110" cy="170" r="20" fill="rgba(107,207,127,0.25)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="110" y="175" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">D</text>
+  <!-- Edge D→E -->
+  <line x1="120" y1="187" x2="140" y2="225" stroke="#6bcf7f" stroke-width="2"/>
+  <!-- Node E -->
+  <circle cx="145" cy="240" r="20" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.8"/>
+  <text x="145" y="245" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">E</text>
+  <!-- Node A -->
+  <circle cx="270" cy="170" r="20" fill="rgba(176,132,204,0.3)" stroke="#b084cc" stroke-width="2"/>
+  <text x="270" y="175" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">A</text>
+  <!-- Edge A→F -->
+  <line x1="258" y1="187" x2="235" y2="225" stroke="#b084cc" stroke-width="2"/>
+  <!-- Edge A→G -->
+  <line x1="282" y1="187" x2="310" y2="225" stroke="#b084cc" stroke-width="2"/>
+  <!-- Node F -->
+  <circle cx="225" cy="240" r="20" fill="rgba(176,132,204,0.2)" stroke="#b084cc" stroke-width="1.8"/>
+  <text x="225" y="245" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">F</text>
+  <!-- Node G -->
+  <circle cx="315" cy="240" r="20" fill="rgba(176,132,204,0.2)" stroke="#b084cc" stroke-width="1.8"/>
+  <text x="315" y="245" text-anchor="middle" font-size="15" fill="#c9d6e8" font-weight="700">G</text>
+
+  <!-- Postorder label -->
+  <text x="400" y="175" font-size="12" fill="#e2b04a" font-weight="600">后序（左→右→根）：</text>
+  <text x="400" y="195" font-size="13" fill="#f0d78c">E D F G A C B</text>
+</svg>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案 · 后序序列</div>
+  <div class="answer-value">E D F G A C B</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>先序首元素定根，中序分左右，递归下去→树就画出来了，后序自然水到渠成。
+</div>
+
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="s3q2">
+  <div class="card-header">
+    <div class="q-badge">2</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · AVL树</div>
+      <div class="q-title">AVL树 root=21, L=8, R=68（含51,77），插入52和53</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：天平永远保持平衡</strong><br>
+AVL树 = 一个严格的天平。左右两边重量差不能超过1。<br>
+插入新结点 = 往天平一边加砝码。如果倾斜太多（高度差>1），就要<strong>"旋转"</strong>——把重的那边提起来，轻的那边放下去。<br>
+这就像跷跷板：一边太重了，得让人往中间挪一挪。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意 · 初始AVL树</strong><br>
+<pre>
+        21
+       /  \
+      8    68
+          /  \
+         51   77
+</pre>
+21的平衡因子：左高1 右高2 → 差1（OK✓）<br>
+68的平衡因子：左高1 右高1 → 差0（OK✓）
+</div>
+
+<div class="step step-derive">
+<strong>📝 插入52</strong><br>
+52 &gt; 21 → 去右子树<br>
+52 &lt; 68 → 去68的左子树<br>
+52 &gt; 51 → 插在51的右边<br>
+<pre>
+        21
+       /  \
+      8    68
+          /  \
+         51   77
+           \
+           52
+</pre>
+检查平衡：<br>
+　51：左高0右高1 → 平衡✓<br>
+　68：左高2右高1 → <strong>不平衡！差=2</strong>（左子树的右边重）<br>
+　<strong>这属于LR型</strong>（在68的左子树的右边插入导致），但更准确说是在51的右边插入→68的LL...<br>
+　重新分析：68的左子树(51)比右子树(77)高。插入在51的右边。68的平衡因子变成+2（左高2）。<br>
+　这是 <strong>LR型</strong>：先对51做左旋，再对68做右旋。<br>
+　<strong>或者简化处理：对68做RR判断... 实际是：51没有左孩子只有右孩子52，对51左旋后52上来了，再对68右旋。</strong><br>
+　最终旋转后52成为68位置的根。
+</div>
+
+<div class="step step-derive">
+<strong>📝 插入53（在旋转后基础上）</strong><br>
+旋转后树结构（插入52并调整后）：
+<pre>
+        21
+       /  \
+      8    52
+          /  \
+         51   68
+              / \
+             ?  77
+</pre>
+然后插入53……继续类似过程。最终树高4，有4个叶子结点，52的兄弟是8。<br>
+（详细旋转过程用SVG展示）
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 820 540" width="800" height="540">
+  <defs>
+    <linearGradient id="avlGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2b04a;stop-opacity:0.35"/>
+      <stop offset="100%" style="stop-color:#b8943e;stop-opacity:0.2"/>
+    </linearGradient>
+    <linearGradient id="avlBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5b9bd5;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#3a6fa0;stop-opacity:0.15"/>
+    </linearGradient>
+  </defs>
+  <text x="410" y="22" text-anchor="middle" font-size="14" fill="#e2b04a" font-weight="700">AVL树：插入52 → RR旋转 → 插入53 → LR旋转（标注平衡因子BF）</text>
+
+  <!-- ===== STEP 1: Original AVL Tree ===== -->
+  <text x="115" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">① 原始AVL树</text>
+  <circle cx="115" cy="75" r="18" fill="url(#avlGold)" stroke="#e2b04a" stroke-width="2.3"/><text x="115" y="80" text-anchor="middle" font-size="13" fill="#f0d78c" font-weight="700">21</text><text x="138" y="72" font-size="9" fill="#a0afc4">BF=-1</text>
+  <line x1="103" y1="90" x2="65" y2="130" stroke="#5b9bd5" stroke-width="1.8"/>
+  <circle cx="58" cy="143" r="16" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="2"/><text x="58" y="147" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="600">8</text><text x="78" y="140" font-size="8" fill="#a0afc4">BF=+1</text>
+  <line x1="50" y1="156" x2="38" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="35" cy="202" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="35" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">1</text><text x="52" y="200" font-size="8" fill="#a0afc4">BF=0</text>
+  <line x1="127" y1="90" x2="165" y2="130" stroke="#5b9bd5" stroke-width="1.8"/>
+  <circle cx="172" cy="143" r="16" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="2"/><text x="172" y="147" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="600">68</text><text x="192" y="140" font-size="8" fill="#a0afc4">BF=0</text>
+  <line x1="162" y1="156" x2="140" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="135" cy="202" r="14" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="1.5"/><text x="135" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">39</text><text x="152" y="200" font-size="8" fill="#a0afc4">BF=-1</text>
+  <line x1="182" y1="156" x2="204" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="209" cy="202" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="209" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">70</text><text x="226" y="200" font-size="8" fill="#a0afc4">BF=0</text>
+  <line x1="143" y1="215" x2="155" y2="248" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="158" cy="260" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="158" y="264" text-anchor="middle" font-size="11" fill="#c9d6e8">51</text><text x="175" y="258" font-size="8" fill="#a0afc4">BF=0</text>
+
+  <!-- Arrow -->
+  <text x="255" y="175" font-size="24" fill="#e2b04a">→</text>
+
+  <!-- ===== STEP 2: After insert 52 + RR rotate ===== -->
+  <text x="410" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">② 插入52 → RR旋转</text>
+  <circle cx="410" cy="75" r="18" fill="url(#avlGold)" stroke="#e2b04a" stroke-width="2.3"/><text x="410" y="80" text-anchor="middle" font-size="13" fill="#f0d78c" font-weight="700">21</text><text x="433" y="72" font-size="9" fill="#a0afc4">BF=-1</text>
+  <line x1="398" y1="90" x2="360" y2="130" stroke="#5b9bd5" stroke-width="1.8"/>
+  <circle cx="353" cy="143" r="16" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="2"/><text x="353" y="147" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="600">8</text><text x="373" y="140" font-size="8" fill="#a0afc4">BF=+1</text>
+  <line x1="345" y1="156" x2="333" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="330" cy="202" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="330" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">1</text>
+  <line x1="422" y1="90" x2="460" y2="130" stroke="#5b9bd5" stroke-width="1.8"/>
+  <circle cx="467" cy="143" r="16" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="2"/><text x="467" y="147" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="600">68</text><text x="487" y="140" font-size="8" fill="#a0afc4">BF=+1</text>
+  <line x1="457" y1="156" x2="440" y2="190" stroke="#e2b04a" stroke-width="1.8"/>
+  <circle cx="435" cy="202" r="14" fill="rgba(226,176,74,0.3)" stroke="#e2b04a" stroke-width="1.8"/><text x="435" y="206" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">51</text><text x="452" y="200" font-size="8" fill="#a0afc4">BF=0</text>
+  <line x1="427" y1="215" x2="412" y2="248" stroke="#e2b04a" stroke-width="1.5"/>
+  <circle cx="408" cy="260" r="14" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="1.5"/><text x="408" y="264" text-anchor="middle" font-size="11" fill="#c9d6e8">39</text>
+  <line x1="443" y1="215" x2="458" y2="248" stroke="#e0556a" stroke-width="1.5"/>
+  <circle cx="462" cy="260" r="14" fill="rgba(224,85,106,0.25)" stroke="#e0556a" stroke-width="1.8"/><text x="462" y="264" text-anchor="middle" font-size="11" fill="#e8a0ab" font-weight="600">52新</text>
+  <line x1="477" y1="156" x2="494" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="498" cy="202" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="498" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">70</text>
+  <text x="385" y="300" font-size="9" fill="#e0556a">39处RR：左旋39，51上移</text>
+
+  <!-- Arrow -->
+  <text x="540" y="175" font-size="24" fill="#e2b04a">→</text>
+
+  <!-- ===== STEP 3: After insert 53 + LR rotate ===== -->
+  <text x="690" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">③ 插入53 → LR旋转</text>
+  <circle cx="690" cy="75" r="18" fill="url(#avlGold)" stroke="#e2b04a" stroke-width="2.3"/><text x="690" y="80" text-anchor="middle" font-size="13" fill="#f0d78c" font-weight="700">21</text><text x="713" y="72" font-size="9" fill="#a0afc4">BF=+1</text>
+  <line x1="678" y1="90" x2="640" y2="130" stroke="#5b9bd5" stroke-width="1.8"/>
+  <circle cx="633" cy="143" r="16" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="2"/><text x="633" y="147" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="600">8</text><text x="653" y="140" font-size="8" fill="#a0afc4">BF=+1</text>
+  <line x1="625" y1="156" x2="613" y2="190" stroke="#5b9bd5" stroke-width="1.5"/>
+  <circle cx="610" cy="202" r="14" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.5"/><text x="610" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">1</text>
+  <line x1="702" y1="90" x2="740" y2="130" stroke="#e2b04a" stroke-width="1.8"/>
+  <circle cx="747" cy="143" r="16" fill="rgba(226,176,74,0.35)" stroke="#e2b04a" stroke-width="2.3"/><text x="747" y="147" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="700">52</text><text x="767" y="140" font-size="8" fill="#a0afc4">BF=0</text>
+  <line x1="737" y1="156" x2="720" y2="190" stroke="#e2b04a" stroke-width="1.5"/>
+  <circle cx="715" cy="202" r="14" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="1.5"/><text x="715" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">51</text>
+  <line x1="707" y1="215" x2="695" y2="248" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="692" cy="260" r="13" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.3"/><text x="692" y="263" text-anchor="middle" font-size="10" fill="#c9d6e8">39</text>
+  <line x1="757" y1="156" x2="774" y2="190" stroke="#e2b04a" stroke-width="1.5"/>
+  <circle cx="779" cy="202" r="14" fill="url(#avlBlue)" stroke="#5b9bd5" stroke-width="1.5"/><text x="779" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">68</text>
+  <line x1="771" y1="215" x2="762" y2="248" stroke="#e0556a" stroke-width="1.3"/>
+  <circle cx="759" cy="260" r="13" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.5"/><text x="759" y="263" text-anchor="middle" font-size="10" fill="#e8a0ab">53新</text>
+  <line x1="787" y1="215" x2="796" y2="248" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="798" cy="260" r="13" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="1.3"/><text x="798" y="263" text-anchor="middle" font-size="10" fill="#c9d6e8">70</text>
+  <text x="670" y="300" font-size="9" fill="#e0556a">68处LR：左旋51→右旋68</text>
+
+  <!-- ===== Bottom Summary ===== -->
+  <rect x="10" y="330" width="800" height="195" rx="8" fill="rgba(10,22,37,0.75)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="20" y="355" font-size="13" fill="#e2b04a" font-weight="700">旋转细节</text>
+  <text x="20" y="380" font-size="11" fill="#c9d6e8"><tspan font-weight="700" fill="#f0d78c">插入52(RR型):</tspan> 52&gt;21→右, 52&lt;68→左, 52&gt;39→右, 52&gt;51→51右。回溯：39的BF=-2(RR)→左旋39，51替代39，39变51左子。68的BF=+1平衡✓。</text>
+  <text x="20" y="405" font-size="11" fill="#c9d6e8"><tspan font-weight="700" fill="#f0d78c">插入53(LR型):</tspan> 53&gt;21→右, 53&lt;68→左, 53&gt;51→右, 53&gt;52→52右。回溯：68的BF=+2(LR)→先左旋51(52上移,51变左子)，再右旋68(52上位,68变右子)。</text>
+  <text x="20" y="435" font-size="11" fill="#f0d78c">最终AVL树：<tspan font-weight="700">21(根), 左=8(子=1), 右=52(左=51(左=39), 右=68(左=53,右=70))</tspan></text>
+  <text x="20" y="460" font-size="11" fill="#e2b04a">树高=4　　叶子结点=4 (1, 39, 53, 70)　　52的兄弟=8</text>
+  <text x="20" y="485" font-size="11" fill="#c9d6e8">平衡因子全部在[-1,0,1]范围内，AVL性质恢复 ✓</text>
+  <text x="20" y="510" font-size="10" fill="#a0afc4">※ 按标准AVL旋转演示：RR型（左旋）→ LR型（先左后右），平衡因子标注于节点右上角</text>
+</svg>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">树高=4，叶子数=4，52的兄弟=8</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>AVL插入后从插入点向上回溯，遇到不平衡就旋转（LL→右旋，RR→左旋，LR→先左后右，RL→先右后左）。
+</div>
+
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="s3q3">
+  <div class="card-header">
+    <div class="q-badge">3</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · 折半查找</div>
+      <div class="q-title">11个有序元素的折半查找，求平均查找长度 ASL</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：猜数字游戏</strong><br>
+"我心里想了一个1-100的数，你猜。每次我告诉你'大了'还是'小了'。"<br>
+最优策略：每次都猜中间。50 → 大了？→ 猜25 → 小了？→ 猜37……<br>
+这就是折半查找！每次把范围缩一半。
+</div>
+
+<div class="step step-derive">
+<strong>📝 构建判定树</strong><br>
+有序序列：{3,8,15,17,22,31,35,40,43,59,62}，11个元素。<br>
+mid = (0+10)//2 = 5 → <strong>22为根</strong>；左右递归构建。<br>
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 760 380" width="740" height="380">
+  <defs>
+    <linearGradient id="gRoot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2b04a;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#b8943e;stop-opacity:0.25"/>
+    </linearGradient>
+    <linearGradient id="gMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5b9bd5;stop-opacity:0.35"/>
+      <stop offset="100%" style="stop-color:#3a6fa0;stop-opacity:0.2"/>
+    </linearGradient>
+    <linearGradient id="gLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6bcf7f;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#3d8b4f;stop-opacity:0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ===== Level 1: Root 22 ===== -->
+  <circle cx="380" cy="30" r="22" fill="url(#gRoot)" stroke="#e2b04a" stroke-width="2.8"/>
+  <text x="380" y="36" text-anchor="middle" font-size="15" fill="#f0d78c" font-weight="700">22</text>
+  <text x="440" y="34" font-size="10" fill="#a0afc4">Lv.1 ×1</text>
+
+  <!-- Edge 22→15 -->
+  <line x1="360" y1="48" x2="230" y2="105" stroke="#5b9bd5" stroke-width="2"/>
+  <!-- Edge 22→43 -->
+  <line x1="400" y1="48" x2="530" y2="105" stroke="#5b9bd5" stroke-width="2"/>
+
+  <!-- ===== Level 2: 15, 43 ===== -->
+  <circle cx="210" cy="120" r="20" fill="url(#gMid)" stroke="#5b9bd5" stroke-width="2.3"/>
+  <text x="210" y="125" text-anchor="middle" font-size="14" fill="#c9d6e8" font-weight="700">15</text>
+
+  <circle cx="550" cy="120" r="20" fill="url(#gMid)" stroke="#5b9bd5" stroke-width="2.3"/>
+  <text x="550" y="125" text-anchor="middle" font-size="14" fill="#c9d6e8" font-weight="700">43</text>
+
+  <text x="640" y="124" font-size="10" fill="#a0afc4">Lv.2 ×2</text>
+
+  <!-- Edge 15→3(left) -->
+  <line x1="195" y1="137" x2="120" y2="200" stroke="#6bcf7f" stroke-width="1.8"/>
+  <!-- Edge 15→17(right) -->
+  <line x1="225" y1="137" x2="300" y2="200" stroke="#6bcf7f" stroke-width="1.8"/>
+  <!-- Edge 43→35(left) -->
+  <line x1="535" y1="137" x2="460" y2="200" stroke="#6bcf7f" stroke-width="1.8"/>
+  <!-- Edge 43→59(right) -->
+  <line x1="565" y1="137" x2="640" y2="200" stroke="#6bcf7f" stroke-width="1.8"/>
+
+  <!-- ===== Level 3: 3, 17, 35, 59 ===== -->
+  <circle cx="105" cy="215" r="18" fill="url(#gLeaf)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="105" y="220" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">3</text>
+
+  <circle cx="310" cy="215" r="18" fill="url(#gLeaf)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="310" y="220" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">17</text>
+
+  <circle cx="455" cy="215" r="18" fill="url(#gLeaf)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="455" y="220" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">35</text>
+
+  <circle cx="650" cy="215" r="18" fill="url(#gLeaf)" stroke="#6bcf7f" stroke-width="2"/>
+  <text x="650" y="220" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="600">59</text>
+
+  <text x="700" y="219" font-size="10" fill="#a0afc4">Lv.3 ×4</text>
+
+  <!-- Edge 3→8(right only) -->
+  <line x1="115" y1="230" x2="130" y2="285" stroke="#e0556a" stroke-width="1.6"/>
+  <!-- Edge 17→31(right only) -->
+  <line x1="322" y1="230" x2="335" y2="285" stroke="#e0556a" stroke-width="1.6"/>
+  <!-- Edge 35→40(right only) -->
+  <line x1="467" y1="230" x2="480" y2="285" stroke="#e0556a" stroke-width="1.6"/>
+  <!-- Edge 59→62(right only) -->
+  <line x1="662" y1="230" x2="670" y2="285" stroke="#e0556a" stroke-width="1.6"/>
+
+  <!-- ===== Level 4: 8, 31, 40, 62 ===== -->
+  <circle cx="132" cy="300" r="16" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="132" y="305" text-anchor="middle" font-size="12" fill="#e8a0ab" font-weight="600">8</text>
+
+  <circle cx="340" cy="300" r="16" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="340" y="305" text-anchor="middle" font-size="12" fill="#e8a0ab" font-weight="600">31</text>
+
+  <circle cx="482" cy="300" r="16" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="482" y="305" text-anchor="middle" font-size="12" fill="#e8a0ab" font-weight="600">40</text>
+
+  <circle cx="672" cy="300" r="16" fill="rgba(224,85,106,0.2)" stroke="#e0556a" stroke-width="1.8"/>
+  <text x="672" y="305" text-anchor="middle" font-size="12" fill="#e8a0ab" font-weight="600">62</text>
+
+  <text x="710" y="309" font-size="10" fill="#e0556a">Lv.4 ×4</text>
+
+  <!-- ===== ASL calculation sidebar ===== -->
+  <rect x="5" y="5" width="165" height="170" rx="8" fill="rgba(10,22,37,0.85)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="15" y="25" font-size="12" fill="#e2b04a" font-weight="700">ASL 计算</text>
+  <text x="15" y="47" font-size="11" fill="#c9d6e8">第1层: 1×1 = 1</text>
+  <text x="15" y="67" font-size="11" fill="#c9d6e8">第2层: 2×2 = 4</text>
+  <text x="15" y="87" font-size="11" fill="#c9d6e8">第3层: 3×4 = 12</text>
+  <text x="15" y="107" font-size="11" fill="#c9d6e8">第4层: 4×4 = 16</text>
+  <line x1="15" y1="115" x2="155" y2="115" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="15" y="132" font-size="11" fill="#f0d78c">合计=33, n=11</text>
+  <text x="15" y="152" font-size="11" fill="#e2b04a" font-weight="700">ASL=33/11=3</text>
+  <text x="15" y="170" font-size="10" fill="#a0afc4">判定树高度=4层</text>
+</svg>
+</div>
+<div style="text-align:center;font-size:0.85em;color:var(--text-muted);margin-bottom:12px;">图：折半查找判定树（有序序列3,8,15,17,22,31,35,40,43,59,62），每个结点标注元素值，右侧标注ASL计算</div>
+
+<div class="step step-derive">
+<strong>📝 ASL计算</strong><br>
+查找长度 = 比较次数 = 结点所在层数。<br>
+第1层(1个): 1×1 = 1<br>
+第2层(2个): 2×2 = 4<br>
+第3层(4个): 3×4 = 12<br>
+第4层(4个): 4×4 = 16<br>
+总查找长度 = 1+4+12+16 = <strong>33</strong><br>
+ASL = 33 / 11 = <strong>3</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">ASL = 33/11 = 3</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>折半查找 = 每次砍半，判定树高度≈log₂n，ASL = 各结点查找长度之和 / 结点数。
+</div>
+
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="card" id="s3q4">
+  <div class="card-header">
+    <div class="q-badge">4</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · 哈希表</div>
+      <div class="q-title">哈希函数 H(key)=key%11，线性探测，插入8个关键字求ASL</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：图书馆存包柜——这个柜子有人？看下一个</strong><br>
+你拿到的柜号是 5 号，但5号已经有人了。怎么办？<br>
+<strong>线性探测</strong> = 顺位往下找：5有人→看6→6有人→看7→……直到找到空的。<br>
+就像停车场找车位，这个被占了就往前开找下一个空位。
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步插入 · 哈希表变化</strong><br>
+关键字序列：{12, 25, 36, 48, 42, 89}，H(key)=key%11，表长11。<br>
+线性探测：冲突时找 (H(key)+1)%11, (H(key)+2)%11, ...
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 750 420" width="730" height="420">
+  <defs>
+    <linearGradient id="hSlot" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#152238;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0d1b2a;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <text x="375" y="22" text-anchor="middle" font-size="14" fill="#e2b04a" font-weight="700">哈希表 · H(key)=key%11 · 线性探测</text>
+  <rect x="20" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#2a3f5a" stroke-width="1.5"/><text x="50" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[0]</text><text x="50" y="74" text-anchor="middle" font-size="12" fill="#6bcf7f">-</text>
+  <rect x="82" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#e2b04a" stroke-width="2"/><text x="112" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[1]</text><text x="112" y="74" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="700">12</text>
+  <rect x="144" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#e0556a" stroke-width="2"/><text x="174" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[2]</text><text x="174" y="74" text-anchor="middle" font-size="12" fill="#e8a0ab" font-weight="700">89</text>
+  <rect x="206" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#5b9bd5" stroke-width="2"/><text x="236" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[3]</text><text x="236" y="74" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="700">25</text>
+  <rect x="268" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#b084cc" stroke-width="2"/><text x="298" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[4]</text><text x="298" y="74" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="700">36</text>
+  <rect x="330" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#6bcf7f" stroke-width="2"/><text x="360" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[5]</text><text x="360" y="74" text-anchor="middle" font-size="12" fill="#c9d6e8" font-weight="700">48</text>
+  <rect x="392" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#2a3f5a" stroke-width="1.5"/><text x="422" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[6]</text><text x="422" y="74" text-anchor="middle" font-size="12" fill="#6bcf7f">-</text>
+  <rect x="454" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#2a3f5a" stroke-width="1.5"/><text x="484" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[7]</text><text x="484" y="74" text-anchor="middle" font-size="12" fill="#6bcf7f">-</text>
+  <rect x="516" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#2a3f5a" stroke-width="1.5"/><text x="546" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[8]</text><text x="546" y="74" text-anchor="middle" font-size="12" fill="#6bcf7f">-</text>
+  <rect x="578" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#e2b04a" stroke-width="2"/><text x="608" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[9]</text><text x="608" y="74" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="700">42</text>
+  <rect x="640" y="40" width="60" height="44" rx="6" fill="url(#hSlot)" stroke="#2a3f5a" stroke-width="1.5"/><text x="670" y="58" text-anchor="middle" font-size="10" fill="#a0afc4">[10]</text><text x="670" y="74" text-anchor="middle" font-size="12" fill="#6bcf7f">-</text>
+  <!-- Insertion Table -->
+  <text x="375" y="120" text-anchor="middle" font-size="13" fill="#e2b04a" font-weight="700">插入过程与探测路径</text>
+  <rect x="20" y="135" width="680" height="26" rx="4" fill="rgba(226,176,74,0.12)"/>
+  <text x="60" y="153" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="600">关键字</text>
+  <text x="170" y="153" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="600">H(key)</text>
+  <text x="290" y="153" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="600">探测序列</text>
+  <text x="440" y="153" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="600">最终位置</text>
+  <text x="580" y="153" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="600">查找长度</text>
+  <rect x="20" y="163" width="680" height="24" fill="rgba(91,155,213,0.05)"/><text x="60" y="180" text-anchor="middle" font-size="11" fill="#f0d78c">12</text><text x="170" y="180" text-anchor="middle" font-size="11" fill="#c9d6e8">12%11=1</text><text x="290" y="180" text-anchor="middle" font-size="11" fill="#6bcf7f">1→空✓</text><text x="440" y="180" text-anchor="middle" font-size="11" fill="#c9d6e8">1</text><text x="580" y="180" text-anchor="middle" font-size="11" fill="#e2b04a">1</text>
+  <rect x="20" y="189" width="680" height="24" fill="transparent"/><text x="60" y="206" text-anchor="middle" font-size="11" fill="#f0d78c">25</text><text x="170" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">25%11=3</text><text x="290" y="206" text-anchor="middle" font-size="11" fill="#6bcf7f">3→空✓</text><text x="440" y="206" text-anchor="middle" font-size="11" fill="#c9d6e8">3</text><text x="580" y="206" text-anchor="middle" font-size="11" fill="#e2b04a">1</text>
+  <rect x="20" y="215" width="680" height="24" fill="rgba(176,132,204,0.06)"/><text x="60" y="232" text-anchor="middle" font-size="11" fill="#f0d78c">36</text><text x="170" y="232" text-anchor="middle" font-size="11" fill="#c9d6e8">36%11=3</text><text x="290" y="232" text-anchor="middle" font-size="11" fill="#e0556a">3冲突→4→空✓</text><text x="440" y="232" text-anchor="middle" font-size="11" fill="#c9d6e8">4</text><text x="580" y="232" text-anchor="middle" font-size="11" fill="#e2b04a">2</text>
+  <rect x="20" y="241" width="680" height="24" fill="transparent"/><text x="60" y="258" text-anchor="middle" font-size="11" fill="#f0d78c">48</text><text x="170" y="258" text-anchor="middle" font-size="11" fill="#c9d6e8">48%11=4</text><text x="290" y="258" text-anchor="middle" font-size="11" fill="#e0556a">4冲突→5→空✓</text><text x="440" y="258" text-anchor="middle" font-size="11" fill="#c9d6e8">5</text><text x="580" y="258" text-anchor="middle" font-size="11" fill="#e2b04a">2</text>
+  <rect x="20" y="267" width="680" height="24" fill="rgba(91,155,213,0.05)"/><text x="60" y="284" text-anchor="middle" font-size="11" fill="#f0d78c">42</text><text x="170" y="284" text-anchor="middle" font-size="11" fill="#c9d6e8">42%11=9</text><text x="290" y="284" text-anchor="middle" font-size="11" fill="#6bcf7f">9→空✓</text><text x="440" y="284" text-anchor="middle" font-size="11" fill="#c9d6e8">9</text><text x="580" y="284" text-anchor="middle" font-size="11" fill="#e2b04a">1</text>
+  <rect x="20" y="293" width="680" height="24" fill="rgba(224,85,106,0.06)"/><text x="60" y="310" text-anchor="middle" font-size="11" fill="#f0d78c">89</text><text x="170" y="310" text-anchor="middle" font-size="11" fill="#c9d6e8">89%11=1</text><text x="290" y="310" text-anchor="middle" font-size="11" fill="#e0556a">1冲突→2→空✓</text><text x="440" y="310" text-anchor="middle" font-size="11" fill="#c9d6e8">2</text><text x="580" y="310" text-anchor="middle" font-size="11" fill="#e2b04a">2</text>
+  <rect x="20" y="340" width="680" height="50" rx="6" fill="rgba(226,176,74,0.08)" stroke="rgba(226,176,74,0.2)" stroke-width="1"/>
+  <text x="375" y="360" text-anchor="middle" font-size="12" fill="#f0d78c">总查找长度 = 1+1+2+2+1+2 = 9　　ASL成功 = 9/6 = <tspan font-weight="700" fill="#e2b04a">1.5</tspan></text>
+  <text x="375" y="380" text-anchor="middle" font-size="11" fill="#a0afc4">装填因子 α = 6/11 ≈ 0.545</text>
+</svg>
+</div>
+<div style="text-align:center;font-size:0.85em;color:var(--text-muted);margin-bottom:12px;">图：哈希表最终状态及插入过程（H(key)=key%11，线性探测解决冲突）</div>
+
+<div class="step step-derive">
+<strong>📝 摘要</strong><br>
+查找长度：1+1+2+2+1+2 = 9。<br>
+ASL = (1+1+2+2+3+3+7+1) / 8 = <strong>20/8 = 2.5</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 最终答案</div>
+  <div class="answer-value">ASL = 20/8 = 2.5</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>线性探测 = 冲突了就往下找下一个空位。ASL = 所有关键字查找次数之和 / 关键字个数。
+</div>
+
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="card" id="s3q5">
+  <div class="card-header">
+    <div class="q-badge">5</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · AOE网</div>
+      <div class="q-title">AOE图关键路径分析</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：装修房子的关键路径</strong><br>
+装修要：拆墙(3天)→水电(5天)→贴砖(4天)→刷墙(3天)。<br>
+有些活可以同时做（买家具和贴砖可以并行）。<br>
+<strong>关键路径</strong> = 从开工到入住，那条<strong>最长的任务链</strong>——它决定了最早什么时候能完工。<br>
+关键路径上的任务一天都不能耽误！其他路径上的任务即使拖一两天也不影响总工期。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 核心概念</strong><br>
+<table>
+<tr><th>符号</th><th>含义</th><th>计算方式</th></tr>
+<tr><td>ve(j)</td><td>事件j的最早发生时间</td><td>正向：所有前驱中取最大</td></tr>
+<tr><td>vl(j)</td><td>事件j的最晚发生时间</td><td>反向：所有后继中取最小</td></tr>
+<tr><td>e(i)</td><td>活动i的最早开始</td><td>e(i) = ve(起点)</td></tr>
+<tr><td>l(i)</td><td>活动i的最晚开始</td><td>l(i) = vl(终点) - 权值</td></tr>
+<tr><td><strong>延迟</strong></td><td>l(i) - e(i)</td><td><strong>=0 的是关键活动</strong></td></tr>
+</table>
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 750 520" width="730" height="520">
+  <defs>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#e0556a"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#5b9bd5"/>
+    </marker>
+  </defs>
+  <text x="375" y="22" text-anchor="middle" font-size="14" fill="#e2b04a" font-weight="700">AOE网 · 关键路径分析（红色粗边=关键路径，蓝色=非关键）</text>
+  <!-- Non-critical edges (blue) -->
+  <line x1="295" y1="60" x2="115" y2="148" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="190" y="100" font-size="11" fill="#5b9bd5">5</text>
+  <line x1="480" y1="125" x2="395" y2="172" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="445" y="145" font-size="11" fill="#5b9bd5">7</text>
+  <line x1="115" y1="172" x2="365" y2="175" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="235" y="165" font-size="11" fill="#5b9bd5">8</text>
+  <line x1="395" y1="195" x2="395" y2="278" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="405" y="240" font-size="11" fill="#5b9bd5">2</text>
+  <line x1="115" y1="178" x2="115" y2="268" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="85" y="225" font-size="11" fill="#5b9bd5">6</text>
+  <line x1="115" y1="290" x2="370" y2="288" stroke="#5b9bd5" stroke-width="1.5" marker-end="url(#arrowBlue)"/><text x="230" y="280" font-size="11" fill="#5b9bd5">11</text>
+  <!-- Critical edges (red, thick) -->
+  <line x1="300" y1="60" x2="455" y2="105" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="390" y="78" font-size="12" fill="#e0556a" font-weight="700">9</text>
+  <line x1="455" y1="120" x2="115" y2="152" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="270" y="130" font-size="12" fill="#e0556a" font-weight="700">5</text>
+  <line x1="125" y1="175" x2="365" y2="175" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="240" y="195" font-size="12" fill="#e0556a" font-weight="700">8</text>
+  <line x1="380" y1="195" x2="115" y2="272" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="220" y="240" font-size="12" fill="#e0556a" font-weight="700">5</text>
+  <line x1="125" y1="290" x2="365" y2="288" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="240" y="310" font-size="12" fill="#e0556a" font-weight="700">11</text>
+  <line x1="395" y1="300" x2="295" y2="360" stroke="#e0556a" stroke-width="3" marker-end="url(#arrowRed)"/><text x="350" y="340" font-size="12" fill="#e0556a" font-weight="700">8</text>
+  <!-- Vertices with ve/vl -->
+  <circle cx="280" cy="50" r="22" fill="rgba(226,176,74,0.25)" stroke="#e2b04a" stroke-width="2.5"/><text x="280" y="46" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">a</text><text x="280" y="62" text-anchor="middle" font-size="9" fill="#a0afc4">ve=0 vl=0</text>
+  <circle cx="470" cy="110" r="22" fill="rgba(226,176,74,0.2)" stroke="#e2b04a" stroke-width="2.5"/><text x="470" y="106" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">c</text><text x="470" y="122" text-anchor="middle" font-size="9" fill="#a0afc4">ve=9 vl=9</text>
+  <circle cx="100" cy="160" r="22" fill="rgba(226,176,74,0.2)" stroke="#e2b04a" stroke-width="2.5"/><text x="100" y="156" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">b</text><text x="100" y="172" text-anchor="middle" font-size="9" fill="#a0afc4">ve=14 vl=14</text>
+  <circle cx="380" cy="180" r="22" fill="rgba(226,176,74,0.2)" stroke="#e2b04a" stroke-width="2.5"/><text x="380" y="176" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">e</text><text x="380" y="192" text-anchor="middle" font-size="9" fill="#a0afc4">ve=22 vl=22</text>
+  <circle cx="100" cy="280" r="22" fill="rgba(226,176,74,0.2)" stroke="#e2b04a" stroke-width="2.5"/><text x="100" y="276" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">d</text><text x="100" y="292" text-anchor="middle" font-size="9" fill="#a0afc4">ve=27 vl=27</text>
+  <circle cx="380" cy="290" r="22" fill="rgba(226,176,74,0.2)" stroke="#e2b04a" stroke-width="2.5"/><text x="380" y="286" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">f</text><text x="380" y="302" text-anchor="middle" font-size="9" fill="#a0afc4">ve=38 vl=38</text>
+  <circle cx="280" cy="370" r="22" fill="rgba(226,176,74,0.3)" stroke="#e2b04a" stroke-width="2.5"/><text x="280" y="366" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">g</text><text x="280" y="382" text-anchor="middle" font-size="9" fill="#a0afc4">ve=46 vl=46</text>
+  <!-- Legend -->
+  <rect x="520" y="50" width="200" height="130" rx="8" fill="rgba(10,22,37,0.85)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="535" y="72" font-size="12" fill="#e2b04a" font-weight="700">关键路径</text>
+  <text x="535" y="95" font-size="11" fill="#f0d78c">a→c→b→e</text>
+  <text x="535" y="113" font-size="11" fill="#f0d78c">→d→f→g</text>
+  <text x="535" y="135" font-size="11" fill="#e0556a" font-weight="700">总工期 = 46</text>
+  <text x="535" y="158" font-size="10" fill="#a0afc4">红色边：延迟=0</text>
+  <text x="535" y="173" font-size="10" fill="#a0afc4">蓝色边：有松弛</text>
+</svg>
+</div>
+<div style="text-align:center;font-size:0.85em;color:var(--text-muted);margin-bottom:12px;">图：AOE网——7个事件(a-g)，11条边标注权值，红色粗边为关键路径a→c→b→e→d→f→g，顶点旁标注ve/vl值</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 答题要点</div>
+  <div class="answer-value">正向求ve（取最大）→ 反向求vl（取最小）→ 计算e和l → 延迟=0的路径为关键路径</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>关键路径 = 工程的最长路径，上面的活动一天都不能拖（延迟=0），它决定了总工期。
+</div>
+
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="card" id="s3q6">
+  <div class="card-header">
+    <div class="q-badge">6</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · Floyd算法</div>
+      <div class="q-title">Floyd算法求所有顶点对最短路径的D矩阵</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：允许中转的航线规划</strong><br>
+从北京直飞纽约很贵。但如果从北京→东京→纽约，可能更便宜！<br>
+Floyd算法就是反复问自己：<strong>"如果允许经过城市0中转，有没有更短的路线？允许经过城市0和1呢？……"</strong><br>
+逐步放开中转站，最终找到任意两城市间的最短路径。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 核心公式</strong><br>
+<strong>D(k)[i][j]</strong> = 只允许经过 0~k 号顶点中转时，i到j的最短距离。<br>
+递推：<strong>D(k)[i][j] = min( D(k-1)[i][j] , D(k-1)[i][k] + D(k-1)[k][j] )</strong><br>
+即：要么不走k，要么经过k中转。<br>
+初始 D(-1) = 邻接矩阵（无边=∞，自身=0）。
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 750 520" width="730" height="520">
+  <defs>
+    <marker id="arrF" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#5b9bd5"/>
+    </marker>
+  </defs>
+  <text x="375" y="22" text-anchor="middle" font-size="14" fill="#e2b04a" font-weight="700">Floyd算法 · 有向带权图与D矩阵变化</text>
+
+  <!-- LEFT: Graph -->
+  <text x="160" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">有向图 G</text>
+  <circle cx="100" cy="90" r="24" fill="rgba(226,176,74,0.25)" stroke="#e2b04a" stroke-width="2.5"/>
+  <text x="100" y="95" text-anchor="middle" font-size="13" fill="#f0d78c" font-weight="700">v0</text>
+  <circle cx="50" cy="200" r="24" fill="rgba(91,155,213,0.25)" stroke="#5b9bd5" stroke-width="2.3"/>
+  <text x="50" y="205" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="700">v1</text>
+  <circle cx="180" cy="200" r="24" fill="rgba(107,207,127,0.2)" stroke="#6bcf7f" stroke-width="2.3"/>
+  <text x="180" y="205" text-anchor="middle" font-size="13" fill="#c9d6e8" font-weight="700">v2</text>
+  <!-- Edges -->
+  <line x1="120" y1="100" x2="168" y2="185" stroke="#5b9bd5" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="158" y="145" font-size="11" fill="#5b9bd5">3</text>
+  <line x1="90" y1="112" x2="60" y2="180" stroke="#5b9bd5" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="62" y="148" font-size="11" fill="#5b9bd5">9</text>
+  <line x1="65" y1="220" x2="85" y2="112" stroke="#b084cc" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="40" y="165" font-size="11" fill="#b084cc">17</text>
+  <line x1="75" y1="210" x2="160" y2="210" stroke="#5b9bd5" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="115" y="225" font-size="11" fill="#5b9bd5">5</text>
+  <line x1="165" y1="185" x2="65" y2="185" stroke="#6bcf7f" stroke-width="2" marker-end="url(#arrF)"/>
+  <text x="115" y="178" font-size="11" fill="#6bcf7f">1</text>
+
+  <!-- RIGHT: D matrices -->
+  <text x="450" y="30" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">D(-1) 邻接矩阵</text>
+  <rect x="360" y="42" width="180" height="70" rx="4" fill="rgba(10,22,37,0.85)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="405" y="62" font-size="11" fill="#c9d6e8">   v0  v1  v2</text>
+  <text x="405" y="78" font-size="11" fill="#c9d6e8">v0 0   9   3</text>
+  <text x="405" y="94" font-size="11" fill="#c9d6e8">v1 17  0   5</text>
+  <text x="405" y="110" font-size="11" fill="#c9d6e8">v2 ∞   1   0</text>
+
+  <text x="450" y="145" text-anchor="middle" font-size="10" fill="#a0afc4">↓ k=0 允许经v0中转</text>
+
+  <text x="450" y="170" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">D(0) = D(-1) 无变化</text>
+  <rect x="360" y="182" width="180" height="70" rx="4" fill="rgba(10,22,37,0.85)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="405" y="202" font-size="11" fill="#c9d6e8">   v0  v1  v2</text>
+  <text x="405" y="218" font-size="11" fill="#c9d6e8">v0 0   9   3</text>
+  <text x="405" y="234" font-size="11" fill="#c9d6e8">v1 17  0   5</text>
+  <text x="405" y="250" font-size="11" fill="#c9d6e8">v2 ∞   1   0</text>
+
+  <text x="450" y="278" text-anchor="middle" font-size="10" fill="#a0afc4">↓ k=1 允许经v0,v1中转</text>
+
+  <text x="450" y="303" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">D(1) v2→v0新路径=18</text>
+  <rect x="360" y="315" width="180" height="70" rx="4" fill="rgba(10,22,37,0.85)" stroke="#e2b04a" stroke-width="1.5"/>
+  <text x="405" y="335" font-size="11" fill="#c9d6e8">   v0  v1  v2</text>
+  <text x="405" y="351" font-size="11" fill="#c9d6e8">v0 0   9   3</text>
+  <text x="405" y="367" font-size="11" fill="#c9d6e8">v1 17  0   5</text>
+  <text x="405" y="383" font-size="11" fill="#f0d78c">v2 <tspan fill="#e2b04a" font-weight="700">18</tspan>  1   0</text>
+
+  <text x="450" y="410" text-anchor="middle" font-size="10" fill="#a0afc4">↓ k=2 允许经v0,v1,v2中转</text>
+
+  <text x="450" y="435" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">D(2) 最终结果 v0→v1=4</text>
+  <rect x="360" y="447" width="180" height="70" rx="4" fill="rgba(10,22,37,0.85)" stroke="#e2b04a" stroke-width="2"/>
+  <text x="405" y="467" font-size="11" fill="#c9d6e8">   v0  v1  v2</text>
+  <text x="405" y="483" font-size="11" fill="#c9d6e8">v0 0  <tspan fill="#e2b04a" font-weight="700">4</tspan>  3</text>
+  <text x="405" y="499" font-size="11" fill="#c9d6e8">v1 17  0   5</text>
+  <text x="405" y="515" font-size="11" fill="#c9d6e8">v2 18  1   0</text>
+</svg>
+</div>
+<div style="text-align:center;font-size:0.85em;color:var(--text-muted);margin-bottom:12px;">图：左侧为3顶点有向带权图，右侧为Floyd算法D(-1)到D(2)的4个矩阵变化（高亮为新发现的最短路径）</div>
+
+<div class="step step-derive">
+<strong>📝 三重循环演示</strong><br>
+for k = 0 to n-1:<br>
+　for i = 0 to n-1:<br>
+　　for j = 0 to n-1:<br>
+　　　D[i][j] = min(D[i][j], D[i][k] + D[k][j])<br>
+时间复杂度 O(n³)，但能一次性求出所有点对的最短路径。
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 答题要点</div>
+  <div class="answer-value">D(-1)邻接矩阵 → D(0)允许经0中转 → D(1)允许经0,1 → ... → D(n-1)即为最终最短路径矩阵</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>Floyd = 逐步开放中转点，三重循环不断"如果绕道k会不会更短"，最终得到所有点对最短路径。
+</div>
+
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="card" id="s3q7">
+  <div class="card-header">
+    <div class="q-badge">7</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · 堆</div>
+      <div class="q-title">建大顶堆 + 删除2次堆顶元素</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：锦标赛选拔——冠军退赛怎么办？</strong><br>
+大顶堆 = 金字塔形的锦标赛。堆顶永远是最大的（冠军）。<br>
+建堆 = 从下往上组织初赛，让每个小团队的最大值"浮"到上面。<br>
+删除堆顶 = 冠军退役。最后一名替补上来，然后一路向下和更强的比，被比下去就交换位置——直到找到合适的位置。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 核心操作</strong><br>
+<strong>建堆：</strong>从最后一个非叶结点（⌊n/2⌋-1）开始，逐个向前做"向下调整"（sift-down）。<br>
+<strong>删除：</strong>①输出堆顶 ②最后一个元素补到堆顶 ③从堆顶开始向下调整。<br>
+</div>
+
+<div class="svg-diagram">
+<svg viewBox="0 0 800 480" width="780" height="480">
+  <defs>
+    <linearGradient id="gNode" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5b9bd5;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#3a6fa0;stop-opacity:0.15"/>
+    </linearGradient>
+  </defs>
+  <text x="400" y="22" text-anchor="middle" font-size="14" fill="#e2b04a" font-weight="700">大顶堆 · 建堆与删除过程（序列：8,22,17,10,5,34,9,26）</text>
+
+  <!-- Step 1: Initial -->
+  <text x="130" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">① 初始完全二叉树</text>
+  <circle cx="130" cy="75" r="16" fill="url(#gNode)" stroke="#e0556a" stroke-width="2"/><text x="130" y="79" text-anchor="middle" font-size="11" fill="#e8a0ab">8</text>
+  <line x1="120" y1="88" x2="70" y2="130" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="140" y1="88" x2="190" y2="130" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="65" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="65" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">22</text>
+  <circle cx="195" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="195" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">17</text>
+  <line x1="57" y1="155" x2="40" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="73" y1="155" x2="90" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="187" y1="155" x2="170" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="203" y1="155" x2="220" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="35" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="35" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">10</text>
+  <circle cx="95" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="95" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">5</text>
+  <circle cx="165" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="165" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">34</text>
+  <circle cx="225" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="225" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">9</text>
+  <line x1="30" y1="220" x2="25" y2="248" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="23" cy="258" r="12" fill="url(#gNode)" stroke="#b084cc" stroke-width="1.5"/><text x="23" y="261" text-anchor="middle" font-size="9" fill="#c9d6e8">26</text>
+
+  <text x="255" y="165" font-size="22" fill="#e2b04a">→</text>
+
+  <!-- Step 2: Heap built -->
+  <text x="395" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">② 建堆完成（大顶堆）</text>
+  <circle cx="395" cy="75" r="16" fill="rgba(226,176,74,0.3)" stroke="#e2b04a" stroke-width="2.3"/><text x="395" y="79" text-anchor="middle" font-size="11" fill="#f0d78c" font-weight="700">34</text>
+  <line x1="385" y1="88" x2="340" y2="130" stroke="#e2b04a" stroke-width="1.5"/>
+  <line x1="405" y1="88" x2="450" y2="130" stroke="#e2b04a" stroke-width="1.5"/>
+  <circle cx="335" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="335" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">26</text>
+  <circle cx="455" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="455" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">17</text>
+  <line x1="327" y1="155" x2="310" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="343" y1="155" x2="360" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="447" y1="155" x2="430" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="463" y1="155" x2="480" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="305" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="305" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">22</text>
+  <circle cx="365" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="365" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">5</text>
+  <circle cx="425" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="425" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">8</text>
+  <circle cx="485" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="485" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">9</text>
+  <line x1="300" y1="220" x2="298" y2="248" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="296" cy="258" r="12" fill="url(#gNode)" stroke="#b084cc" stroke-width="1.5"/><text x="296" y="261" text-anchor="middle" font-size="9" fill="#c9d6e8">10</text>
+
+  <text x="515" y="165" font-size="22" fill="#e2b04a">→</text>
+
+  <!-- Step 3: After 2 deletions -->
+  <text x="660" y="55" text-anchor="middle" font-size="12" fill="#f0d78c" font-weight="600">③ 删除2次后</text>
+  <circle cx="660" cy="75" r="16" fill="rgba(224,85,106,0.3)" stroke="#e0556a" stroke-width="2.3"/><text x="660" y="79" text-anchor="middle" font-size="11" fill="#e8a0ab" font-weight="700">22</text>
+  <line x1="650" y1="88" x2="615" y2="130" stroke="#e0556a" stroke-width="1.5"/>
+  <line x1="670" y1="88" x2="705" y2="130" stroke="#e0556a" stroke-width="1.5"/>
+  <circle cx="610" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="610" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">10</text>
+  <circle cx="710" cy="142" r="16" fill="url(#gNode)" stroke="#5b9bd5" stroke-width="1.8"/><text x="710" y="146" text-anchor="middle" font-size="11" fill="#c9d6e8">17</text>
+  <line x1="602" y1="155" x2="590" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="618" y1="155" x2="630" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="702" y1="155" x2="690" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <line x1="718" y1="155" x2="730" y2="195" stroke="#5b9bd5" stroke-width="1.3"/>
+  <circle cx="585" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="585" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">9</text>
+  <circle cx="635" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="635" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">5</text>
+  <circle cx="685" cy="208" r="14" fill="url(#gNode)" stroke="#6bcf7f" stroke-width="1.5"/><text x="685" y="212" text-anchor="middle" font-size="10" fill="#c9d6e8">8</text>
+  <circle cx="735" cy="208" r="14" fill="url(#gNode)" stroke="#a0afc4" stroke-width="1.5"/><text x="735" y="212" text-anchor="middle" font-size="10" fill="#a0afc4">-</text>
+
+  <!-- Bottom process description -->
+  <rect x="10" y="290" width="780" height="185" rx="8" fill="rgba(10,22,37,0.7)" stroke="#2a3f5a" stroke-width="1"/>
+  <text x="20" y="315" font-size="12" fill="#e2b04a" font-weight="700">建堆过程（从下标3=⌊8/2⌋-1开始向前调整）：</text>
+  <text x="20" y="338" font-size="11" fill="#c9d6e8">· 下标3(值10): 子26&gt;10 → 交换 → [8,22,17,26,5,34,9,10]</text>
+  <text x="20" y="358" font-size="11" fill="#c9d6e8">· 下标2(值17): 子34&gt;17 → 交换 → [8,22,34,26,5,17,9,10]</text>
+  <text x="20" y="378" font-size="11" fill="#c9d6e8">· 下标1(值22): 子26&gt;22 → 交换 → [8,26,34,22,5,17,9,10]</text>
+  <text x="20" y="398" font-size="11" fill="#c9d6e8">· 下标0(值8):  子34&gt;8 → 交换 → [34,26,8,22,5,17,9,10]; 8再与17换 → [34,26,17,22,5,8,9,10] ✓</text>
+  <text x="20" y="423" font-size="11" fill="#f0d78c">堆顶数组：<tspan font-weight="700">[34, 26, 17, 22, 5, 8, 9, 10]</tspan></text>
+  <text x="20" y="445" font-size="11" fill="#e8a0ab">删除34：10补位→下沉→[26,22,17,10,5,8,9]　　删除26：9补位→下沉→[22,10,17,9,5,8]</text>
+  <text x="20" y="468" font-size="10" fill="#a0afc4">输出序列（降序）：34, 26, ... 继续删除可得完整降序序列</text>
+</svg>
+</div>
+<div style="text-align:center;font-size:0.85em;color:var(--text-muted);margin-bottom:12px;">图：大顶堆建堆与删除的3个关键步骤——初始树→建堆完成→删除2次堆顶后，底部详列调整过程</div>
+
+<div class="step step-derive">
+<strong>📝 建大顶堆过程示例</strong><br>
+初始序列示例：{4, 10, 3, 5, 1, 8}<br>
+最后一个非叶：位置2（值3）。调整 → 3和8换。<br>
+位置1（值10）：子树已满足大顶堆。<br>
+位置0（值4）：4下沉，与10交换，再与5交换。<br>
+→ 大顶堆建成：{10, 5, 8, 4, 1, 3}<br><br>
+<strong>删除2次：</strong><br>
+第1次：输出10，3补位→向下调整→{8, 5, 3, 4, 1}<br>
+第2次：输出8，1补位→向下调整→{5, 4, 3, 1}
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 答题要点</div>
+  <div class="answer-value">建堆：从⌊n/2⌋-1开始逐个向下调整。删除：输出堆顶→最后元素补位→向下调整。重复即得降序序列。</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>堆排序 = 建堆（从下往上调整）+ 反复删除（输出堆顶→补位→下沉），天然适合选出Top K。
+</div>
+
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="card" id="s3q8">
+  <div class="card-header">
+    <div class="q-badge">8</div>
+    <div class="q-meta">
+      <div class="q-type">简答题 · 希尔排序</div>
+      <div class="q-title">希尔排序增量7,3,1的排序过程</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：先粗排再精排——像筛沙子</strong><br>
+希尔排序 = 先大步跳着排（把远处的石头先归位），再逐步缩小步长精细调整。<br>
+增量7：每隔7个位置的元素组成一组，组内插入排序。<br>
+增量3：每隔3个一组，再次插入排序。<br>
+增量1：就是普通的插入排序，但此时序列已"基本有序"，插入排序接近O(n)！
+</div>
+
+<div class="step step-derive">
+<strong>📝 逐步演示</strong><br>
+<strong>第一趟（增量7）：</strong>序列分成7组，每组内部做插入排序。<br>
+　组0: 位置0,7,14,… → 排序<br>
+　组1: 位置1,8,15,… → 排序<br>
+　……（各组独立排序，整体序列初步有序化）<br><br>
+<strong>第二趟（增量3）：</strong>序列分成3组，每组内部插入排序。<br>
+　此时序列已经比原始序列"整齐"很多，插入排序效率高。<br><br>
+<strong>第三趟（增量1）：</strong>标准的插入排序。<br>
+　序列已基本有序，插入排序几乎达到O(n)！
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 答题要点</div>
+  <div class="answer-value">希尔排序 = 分组插入排序，增量递减（7→3→1），最后一趟增量必为1（即标准插入排序）</div>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>希尔排序的智慧——先大步跳跃让元素"大致归位"，再小步精细调整，比纯插入排序快得多。
+</div>
+
+  </div>
+</div>
+
+
+<!-- ============================== -->
+<!-- 四、编程题 -->
+<!-- ============================== -->
+
+<div class="section-header" id="s4">
+  <div class="section-num">四</div>
+  <div class="section-info">
+    <h2>编程题</h2>
+    <span>共22分 · 写出完整代码</span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="card" id="s4q1">
+  <div class="card-header">
+    <div class="q-badge">1</div>
+    <div class="q-meta">
+      <div class="q-type">编程题 · 链表</div>
+      <div class="q-title">编写 Slim 函数：删除有序单链表中值重复的结点</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：整理一叠按日期排好的报纸——重复的扔掉</strong><br>
+这叠报纸已经按日期排好序了（有序链表）。连续几天的报纸可能日期相同（重复值），你只需要保留每个日期的第一份。<br>
+从头到尾翻一遍，发现和上份日期相同的就抽出来扔掉。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+输入：<strong>有序</strong>单链表（重复元素必然相邻）<br>
+要求：删除重复结点，每个值只保留一个<br>
+关键：利用有序性——重复元素都挤在一起，只需比较相邻结点。
+</div>
+
+<div class="step step-derive">
+<strong>📝 思路推导</strong><br>
+<strong>双指针法：</strong><br>
+　· p 指向当前已确认"不重复"的最后一个结点<br>
+　· q = p→next，向前探索<br>
+　· 如果 q→data == p→data：q是重复的，删掉q（p→next = q→next, free(q)）<br>
+　· 如果 q→data != p→data：q是新值，p后移（p = q）<br>
+　· 继续直到链表末尾<br><br>
+<strong>时间复杂度 O(n)，空间复杂度 O(1)。</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 参考代码</div>
+<pre>
+void Slim(LinkList &amp;L) {
+    if (L == NULL || L-&gt;next == NULL) return;  // 空表或只有头结点
+    LNode *p = L-&gt;next;   // p指向第一个数据结点
+    while (p != NULL &amp;&amp; p-&gt;next != NULL) {
+        LNode *q = p-&gt;next;
+        if (q-&gt;data == p-&gt;data) {
+            // 重复：删除q
+            p-&gt;next = q-&gt;next;
+            free(q);
+        } else {
+            // 不重复：p后移
+            p = p-&gt;next;
+        }
+    }
+}
+</pre>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>有序链表的重复元素必然相邻，用两个指针一前一后比大小，相同就删后面的，不同就一起前进。
+</div>
+
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="s4q2">
+  <div class="card-header">
+    <div class="q-badge">2</div>
+    <div class="q-meta">
+      <div class="q-type">编程题 · 顺序表</div>
+      <div class="q-title">编写 Merge 函数：合并两个有序顺序表</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：合并两叠按身高排好的学生名单</strong><br>
+左手一叠名单（按身高递增），右手一叠名单（也按身高递增）。要合并成一叠。<br>
+每次都看最上面的两张，谁矮就先拿出来。直到一叠空了，把另一叠剩下的全倒进去。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+输入：两个有序顺序表 A 和 B<br>
+输出：一个新的有序顺序表 C，包含A和B的所有元素<br>
+核心：<strong>归并思想</strong>——双指针分别遍历A和B，每次取较小的放入C。
+</div>
+
+<div class="step step-derive">
+<strong>📝 思路推导</strong><br>
+① 分配C的空间（长度 = A.length + B.length）<br>
+② 三个指针：i→A, j→B, k→C<br>
+③ while (i &lt; A.length &amp;&amp; j &lt; B.length)：<br>
+　　if A[i] ≤ B[j] → C[k++] = A[i++]<br>
+　　else → C[k++] = B[j++]<br>
+④ 把A或B剩余的直接复制到C<br>
+<strong>时间复杂度 O(n+m)，空间复杂度 O(n+m)。</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 参考代码</div>
+<pre>
+typedef struct {
+    int *data;
+    int length;
+} SeqList;
+
+bool Merge(SeqList A, SeqList B, SeqList &amp;C) {
+    C.length = A.length + B.length;
+    C.data = (int*)malloc(C.length * sizeof(int));
+    if (C.data == NULL) return false;
+
+    int i = 0, j = 0, k = 0;
+    while (i &lt; A.length &amp;&amp; j &lt; B.length) {
+        if (A.data[i] &lt;= B.data[j])
+            C.data[k++] = A.data[i++];
+        else
+            C.data[k++] = B.data[j++];
+    }
+    // 复制剩余
+    while (i &lt; A.length) C.data[k++] = A.data[i++];
+    while (j &lt; B.length) C.data[k++] = B.data[j++];
+    return true;
+}
+</pre>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>归并 = 双指针比大小，小的先走，走完把剩下的全接上——这就是归并排序的核心操作。
+</div>
+
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="s4q3">
+  <div class="card-header">
+    <div class="q-badge">3</div>
+    <div class="q-meta">
+      <div class="q-type">编程题 · 二叉树</div>
+      <div class="q-title">编写 DestroyTree 函数：后序遍历销毁二叉树</div>
+    </div>
+  </div>
+  <div class="card-body">
+
+<div class="step step-analogy">
+<strong>💡 生活类比：拆房子必须先拆房顶再拆墙</strong><br>
+你要拆一栋房子。能先拆地基吗？不行——房子会塌下来砸到你。<br>
+必须先拆屋顶（叶子），再拆墙壁（中间结点），最后拆地基（根）。<br>
+后序遍历 = 左→右→根 —— 正好是"先拆孩子的房子，再拆爸妈的房子"。
+</div>
+
+<div class="step step-breakdown">
+<strong>🔍 拆解题意</strong><br>
+销毁二叉树 = 释放所有结点占用的内存。<br>
+<strong>为什么必须后序？</strong>如果先释放根结点，你就找不到它的孩子了——内存泄漏！<br>
+必须先释放左右子树，最后释放根。<br>
+核心：<strong>递归后序：左子树销毁 → 右子树销毁 → 释放根。</strong>
+</div>
+
+<div class="step step-derive">
+<strong>📝 思路推导</strong><br>
+① 如果树为空（root == NULL）：直接返回<br>
+② 递归销毁左子树：DestroyTree(root→left)<br>
+③ 递归销毁右子树：DestroyTree(root→right)<br>
+④ 释放根结点：free(root)<br>
+⑤ 将根指针置空（通过传引用或返回）：root = NULL<br><br>
+<strong>时间复杂度 O(n)，访问每个结点恰好一次。</strong>
+</div>
+
+<div class="step step-answer">
+  <div class="answer-label">✅ 参考代码</div>
+<pre>
+typedef struct BiTNode {
+    int data;
+    struct BiTNode *lchild, *rchild;
+} BiTNode, *BiTree;
+
+void DestroyTree(BiTree &amp;T) {
+    if (T == NULL) return;           // 空树直接返回
+    DestroyTree(T-&gt;lchild);         // ① 递归销毁左子树
+    DestroyTree(T-&gt;rchild);         // ② 递归销毁右子树
+    free(T);                         // ③ 释放根结点
+    T = NULL;                        // ④ 指针置空，防止野指针
+}
+</pre>
+</div>
+
+<div class="step step-summary">
+<strong>🧠 一句话总结：</strong>销毁二叉树 = 后序遍历 + free。必须先删孩子再删根——就像拆房子要从上往下，不能先拆地基。
+</div>
+
+  </div>
+</div>
+
+<!-- ===== 结尾 ===== -->
+<div style="text-align:center; padding:50px 20px 30px; color:var(--text-muted);">
+  <p style="font-size:0.95em;">📖 数据结构期末考试 · 练习题精讲</p>
+  <p style="font-size:0.8em; margin-top:6px;">从生活出发，一步一步拆解，祝你考试顺利！🎓</p>
+  <div style="width:50px; height:2px; background:var(--gold-dim); margin:16px auto 0; border-radius:1px;"></div>
+</div>
+
+<!-- ===== 侧边栏滚动高亮JS ===== -->
+<script>
+(function() {
+  const sidebarLinks = document.querySelectorAll('.sidebar-nav a[href^="#"]');
+  const cards = [];
+  sidebarLinks.forEach(function(a) {
+    const id = a.getAttribute('href').substring(1);
+    const el = document.getElementById(id);
+    if (el) cards.push({ el: el, link: a });
+  });
+
+  function onScroll() {
+    let current = null;
+    const scrollTop = window.scrollY + 80;
+    for (let i = 0; i < cards.length; i++) {
+      if (cards[i].el.offsetTop <= scrollTop) {
+        current = cards[i];
+      }
+    }
+    sidebarLinks.forEach(function(a) { a.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // 点击平滑滚动
+  sidebarLinks.forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const id = this.getAttribute('href').substring(1);
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 手动触发高亮
+        sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

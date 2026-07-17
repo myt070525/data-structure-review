@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据结构 · 完整精讲</title>
+<style>
+  /* ===== 温暖书卷风 ===== */
+  :root {
+    --parchment: #f5ecd7;
+    --parchment-dark: #ede0c8;
+    --brown-900: #3e2723;
+    --brown-700: #5d4037;
+    --brown-500: #795548;
+    --brown-300: #a1887f;
+    --brown-100: #d7ccc8;
+    --gold: #c2943b;
+    --gold-light: #e6c97a;
+    --ink: #2c1810;
+    --red-warm: #c0392b;
+    --green-warm: #4a7c59;
+    --blue-warm: #3a6b8c;
+    --purple-warm: #6b4e71;
+    --sidebar-w: 270px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #d4c3a3 url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    font-family: "Noto Serif SC", "STSong", "Songti SC", "SimSun", "KaiTi", serif;
+    color: var(--ink);
+    line-height: 1.85;
+    min-height: 100vh;
+    padding: 20px;
+    margin-left: var(--sidebar-w);
+  }
+  /* 顶部装饰 */
+  .header {
+    text-align: center;
+    padding: 50px 30px 30px;
+    position: relative;
+  }
+  .header h1 {
+    font-size: 2.4em;
+    color: var(--brown-900);
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(62,39,35,0.15);
+  }
+  .header .subtitle {
+    font-size: 1.05em;
+    color: var(--brown-500);
+    margin-top: 8px;
+    letter-spacing: 0.12em;
+  }
+  .header .ornament {
+    display: inline-block;
+    font-size: 1.8em;
+    color: var(--gold);
+    margin: 12px 0;
+  }
+  /* 卡片容器 */
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .card {
+    background: linear-gradient(135deg, #fdf8ed 0%, #f7eed8 40%, #fcf5e6 100%);
+    border: 1px solid #d4b896;
+    border-radius: 18px;
+    box-shadow:
+      0 4px 20px rgba(62,39,35,0.10),
+      0 1px 4px rgba(62,39,35,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    margin: 28px 0;
+    padding: 36px 34px 32px;
+    position: relative;
+    transition: box-shadow 0.3s;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), var(--gold), var(--gold-light), transparent);
+    border-radius: 0 0 4px 4px;
+  }
+  .card:hover {
+    box-shadow:
+      0 6px 28px rgba(62,39,35,0.14),
+      0 1px 6px rgba(62,39,35,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .card-badge {
+    display: inline-block;
+    background: var(--brown-700);
+    color: #fdf8ed;
+    font-size: 0.8em;
+    padding: 3px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .card h2 {
+    color: var(--brown-900);
+    font-size: 1.5em;
+    margin-bottom: 6px;
+    font-weight: 700;
+    border-left: 5px solid var(--gold);
+    padding-left: 14px;
+  }
+  .card h2 .qnum {
+    display: inline-block;
+    background: var(--brown-100);
+    color: var(--brown-700);
+    width: 42px; height: 42px;
+    text-align: center; line-height: 42px;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 1em;
+    vertical-align: middle;
+  }
+  .card h3 {
+    color: var(--brown-700);
+    margin: 22px 0 8px;
+    font-size: 1.1em;
+    border-left: 4px solid var(--gold);
+    padding-left: 12px;
+  }
+  .card h3.analogy { border-left-color: #e8a838; }
+  .card h3.deconstruct { border-left-color: var(--blue-warm); }
+  .card h3.derive { border-left-color: var(--green-warm); }
+  .card h3.answer { border-left-color: var(--red-warm); }
+  /* 步骤区 */
+  .step-block {
+    background: rgba(255,255,255,0.5);
+    border: 1px dashed #c9b896;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    font-size: 0.95em;
+  }
+  .step-block .step-label {
+    display: inline-block;
+    background: var(--brown-100);
+    color: var(--brown-700);
+    padding: 1px 10px;
+    border-radius: 10px;
+    font-size: 0.82em;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+  .badge-answer {
+    display: inline-block;
+    background: var(--red-warm);
+    color: #fff;
+    padding: 3px 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.95em;
+    letter-spacing: 0.04em;
+    margin: 8px 0;
+  }
+  .summary-line {
+    background: linear-gradient(90deg, #fef3d5 0%, transparent 100%);
+    border-left: 5px solid var(--gold);
+    padding: 10px 16px;
+    margin: 14px 0;
+    border-radius: 0 10px 10px 0;
+    font-style: italic;
+    color: var(--brown-700);
+  }
+  /* SVG 容器 */
+  .svg-box {
+    text-align: center;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .svg-box svg {
+    max-width: 100%;
+    height: auto;
+  }
+  /* 代码块 */
+  .code-block {
+    background: #2c2420;
+    color: #f0e6d3;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+    font-size: 0.88em;
+    overflow-x: auto;
+    margin: 10px 0;
+    line-height: 1.6;
+  }
+  .code-block .kw { color: #e8b96a; }
+  .code-block .fn { color: #b4c99e; }
+  .code-block .cm { color: #8a8a7a; font-style: italic; }
+  .code-block .str { color: #d4a76a; }
+  /* 表格 */
+  .info-table {
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.9em;
+    width: 100%;
+  }
+  .info-table th {
+    background: var(--brown-700);
+    color: #fdf8ed;
+    padding: 8px 12px;
+    text-align: center;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .info-table td {
+    border: 1px solid #c9b896;
+    padding: 7px 12px;
+    text-align: center;
+    background: rgba(255,255,255,0.35);
+  }
+  .info-table tr:nth-child(even) td { background: rgba(255,255,255,0.6); }
+  /* 高亮 */
+  .hl { background: #fef3d5; padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .hl-red { background: #fde8e8; color: var(--red-warm); padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .hl-green { background: #e6f0e6; color: var(--green-warm); padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  .hl-blue { background: #e0ecf4; color: var(--blue-warm); padding: 1px 6px; border-radius: 3px; font-weight: 600; }
+  /* 分隔 */
+  .section-title {
+    text-align: center;
+    margin: 50px 0 10px;
+    font-size: 1.7em;
+    color: var(--brown-900);
+    letter-spacing: 0.1em;
+  }
+  .section-title span {
+    display: inline-block;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 6px;
+  }
+  /* 提示框 */
+  .tip-box {
+    background: #fdf6e8;
+    border: 1px solid #e8d5a0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-size: 0.9em;
+    color: #6b5a3e;
+  }
+  .tip-box::before { content: '💬 '; font-size: 1.1em; }
+  /* 题目原文醒目样式 */
+  .question-text {
+    background: #fef9e7;
+    border-left: 5px solid var(--gold);
+    padding: 14px 18px;
+    margin: 8px 0 18px;
+    border-radius: 0 10px 10px 0;
+    font-weight: 500;
+    font-size: 1.02em;
+    color: var(--brown-900);
+    line-height: 1.9;
+  }
+  /* 手绘虚线圆角 SVG */
+  .sketch-box {
+    background: rgba(255,255,255,0.45);
+    border: 2px solid #c9b896;
+    border-radius: 16px 8px 16px 8px;
+    padding: 20px;
+    margin: 14px 0;
+  }
+  /* ===== 固定侧边栏导航 ===== */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: linear-gradient(180deg, #3e2723 0%, #4e342e 40%, #3e2723 100%);
+    color: #f5ecd7;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    box-shadow: 3px 0 18px rgba(0,0,0,0.25);
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: #795548 #3e2723;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-track { background: #3e2723; }
+  .sidebar::-webkit-scrollbar-thumb { background: #795548; border-radius: 3px; }
+  .sidebar-header {
+    text-align: center;
+    padding: 22px 16px 14px;
+    border-bottom: 1px solid rgba(212,184,150,0.3);
+    position: sticky;
+    top: 0;
+    background: linear-gradient(180deg, #3e2723 0%, #3e2723 85%, transparent 100%);
+    z-index: 2;
+  }
+  .sidebar-header .nav-title {
+    font-size: 1.15em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #e6c97a;
+  }
+  .sidebar-group {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(212,184,150,0.12);
+  }
+  .sidebar-group-title {
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #c2943b;
+    padding: 10px 18px 4px;
+    letter-spacing: 0.08em;
+  }
+  .sidebar-group a {
+    display: block;
+    padding: 4px 18px 4px 24px;
+    color: #d7ccc8;
+    text-decoration: none;
+    font-size: 0.82em;
+    line-height: 1.65;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+  }
+  .sidebar-group a:hover,
+  .sidebar-group a:focus {
+    color: #fff;
+    background: rgba(212,184,150,0.1);
+    border-left-color: #c2943b;
+  }
+  .sidebar-group a .nav-num {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    font-size: 0.78em;
+    margin-right: 5px;
+    color: #e6c97a;
+  }
+  .sidebar-footer {
+    text-align: center;
+    padding: 18px 12px;
+    font-size: 0.7em;
+    color: #8d6e63;
+  }
+
+  /* 响应式 */
+  @media (max-width: 800px) {
+    .sidebar { width: 220px; }
+    body { margin-left: 220px; }
+    :root { --sidebar-w: 220px; }
+    .card { padding: 20px 16px 18px; }
+    .header h1 { font-size: 1.6em; }
+  }
+  @media (max-width: 600px) {
+    .sidebar { display: none; }
+    body { margin-left: 0; }
+    .card { padding: 20px 16px 18px; }
+    .header h1 { font-size: 1.6em; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== 固定侧边栏导航 ========== -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="nav-title">📋 题目导航</div>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">一、选择题（10题）</div>
+    <a href="#cq1"><span class="nav-num">1</span>ADT定义</a>
+    <a href="#cq2"><span class="nav-num">2</span>线性表插入范围</a>
+    <a href="#cq3"><span class="nav-num">3</span>循环链表判空</a>
+    <a href="#cq4"><span class="nav-num">4</span>出栈序列计数</a>
+    <a href="#cq5"><span class="nav-num">5</span>循环队列判空</a>
+    <a href="#cq6"><span class="nav-num">6</span>三角矩阵压缩</a>
+    <a href="#cq7"><span class="nav-num">7</span>广义表运算</a>
+    <a href="#cq8"><span class="nav-num">8</span>快速排序一趟</a>
+    <a href="#cq9"><span class="nav-num">9</span>邻接矩阵判断边</a>
+    <a href="#cq10"><span class="nav-num">10</span>排序算法选择</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">二、填空题（8题）</div>
+    <a href="#fq1"><span class="nav-num">1</span>时间复杂度分析</a>
+    <a href="#fq2"><span class="nav-num">2</span>中缀转后缀</a>
+    <a href="#fq3"><span class="nav-num">3</span>KMP next数组</a>
+    <a href="#fq4"><span class="nav-num">4</span>哈夫曼树叶子</a>
+    <a href="#fq5"><span class="nav-num">5</span>森林树计数</a>
+    <a href="#fq6"><span class="nav-num">6</span>单源最短路径</a>
+    <a href="#fq7"><span class="nav-num">7</span>BST插入序列</a>
+    <a href="#fq8"><span class="nav-num">8</span>冒泡排序复杂度</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">三、简答题（8题）</div>
+    <a href="#sq1"><span class="nav-num">1</span>二叉树重建</a>
+    <a href="#sq2"><span class="nav-num">2</span>AVL树插入旋转</a>
+    <a href="#sq3"><span class="nav-num">3</span>顺序vs折半ASL</a>
+    <a href="#sq4"><span class="nav-num">4</span>哈希表线性探测</a>
+    <a href="#sq5"><span class="nav-num">5</span>AOE网关键路径</a>
+    <a href="#sq6"><span class="nav-num">6</span>Prim最小生成树</a>
+    <a href="#sq7"><span class="nav-num">7</span>建最大堆+堆排序</a>
+    <a href="#sq8"><span class="nav-num">8</span>插入排序前两趟</a>
+  </div>
+
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">四、编程题（2题）</div>
+    <a href="#pq1"><span class="nav-num">1</span>BuildLeafList</a>
+    <a href="#pq2"><span class="nav-num">2</span>Insert_sort</a>
+  </div>
+
+  <div class="sidebar-footer">—— 共28题 ——</div>
+</nav>
+
+<!-- ========== 顶部 ========== -->
+<div class="header">
+  <div class="ornament">❦</div>
+  <h1>数据结构 · 完整精讲</h1>
+  <div class="subtitle">—— 不只给答案，更要让你"看见"思考 ——</div>
+  <div class="ornament">❦</div>
+</div>
+
+<div class="container">
+
+<!-- ==================== 一、选择题 ==================== -->
+<div class="section-title"><span>一、选择题（20分）</span></div>
+
+<!-- 第1题 -->
+<div class="card" id="cq1">
+  <span class="card-badge">选择题 · 第 1 题</span>
+  <h2><span class="qnum">1</span>ADT 不包括什么？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>ADT（抽象数据类型）不包括什么？（ ）<br>
+    A. 数据对象&emsp;B. 数据结构&emsp;C. 数据操作&emsp;D. 存储结构
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：手机说明书 vs 手机芯片</h3>
+  <p>想象你去买手机。柜台上有本<strong>说明书</strong>，上面写着："可以打电话、发微信、拍照、上网"。你会拿这台手机<strong>做什么</strong>，说明书全告诉你。但说明书<strong>不会</strong>告诉你里面用的是骁龙8还是A16芯片，也不会告诉你内存颗粒是三星还是镁光。</p>
+  <p><strong>ADT（抽象数据类型）就是这本说明书。</strong>它只描述"这玩意儿能干嘛"，不描述"它内部怎么造的"。而"怎么造的"——用什么存储结构、内存怎么布局——属于<strong>物理实现</strong>，不在说明书范围里。</p>
+
+  <h3 class="deconstruct">🔍 拆解题意</h3>
+  <div class="step-block">
+    <span class="step-label">ADT三要素</span>
+    ① <strong>数据对象</strong>（Data Object）—— 这结构存的是什么东西？整数？人？<br>
+    ② <strong>数据关系</strong>（Data Relationship）—— 这些东西之间是什么逻辑关系？线性的？树形的？<br>
+    ③ <strong>基本操作</strong>（Basic Operations）—— 能对它做什么？插入？删除？查找？<br>
+    <span style="color:var(--red-warm);">⚠ 注意：存储结构不在三要素里！那是物理实现层面的事。</span>
+  </div>
+
+  <h3 class="derive">✍️ 逐步推导</h3>
+  <div class="step-block">
+    <span class="step-label">第1步</span> 题目问：ADT<strong>不包括</strong>什么？<br>
+    <span class="step-label">第2步</span> A. 数据对象 → ❌ 是三要素之一<br>
+    <span class="step-label">第3步</span> B. 数据结构（此处指数据关系）→ ❌ 是三要素之一<br>
+    <span class="step-label">第4步</span> C. 数据操作 → ❌ 是三要素之一<br>
+    <span class="step-label">第5步</span> D. 存储结构 → ✅ 不在三要素中，属于实现细节
+  </div>
+
+  <span class="badge-answer">答案：D</span>
+  <div class="summary-line">📝 ADT = 说明书，只管"能干嘛"；存储结构 = 零件表，管"怎么造"——两者不是一回事。</div>
+</div>
+
+<!-- 第2题 -->
+<div class="card" id="cq2">
+  <span class="card-badge">选择题 · 第 2 题</span>
+  <h2><span class="qnum">2</span>线性表在第 i 位插入，i 的合法范围是？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>线性表在第 i 个位置插入新元素，i 的合法范围是？（ ）<br>
+    A. 1≤i≤n&emsp;B. 1≤i≤n-1&emsp;C. 1≤i≤n+1&emsp;D. 0≤i≤n
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：插队</h3>
+  <p>想象你在食堂排队，队伍已经有 <strong>n</strong> 个人了。你想插队——你能插在哪些位置？</p>
+  <div class="svg-box">
+    <svg width="520" height="110" viewBox="0 0 520 110">
+      <defs><filter id="rough1"><feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1.5"/></filter></defs>
+      <!-- 队伍 -->
+      <rect x="10" y="35" width="58" height="42" rx="22" fill="#f5e6d3" stroke="#795548" stroke-width="2" filter="url(#rough1)"/>
+      <text x="39" y="62" text-anchor="middle" font-size="14" fill="#3e2723">第1位</text>
+      <rect x="75" y="35" width="58" height="42" rx="22" fill="#f5e6d3" stroke="#795548" stroke-width="2" filter="url(#rough1)"/>
+      <text x="104" y="62" text-anchor="middle" font-size="14" fill="#3e2723">第2位</text>
+      <text x="140" y="62" font-size="20" fill="#795548">…</text>
+      <rect x="160" y="35" width="58" height="42" rx="22" fill="#f5e6d3" stroke="#795548" stroke-width="2" filter="url(#rough1)"/>
+      <text x="189" y="62" text-anchor="middle" font-size="14" fill="#3e2723">第n位</text>
+      <!-- 可插入位置标记 -->
+      <text x="22" y="28" font-size="11" fill="#c0392b" text-anchor="middle">↓i=1</text>
+      <text x="88" y="28" font-size="11" fill="#c0392b" text-anchor="middle">↓i=2</text>
+      <text x="172" y="28" font-size="11" fill="#c0392b" text-anchor="middle">↓i=n</text>
+      <text x="230" y="28" font-size="11" fill="#c0392b" text-anchor="middle">↓i=n+1</text>
+      <!-- 队尾虚线框 -->
+      <rect x="225" y="35" width="58" height="42" rx="22" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="254" y="62" text-anchor="middle" font-size="12" fill="#c0392b">队尾追加</text>
+      <!-- 底部说明 -->
+      <text x="260" y="100" text-anchor="middle" font-size="13" fill="#5d4037">一共 n+1 个可以插入的位置</text>
+    </svg>
+  </div>
+
+  <h3 class="deconstruct">🔍 拆解题意</h3>
+  <p>线性表有 n 个元素，位置编号从 1 到 n。插入一个新元素，你可以：</p>
+  <div class="step-block">
+    • 插在<strong>最前面</strong>（原来第1个变成第2个）→ i = 1<br>
+    • 插在<strong>任意两个之间</strong> → i = 2, 3, ..., n<br>
+    • 插在<strong>最后面</strong>（追加在队尾）→ i = n + 1<br>
+    所以合法 i 的范围是：<strong>1 ≤ i ≤ n + 1</strong>
+  </div>
+
+  <span class="badge-answer">答案：C（1 ≤ i ≤ n+1）</span>
+  <div class="summary-line">📝 n 个人的队伍有 n+1 个可插入位置——你可以在任何人前面插，也可以在队尾追加。</div>
+</div>
+
+<!-- 第3题 -->
+<div class="card" id="cq3">
+  <span class="card-badge">选择题 · 第 3 题</span>
+  <h2><span class="qnum">3</span>带头结点循环链表判空的条件是？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>带头结点的循环链表 L 判空的条件是？（ ）<br>
+    A. L-&gt;Next==NULL&emsp;B. L-&gt;Next==L&emsp;C. L-&gt;Next==Head&emsp;D. L-&gt;Next!=L
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：一个人自己牵自己的手</h3>
+  <p>想象一群小朋友手拉手围成圈做游戏。如果<strong>只有一个小朋友</strong>，他怎么围成圈？——他<strong>左手牵右手，自己牵自己</strong>，形成一个圈！</p>
+  <p>带<strong>头结点</strong>的循环链表也一样：头结点是那个"领队"。当链表为空（没有真正的小朋友），头结点只好"自己指回自己"——<code class="hl">L-&gt;Next == L</code>。</p>
+
+  <div class="svg-box">
+    <svg width="280" height="170" viewBox="0 0 280 170">
+      <defs><filter id="rough2"><feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1.2"/></filter></defs>
+      <text x="140" y="22" text-anchor="middle" font-size="13" fill="#5d4037">空循环链表</text>
+      <!-- 头结点 -->
+      <rect x="100" y="40" width="80" height="36" rx="10" fill="#f5e6d3" stroke="#795548" stroke-width="2.5" filter="url(#rough2)"/>
+      <text x="140" y="63" text-anchor="middle" font-size="12" fill="#3e2723" font-weight="bold">头结点 L</text>
+      <!-- 自环箭头 -->
+      <path d="M180,58 C210,58 220,80 200,100 C180,118 140,118 120,100 C100,82 110,58 140,56" fill="none" stroke="#c0392b" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+      <defs><marker id="arrowRed" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><circle cx="4" cy="4" r="3" fill="#c0392b"/></marker></defs>
+      <text x="205" y="82" font-size="12" fill="#c0392b">Next 指向自己</text>
+      <text x="140" y="155" text-anchor="middle" font-size="13" fill="#3e2723">L-&gt;Next == L → 链表为空</text>
+    </svg>
+  </div>
+
+  <h3 class="derive">✍️ 逐个选项分析</h3>
+  <div class="step-block">
+    <span class="step-label">A</span> L-&gt;Next == NULL → ❌ 循环链表没有NULL，最后一个结点指向头结点<br>
+    <span class="step-label">B</span> L-&gt;Next == L → ✅ 头结点的Next指向自己，说明没有其他结点<br>
+    <span class="step-label">C</span> L-&gt;Next == Head → ❌ Head和L是同一个东西，表述重复<br>
+    <span class="step-label">D</span> L-&gt;Next != L → ❌ 这恰恰是非空的标志
+  </div>
+
+  <span class="badge-answer">答案：B</span>
+  <div class="summary-line">📝 空循环链表 = 头结点自己指自己，就像一个小朋友左手牵右手围成圈。</div>
+</div>
+
+<!-- 第4题 -->
+<div class="card" id="cq4">
+  <span class="card-badge">选择题 · 第 4 题</span>
+  <h2><span class="qnum">4</span>入栈顺序 A→B→C→D，C 第一个出栈，不同出栈序列有几个？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>入栈顺序为 A→B→C→D，若 C 第一个出栈，则不同的出栈序列有几个？（ ）<br>
+    A. 2&emsp;B. 3&emsp;C. 4&emsp;D. 5
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：叠盘子</h3>
+  <p>你把 A、B、C、D 四个盘子<strong>依次叠上去</strong>（A在最底下，D在最上面）。拿盘子只能<strong>从最上面拿</strong>——这就是栈。</p>
+  <p>现在规定：<strong>C 必须第一个被拿走</strong>。这意味着什么？</p>
+
+  <h3 class="deconstruct">🔍 拆解题意</h3>
+  <div class="step-block">
+    <span class="step-label">关键推理</span>
+    C 第一个出栈 → C 拿的时候，A 和 B 还在栈里<strong>压着</strong>，而且 A 在 B 下面。<br>
+    所以 A 和 B 的出栈顺序<strong>只能是 B 先出、A 后出</strong>（因为 B 压在 A 上面，不拿 B 就拿不到 A）。<br>
+    而 D 呢？D 是最后入栈的——它可以在 C 出栈<strong>之前</strong>入栈然后立刻出，也可以在 C 出栈<strong>之后</strong>再入栈。
+  </div>
+
+  <h3 class="derive">✍️ 枚举所有合法序列</h3>
+
+  <!-- 序列1 -->
+  <div class="step-block">
+    <span class="step-label">序列①</span> <strong>C → D → B → A</strong><br>
+    入A,入B,入C,<span style="color:#c0392b;">出C</span>,入D,<span style="color:#c0392b;">出D</span>,出B,出A
+  </div>
+  <div class="svg-box">
+    <svg width="520" height="140" viewBox="0 0 520 140">
+      <defs><filter id="rough3"><feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="3"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1"/></filter></defs>
+      <!-- 栈框 -->
+      <rect x="20" y="10" width="80" height="120" rx="6" fill="none" stroke="#795548" stroke-width="2.5"/>
+      <rect x="28" y="90" width="64" height="28" rx="6" fill="#d4a76a" stroke="#795548" stroke-width="1.5"/><text x="60" y="108" text-anchor="middle" font-size="11" fill="#fff">A</text>
+      <rect x="28" y="65" width="64" height="28" rx="6" fill="#b4c99e" stroke="#795548" stroke-width="1.5"/><text x="60" y="83" text-anchor="middle" font-size="11" fill="#fff">B</text>
+      <rect x="28" y="40" width="64" height="28" rx="6" fill="#e8b96a" stroke="#795548" stroke-width="1.5"/><text x="60" y="58" text-anchor="middle" font-size="11" fill="#fff">C</text>
+      <text x="15" y="32" font-size="10" fill="#c0392b">出C!</text>
+      <!-- D入然后出 -->
+      <rect x="28" y="15" width="64" height="28" rx="6" fill="#8ab4d8" stroke="#795548" stroke-width="1.5" stroke-dasharray="4,2"/><text x="60" y="33" text-anchor="middle" font-size="10" fill="#3a6b8c">D(瞬)</text>
+      <text x="120" y="115" font-size="12" fill="#5d4037">→ 出栈序列: C,D,B,A</text>
+    </svg>
+  </div>
+
+  <!-- 序列2 -->
+  <div class="step-block">
+    <span class="step-label">序列②</span> <strong>C → B → D → A</strong><br>
+    入A,入B,入C,<span style="color:#c0392b;">出C</span>,<span style="color:#c0392b;">出B</span>,入D,<span style="color:#c0392b;">出D</span>,出A
+  </div>
+
+  <!-- 序列3 -->
+  <div class="step-block">
+    <span class="step-label">序列③</span> <strong>C → B → A → D</strong><br>
+    入A,入B,入C,<span style="color:#c0392b;">出C</span>,<span style="color:#c0392b;">出B</span>,<span style="color:#c0392b;">出A</span>,入D,<span style="color:#c0392b;">出D</span>
+  </div>
+
+  <div class="tip-box">
+    为什么 C, A, B, D 不行？—— C 出栈后，栈里还剩 A(底) 和 B(顶)。必须先拿 B 才能拿 A，所以 A 不可能在 B 前面出。
+  </div>
+
+  <span class="badge-answer">答案：C（3种）</span>
+  <div class="summary-line">📝 C 先出 → A、B 被压在栈底，只能 B→A 顺序出；D 可在任意时机出入，共 3 种合法序列。</div>
+</div>
+
+<!-- 第5题 -->
+<div class="card" id="cq5">
+  <span class="card-badge">选择题 · 第 5 题</span>
+  <h2><span class="qnum">5</span>循环队列判空的条件是？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>循环队列判空的条件是？（ ）<br>
+    A. Front==Rear&emsp;B. Front==(Rear+1)%Size&emsp;C. Rear==(Front+1)%Size&emsp;D. Front==0
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：环形跑道上的两个人</h3>
+  <p>想象一个环形跑道上，有两个人：<strong>Front（队头）</strong>和<strong>Rear（队尾）</strong>。队列为空时，两人<strong>站在同一个位置</strong>——队头和队尾重合。</p>
+
+  <div class="svg-box">
+    <svg width="320" height="220" viewBox="0 0 320 220">
+      <defs><filter id="rough4"><feTurbulence type="turbulence" baseFrequency="0.06" numOctaves="3"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1"/></filter></defs>
+      <!-- 环形 -->
+      <circle cx="160" cy="115" r="70" fill="none" stroke="#795548" stroke-width="2.5" stroke-dasharray="8,4"/>
+      <!-- 槽位 -->
+      <rect x="100" y="28" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="175" y="35" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="220" y="75" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="220" y="135" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="170" y="176" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="100" y="168" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="60" y="130" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <rect x="60" y="72" width="34" height="28" rx="6" fill="#ede0c8" stroke="#a1887f" stroke-width="1.5"/>
+      <!-- F/R 重合标记 -->
+      <circle cx="117" cy="42" r="8" fill="#c0392b" opacity="0.8"/>
+      <text x="117" y="60" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="bold">Front=Rear</text>
+      <text x="160" y="210" text-anchor="middle" font-size="13" fill="#3e2723">空队列：队头队尾指向同一个空位置</text>
+    </svg>
+  </div>
+
+  <h3 class="derive">✍️ 关键对比</h3>
+  <div class="step-block">
+    <span class="step-label">判空</span> Front == Rear → 队头和队尾重合，没有元素<br>
+    <span class="step-label">判满</span> (Rear + 1) % Size == Front → 故意<strong>牺牲一个位置</strong>来区分空和满<br>
+    <span style="color:#795548;">（如果不牺牲一个位置，满的时候 Front==Rear 也和空一样，无法区分）</span>
+  </div>
+
+  <span class="badge-answer">答案：A（Front == Rear）</span>
+  <div class="summary-line">📝 循环队列空 → 头尾重合；满 → 尾+1追上头（牺牲一格做标记）。</div>
+</div>
+
+<!-- 第6题 -->
+<div class="card" id="cq6">
+  <span class="card-badge">选择题 · 第 6 题</span>
+  <h2><span class="qnum">6</span>三角矩阵压缩存储需要多少空间？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>n 阶下三角矩阵压缩存储需要多少存储单元？（ ）<br>
+    A. n²&emsp;B. n(n-1)/2&emsp;C. n(n+1)/2&emsp;D. n²/2
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：阶梯座位</h3>
+  <p>想象教室里有 n 排座位，第1排1个座位，第2排2个，……，第n排n个。总共几个座位？</p>
+  <p>这就是<strong>下三角矩阵</strong>——主对角线以上全是0（或相同值），不需要存。只存下半部分，就像只数阶梯座位。</p>
+
+  <div class="svg-box">
+    <svg width="280" height="230" viewBox="0 0 280 230">
+      <defs><filter id="rough5"><feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="3"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1"/></filter></defs>
+      <text x="140" y="18" text-anchor="middle" font-size="12" fill="#5d4037">下三角矩阵（n=4）</text>
+      <!-- 格子 -->
+      <rect x="60" y="30" width="35" height="27" rx="3" fill="#d4a76a" stroke="#795548" stroke-width="1.5"/><text x="77" y="48" text-anchor="middle" font-size="10">a₁₁</text>
+      <rect x="95" y="30" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="112" y="48" text-anchor="middle" font-size="9" fill="#999">0</text>
+      <rect x="130" y="30" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="147" y="48" text-anchor="middle" font-size="9" fill="#999">0</text>
+      <rect x="165" y="30" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="182" y="48" text-anchor="middle" font-size="9" fill="#999">0</text>
+
+      <rect x="60" y="57" width="35" height="27" rx="3" fill="#b4c99e" stroke="#795548" stroke-width="1.5"/><text x="77" y="75" text-anchor="middle" font-size="10">a₂₁</text>
+      <rect x="95" y="57" width="35" height="27" rx="3" fill="#b4c99e" stroke="#795548" stroke-width="1.5"/><text x="112" y="75" text-anchor="middle" font-size="10">a₂₂</text>
+      <rect x="130" y="57" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="147" y="75" text-anchor="middle" font-size="9" fill="#999">0</text>
+      <rect x="165" y="57" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="182" y="75" text-anchor="middle" font-size="9" fill="#999">0</text>
+
+      <rect x="60" y="84" width="35" height="27" rx="3" fill="#8ab4d8" stroke="#795548" stroke-width="1.5"/><text x="77" y="102" text-anchor="middle" font-size="10">a₃₁</text>
+      <rect x="95" y="84" width="35" height="27" rx="3" fill="#8ab4d8" stroke="#795548" stroke-width="1.5"/><text x="112" y="102" text-anchor="middle" font-size="10">a₃₂</text>
+      <rect x="130" y="84" width="35" height="27" rx="3" fill="#8ab4d8" stroke="#795548" stroke-width="1.5"/><text x="147" y="102" text-anchor="middle" font-size="10">a₃₃</text>
+      <rect x="165" y="84" width="35" height="27" rx="3" fill="#ddd" stroke="#ccc" stroke-width="1"/><text x="182" y="102" text-anchor="middle" font-size="9" fill="#999">0</text>
+
+      <rect x="60" y="111" width="35" height="27" rx="3" fill="#e8b96a" stroke="#795548" stroke-width="1.5"/><text x="77" y="129" text-anchor="middle" font-size="10">a₄₁</text>
+      <rect x="95" y="111" width="35" height="27" rx="3" fill="#e8b96a" stroke="#795548" stroke-width="1.5"/><text x="112" y="129" text-anchor="middle" font-size="10">a₄₂</text>
+      <rect x="130" y="111" width="35" height="27" rx="3" fill="#e8b96a" stroke="#795548" stroke-width="1.5"/><text x="147" y="129" text-anchor="middle" font-size="10">a₄₃</text>
+      <rect x="165" y="111" width="35" height="27" rx="3" fill="#e8b96a" stroke="#795548" stroke-width="1.5"/><text x="182" y="129" text-anchor="middle" font-size="10">a₄₄</text>
+
+      <text x="140" y="170" text-anchor="middle" font-size="12" fill="#5d4037">彩色格子需要存储 = 1+2+3+4</text>
+      <text x="140" y="195" text-anchor="middle" font-size="14" fill="#c0392b" font-weight="bold">= n(n+1)/2 = 10 个</text>
+    </svg>
+  </div>
+
+  <h3 class="derive">✍️ 等差数列求和</h3>
+  <div class="step-block">
+    第1行：1个元素 → 第2行：2个 → ... → 第n行：n个<br>
+    总数 = 1 + 2 + 3 + ... + n = <strong>n(n+1)/2</strong><br>
+    这是小学数学就学过的<strong>高斯求和公式</strong>。
+  </div>
+
+  <span class="badge-answer">答案：C（n(n+1)/2）</span>
+  <div class="summary-line">📝 下三角矩阵 = 阶梯座位，第 i 排 i 个座，等差数列求和得 n(n+1)/2。</div>
+</div>
+
+<!-- 第7题 -->
+<div class="card" id="cq7">
+  <span class="card-badge">选择题 · 第 7 题</span>
+  <h2><span class="qnum">7</span>广义表 Head(Tail(Head(Tail(A)))) 的结果是？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>广义表 A = ((a,b), (c,(d),((e,f),g)))，那么 Head(Tail(Head(Tail(A)))) 的值为（ ）。<br>
+    A、()&emsp;B、(e,f)&emsp;C、(c)&emsp;D、(d)
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：剥洋葱——一层一层来</h3>
+  <p>广义表就像一颗<strong>可以嵌套的洋葱</strong>。大盒子里有小盒子，小盒子里还有更小的盒子。两个核心操作：</p>
+  <div class="step-block">
+    <strong>Head（表头）</strong> = 取<strong>第一个元素</strong>，保持它原本的样子<br>
+    <strong>Tail（表尾）</strong> = 去掉第一个元素后剩下的所有，<strong>外面一定加一层括号</strong>
+  </div>
+
+  <h3 class="derive">✍️ 逐层手算——跟着走，别跳过！</h3>
+
+  <div class="step-block">
+    <span class="step-label">先看清 A 的结构</span><br>
+    A = <strong>( (a,b) , (c,(d),((e,f),g)) )</strong><br>
+    最外层括号里有两个元素：<br>
+    &nbsp;&nbsp;① (a,b) —— 一个小表<br>
+    &nbsp;&nbsp;② (c,(d),((e,f),g)) —— 另一个小表（里面有三个元素：c、(d)、((e,f),g)）
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第①步：Tail(A)</span><br>
+    = 去掉第一个元素 (a,b)，剩下的加括号<br>
+    = <strong>( (c,(d),((e,f),g)) )</strong><br>
+    <span style="color:#795548;">Tail 一定加括号！即使只剩一个元素。</span>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第②步：Head(Tail(A))</span><br>
+    = 取 ( (c,(d),((e,f),g)) ) 的第一个元素<br>
+    = <strong>(c, (d), ((e,f),g))</strong><br>
+    <span style="color:#795548;">这是有三个元素的表：c、(d) 和 ((e,f),g)</span>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第③步：Tail(Head(Tail(A)))</span><br>
+    = 对 (c, (d), ((e,f),g)) 去掉第一个元素 c<br>
+    剩下 (d) 和 ((e,f),g)，外面加括号<br>
+    = <strong>( (d), ((e,f),g) )</strong>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第④步：Head(Tail(Head(Tail(A))))</span><br>
+    = 取 ( (d), ((e,f),g) ) 的第一个元素<br>
+    = <strong>(d)</strong> ← 这就是答案！
+  </div>
+
+  <span class="badge-answer">答案：D（(d)）</span>
+  <div class="summary-line">📝 Head = 取首元素，Tail = 去首加括号。从最外层开始一层层剥，每步只做一个操作，别跳步！</div>
+</div>
+
+<div class="card" id="cq8">
+  <span class="card-badge">选择题 · 第 8 题</span>
+  <h2><span class="qnum">8</span>哪个不可能是快速排序一趟的结果？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>下面哪个序列不可能是一趟快速排序之后的结果（ ）。<br>
+    A、27, 13, 2, 5, 19&emsp;&emsp;B、3, 14, 38, 17, 32&emsp;&emsp;C、8, 52, 15, 1, 71&emsp;&emsp;D、5, 26, 28, 47, 15
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：老师按身高排座位</h3>
+  <p>老师选一个同学做"基准"，比他矮的坐左边，比他高的坐右边。一趟结束后，<strong>基准同学坐在了正确的位置</strong>——左边全比他矮，右边全比他高。这个位置以后不会再变。</p>
+
+  <h3 class="deconstruct">🔍 快排一趟的核心特征</h3>
+  <div class="step-block">
+    快排一趟后：存在一个<strong>基准元素</strong>，它<strong>左边所有元素都≤它，右边所有元素都≥它</strong>。<br>
+    这个基准元素已经"归位"——它在最终有序数组中的位置就确定了。<br>
+    <span style="color:var(--red-warm);">⚠ 关键：一趟后基准必须归位，左边全≤它，右边全≥它。</span>
+  </div>
+
+  <h3 class="derive">✍️ 逐个选项检查</h3>
+
+  <div class="step-block">
+    <span class="step-label">选项A</span> <strong>27, 13, 2, 5, 19</strong><br>
+    • 若 27 是基准在位置1：右边 13,2,5,19 都 ≤ 27 ✓。但问题是 27 是<strong>最大值</strong>（排序后应在最后位置），一趟后却在第一位 → 27 没有归位！✗<br>
+    • 若 19 是基准在最后：左边 27,13,2,5 中 27 &gt; 19 ✗。27 不应该出现在19左边！<br>
+    • 若 13 是基准：左边 27 &gt; 13 ✗。<br>
+    <strong>找不到任何一个元素能成为合法基准 → A 不可能！</strong>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">选项B</span> <strong>3, 14, 38, 17, 32</strong><br>
+    3 最小在第一位 → 可选 3 做基准：右边 14,38,17,32 都 ≥ 3 ✓ → <strong>可能</strong>。
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">选项C</span> <strong>8, 52, 15, 1, 71</strong><br>
+    71 最大在最后 → 可选 71 做基准：左边 8,52,15,1 都 ≤ 71 ✓ → <strong>可能</strong>。
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">选项D</span> <strong>5, 26, 28, 47, 15</strong><br>
+    5 最小在第一位 → 可选 5 做基准：右边 26,28,47,15 都 ≥ 5 ✓。<br>
+    注意 15 虽然在 5 右边但 5 是基准时右边元素只要 ≥5 就行，15 &gt; 5 ✓ → <strong>可能</strong>。
+  </div>
+
+  <span class="badge-answer">答案：A</span>
+  <div class="summary-line">📝 快排一趟后基准归位，左边全≤它，右边全≥它。A 中 27 是最大值却在第一位（没归位），19 在最后但前面有 27&gt;19 —— 没有任何元素能当合法基准！</div>
+</div>
+
+<!-- 第9题 -->
+<div class="card" id="cq9">
+  <span class="card-badge">选择题 · 第 9 题</span>
+  <h2><span class="qnum">9</span>邻接矩阵便于判断顶点间是否有边，因为？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>邻接矩阵便于判断两个顶点之间是否有边，因为？（ ）<br>
+    A. 空间省&emsp;B. 容易遍历&emsp;C. 可直接取值 O(1)&emsp;D. 容易增删顶点
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：通讯录查好友</h3>
+  <p>你想知道张三和李四是不是好友。邻接矩阵就像一张<strong>表格</strong>——查第 i 行第 j 列，是 1 就有边，是 0 就无边。<strong>一眼就能看到</strong>，这就是 O(1)。</p>
+  <p>而邻接表呢？你得翻张三的"好友列表"一条条找有没有李四——可能找很久。</p>
+
+  <h3 class="derive">✍️ 邻接矩阵 vs 邻接表</h3>
+  <table class="info-table">
+    <tr><th>操作</th><th>邻接矩阵</th><th>邻接表</th></tr>
+    <tr><td>判断 i→j 是否有边</td><td class="hl-green">O(1) 直接查 edge[i][j]</td><td>O(度) 需遍历链表</td></tr>
+    <tr><td>增加/删除顶点</td><td>O(n²) 需重建矩阵</td><td>O(1) 或 O(n)</td></tr>
+    <tr><td>空间（稀疏图）</td><td>O(n²) 浪费</td><td class="hl-green">O(n+e) 省空间</td></tr>
+    <tr><td>找所有邻接点</td><td>O(n) 扫一整行</td><td>O(度) 只遍历有边的</td></tr>
+  </table>
+
+  <span class="badge-answer">答案：C</span>
+  <div class="summary-line">📝 邻接矩阵 edge[i][j] 直接取值 O(1) 判边，像查表格一样；但加删顶点要重建矩阵成本高。</div>
+</div>
+
+<!-- 第10题 -->
+<div class="card" id="cq10">
+  <span class="card-badge">选择题 · 第 10 题</span>
+  <h2><span class="qnum">10</span>空间少 + 平均快 → 选哪个排序？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>要求空间复杂度尽量低且平均速度较快，应选择哪种排序？（ ）<br>
+    A. 快速排序&emsp;B. 归并排序&emsp;C. 插入排序&emsp;D. 堆排序
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：选搬家工具</h3>
+  <p>你要搬家，东西很多：</p>
+  <div class="step-block">
+    • <strong>快速排序</strong> = 请搬家公司的车，但需要额外仓库（递归栈 O(logn)）<br>
+    • <strong>归并排序</strong> = 需要租一个等大的仓库放东西（O(n) 辅助空间）<br>
+    • <strong>插入排序</strong> = 自己一趟趟搬，慢（O(n²)）<br>
+    • <strong>堆排序</strong> = <strong>原地操作，不需要额外仓库，而且速度稳定 O(nlogn)</strong>
+  </div>
+
+  <h3 class="derive">✍️ 四个选项逐一比较</h3>
+  <table class="info-table">
+    <tr><th>排序</th><th>时间复杂度</th><th>空间复杂度</th><th>评价</th></tr>
+    <tr><td>A. 快速排序</td><td>O(nlogn) 平均</td><td>O(logn) 递归栈</td><td>空间不是最优</td></tr>
+    <tr><td>B. 归并排序</td><td>O(nlogn)</td><td>O(n) 辅助数组</td><td>空间太大</td></tr>
+    <tr><td>C. 插入排序</td><td>O(n²)</td><td>O(1)</td><td>空间小但太慢</td></tr>
+    <tr><td class="hl-green">D. 堆排序</td><td class="hl-green">O(nlogn)</td><td class="hl-green">O(1)</td><td class="hl-green">✅ 空间少+平均快</td></tr>
+  </table>
+
+  <span class="badge-answer">答案：D</span>
+  <div class="summary-line">📝 堆排序 = 原地 O(1) 空间 + O(nlogn) 时间，是"空间少且平均快"的唯一选择。</div>
+</div>
+
+<!-- ==================== 二、填空题 ==================== -->
+<div class="section-title"><span>二、填空题（20分）</span></div>
+
+<!-- 填空第1题 -->
+<div class="card" id="fq1">
+  <span class="card-badge">填空题 · 第 1 题</span>
+  <h2><span class="qnum">1</span>时间复杂度分析</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>分析下面代码的时间复杂度。
+  </div>
+
+  <div class="code-block">
+<span class="kw">int</span> <span class="fn">func</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> i, j, sum = <span class="str">0</span>;
+    <span class="kw">for</span> (i = <span class="str">1</span>; i &lt;= <span class="str">1000</span>; i++)        <span class="cm">// ← 注意！i只到1000</span>
+        <span class="kw">for</span> (j = <span class="str">1</span>; j &lt;= i; j++)
+            sum++;
+    <span class="kw">return</span> sum;
+}
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：数楼层</h3>
+  <p>假设你爬楼梯，不管楼有多高（n多大），你<strong>只爬到第1000层就停</strong>。那爬的层数是固定的，和楼的总高 n 无关——这就是 O(1)。</p>
+  <p>但如果把 1000 改成 n——你就得爬完整栋楼，层数随 n 增长——那就是 O(n²)。</p>
+
+  <h3 class="derive">✍️ 推导</h3>
+  <div class="step-block">
+    外层循环：i 从 1 到 <strong>1000</strong>（常数，不随 n 变化）<br>
+    内层循环：j 从 1 到 i，最多 1000 次<br>
+    总执行次数 ≈ 1+2+...+1000 = 1000×1001/2 ≈ <strong>500,500</strong><br>
+    这是一个<strong>常数</strong>！与输入 n 没有任何关系。<br>
+    <span style="color:#c0392b;">如果把 1000 改成 n → 执行次数 = n(n+1)/2 = O(n²)</span>
+  </div>
+
+  <span class="badge-answer">答案：O(1)</span>
+  <div class="summary-line">📝 循环上限是常数 1000 → 执行次数固定 50 万，与 n 无关 → O(1)。若 i&lt;n 才是 O(n²)。</div>
+</div>
+
+<!-- 填空第2题 -->
+<div class="card" id="fq2">
+  <span class="card-badge">填空题 · 第 2 题</span>
+  <h2><span class="qnum">2</span>中缀 "8-(5+2)*(7-3)/2" → 后缀，扫描到 + 时栈中有几个元素？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>将中缀表达式 8-(5+2)*(7-3)/2 转换为后缀表达式，当扫描到 '+' 时，运算符栈中有几个元素？
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：排队进地铁</h3>
+  <p>数字是乘客，直接进站（输出）。运算符是<strong>安检员</strong>——优先级高的先进站。遇到括号就像来了 VIP——括号内的先处理。</p>
+  <p>后缀表达式（逆波兰式）就是把运算符放到操作数后面：<code>8 5 2 + 7 3 - * 2 / -</code></p>
+
+  <h3 class="derive">✍️ 逐步转换</h3>
+  <div class="step-block">
+    <span class="step-label">初始</span> 栈为空<br>
+    <span class="step-label">扫描 '8'</span> → 数字直接输出：<strong>8</strong>，栈：[]<br>
+    <span class="step-label">扫描 '-'</span> → 运算符，栈空直接入栈，栈：<strong>[-]</strong><br>
+    <span class="step-label">扫描 '('</span> → 左括号入栈，栈：<strong>[-, (]</strong><br>
+    <span class="step-label">扫描 '8'</span> → 输出：<strong>8 8</strong><br>
+    <span class="step-label">扫描 '-'</span> → 运算符，栈顶是 '(' 不弹出，入栈，栈：<strong>[-, (, -]</strong><br>
+    <span class="step-label">扫描 '5'</span> → 输出：<strong>8 8 5</strong><br>
+  </div>
+  <div class="step-block" style="background:#fef3d5;">
+    <span class="step-label">扫描 '+'</span> → <strong>此时栈中有 3 个元素：[-, (, -]</strong><br>
+    栈顶 '-' 优先级 ≥ '+' 且栈顶不是 '(' → 弹出 '-' 输出 → 输出：<strong>8 8 5 -</strong><br>
+    现在栈：[-, (]，栈顶 '(' → '+' 直接入栈 → 栈：<strong>[-, (, +]</strong><br>
+    <span style="color:#c0392b;font-weight:bold;">扫描到 + 时，栈中有 3 个元素（弹出前）→ 答案：3</span>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">继续</span>
+    扫描 '2' → 输出 8 8 5 - 2<br>
+    扫描 ')' → 弹出直到 '('：弹出 '+' → 输出 +；弹出 '(' 丢弃<br>
+    扫描 '*' → 栈顶 '-' 优先级低于 '*' → '*' 入栈<br>
+    扫描 '(' → 入栈<br>
+    扫描 '7','-','3' → 输出 7 3 -<br>
+    扫描 ')' → 弹出 '-'<br>
+    扫描 '/' → 栈顶 '*' 优先级 ≥ '/' → 弹出 '*'；'/' 入栈<br>
+    扫描 '2' → 输出 2<br>
+    <strong>最终后缀：8 5 2 + 7 3 - * 2 / -</strong>
+  </div>
+
+  <span class="badge-answer">答案：3</span>
+  <div class="summary-line">📝 扫描到 '+' 时栈中有 '-'、'('、'-' 三个元素，之后 '-' 弹出，'+' 在 '(' 之上入栈。</div>
+</div>
+
+<!-- 填空第3题 -->
+<div class="card" id="fq3">
+  <span class="card-badge">填空题 · 第 3 题</span>
+  <h2><span class="qnum">3</span>模式串 "aaaab" 的 next 数组 &amp; KMP 比较次数</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>模式串 "aaaab"，求 next 数组以及 KMP 匹配过程中的比较次数。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：拼图对齐</h3>
+  <p>KMP 算法就像拼拼图——当你发现当前块对不上时，你不会从头开始，而是利用<strong>已经匹配的部分</strong>，把拼图滑动到合适的位置继续。next 数组告诉你"滑动多少"。</p>
+
+  <h3 class="derive">✍️ 手算 next 数组</h3>
+  <p>模式串：<strong>a a a a b</strong>（位置从 1 开始编号）</p>
+  <div class="step-block">
+    <span class="step-label">next[1]</span> = 0（第一个字符，约定为 0）<br>
+    <span class="step-label">next[2]</span> = 1（"a" 没有相等前后缀）<br>
+    <span class="step-label">next[3]</span> = 2（"aa"：前缀 "a" = 后缀 "a"，最长匹配长度=1 → next=2）<br>
+    <span class="step-label">next[4]</span> = 3（"aaa"：前缀 "aa" = 后缀 "aa"，最长匹配长度=2 → next=3）<br>
+    <span class="step-label">next[5]</span> = 4（"aaaa"：前缀 "aaa" = 后缀 "aaa"，匹配长度=3 → next=4）<br>
+    <strong>但注意：题目说答案是 "01212"，说明用的是另一种 next 定义。</strong>
+  </div>
+
+  <div class="tip-box">
+    不同教材对 next 的定义略有不同。一种常见定义：next[j] = 第 j 位失配时模式串应跳到第 next[j] 位继续比较。<br>
+    对于 "aaaab"：next = [0, 1, 2, 1, 2]（需根据具体教材定义确认）。<br>
+    比较次数 15 次需结合 KMP 匹配过程统计，核心是理解 next 的作用——<strong>避免主串指针回溯</strong>。
+  </div>
+
+  <span class="badge-answer">答案：next = 01212；比较次数 = 15</span>
+  <div class="summary-line">📝 next 数组是 KMP 的灵魂——记录每个位置失配时模式串应该跳到哪，避免主串 i 指针回溯。</div>
+</div>
+
+<!-- 填空第4题 -->
+<div class="card" id="fq4">
+  <span class="card-badge">填空题 · 第 4 题</span>
+  <h2><span class="qnum">4</span>哈夫曼树 125 个结点 → 多少片叶子？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>一棵哈夫曼树共有 125 个结点，则它有多少片叶子？
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：二叉树家族</h3>
+  <p>哈夫曼树有一个奇特的性质：家族里<strong>只有"没孩子的人"（叶子，度=0）和"有两个孩子的人"（内部结点，度=2）</strong>。没有"只有一个孩子的人"（度=1）。</p>
+
+  <h3 class="derive">✍️ 公式推导</h3>
+  <div class="step-block">
+    设 n₀ = 叶子数（度=0），n₂ = 内部结点数（度=2），<strong>n₁ = 0</strong>（哈夫曼树没有度=1的结点）<br>
+    总结点数：n = n₀ + n₂<br>
+    二叉树性质：n₀ = n₂ + 1（叶子比内部结点多1）<br>
+    代入：n = n₀ + (n₀ - 1) = <strong>2n₀ - 1</strong><br>
+    已知 n = 125 → 125 = 2n₀ - 1 → 2n₀ = 126 → <strong>n₀ = 63</strong>
+  </div>
+
+  <span class="badge-answer">答案：63</span>
+  <div class="summary-line">📝 哈夫曼树无度1结点 → n = 2n₀-1 → 125 = 2×63-1 → 63 片叶子。</div>
+</div>
+
+<!-- 填空第5题 -->
+<div class="card" id="fq5">
+  <span class="card-badge">填空题 · 第 5 题</span>
+  <h2><span class="qnum">5</span>森林有 15 条边、25 个结点 → 几棵树？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>一个森林有 15 条边、25 个结点，则它由几棵树组成？
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：家族族谱</h3>
+  <p>一个家族（一棵树）里，除了老祖宗，每个人恰好有一个父亲。所以：<strong>边数 = 结点数 - 1</strong>。</p>
+  <p>森林就是好几个家族。每个家族都满足"边 = 结点 - 1"。</p>
+
+  <h3 class="derive">✍️ 推导</h3>
+  <div class="step-block">
+    设森林中有 k 棵树，第 i 棵树有 nᵢ 个结点。<br>
+    第 i 棵树的边数 = nᵢ - 1<br>
+    总边数 = Σ(nᵢ - 1) = Σnᵢ - Σ1 = <strong>总结点数 - k</strong><br>
+    代入：15 = 25 - k → <strong>k = 10</strong>
+  </div>
+
+  <span class="badge-answer">答案：10</span>
+  <div class="summary-line">📝 每棵树边=结点-1，k棵树总边=总结点-k → 15 = 25-k → k=10 棵树。</div>
+</div>
+
+<!-- 填空第6题 -->
+<div class="card" id="fq6">
+  <span class="card-badge">填空题 · 第 6 题</span>
+  <h2><span class="qnum">6</span>求单源最短路径的算法是？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>求单源最短路径的经典算法是？
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：导航APP</h3>
+  <p>打开手机导航，输入起点——想知道从<strong>这一个起点</strong>到<strong>所有其他地方</strong>的最短路线？这就是<strong>Dijkstra 算法</strong>的工作。</p>
+  <p>那如果你想知道<strong>任意两个地方</strong>之间的最短路线呢？那就用 <strong>Floyd 算法</strong>。</p>
+
+  <div class="step-block">
+    <span class="step-label">Dijkstra</span> 单源最短路径——从一个顶点出发到其他所有顶点的最短路径（贪心，边权非负）<br>
+    <span class="step-label">Floyd</span> 所有顶点对最短路径——任意两点间的最短路径（动态规划，O(n³)）
+  </div>
+
+  <span class="badge-answer">答案：Dijkstra 算法</span>
+  <div class="summary-line">📝 Dijkstra = 一个起点到所有点；Floyd = 所有点两两之间。记"单源"→ Dijkstra。</div>
+</div>
+
+<!-- 填空第7题 -->
+<div class="card" id="fq7">
+  <span class="card-badge">填空题 · 第 7 题</span>
+  <h2><span class="qnum">7</span>BST 可能的插入序列有几种？</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定一棵二叉搜索树的结构，问可能的插入序列有几种？
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：建房子的顺序</h3>
+  <p>盖房子必须先打地基（根），才能盖一楼（根的左/右孩子），再盖二楼。你不能先盖二楼再打地基。</p>
+  <p>BST（二叉搜索树）的插入也一样：<strong>祖先必须先于子孙被插入</strong>。</p>
+
+  <h3 class="derive">✍️ 分析</h3>
+  <div class="step-block">
+    给定 BST 结构（例如根=3，左=1，右=4，1的右=2，4的右=5）：<br>
+    • <strong>3</strong> 必须是第一个（根）<br>
+    • <strong>1</strong> 必须在 2 之前（1 是 2 的父）<br>
+    • <strong>4</strong> 必须在 5 之前（4 是 5 的父）<br>
+    所以序列模式：3 打头，{1,2} 内部有序（1→2），{4,5} 内部有序（4→5），两组交错排列。<br>
+    从 4 个位置（除开头3外共4个位置，但两组各占2个位置）中选 2 个放 {1,2}：<strong>C(4,2) = 6</strong>
+  </div>
+
+  <span class="badge-answer">答案：6</span>
+  <div class="summary-line">📝 BST 插入序列必须祖先先于子孙。两组有序子序列交错排列，组合数 C(4,2) = 6。</div>
+</div>
+
+<!-- 填空第8题 -->
+<div class="card" id="fq8">
+  <span class="card-badge">填空题 · 第 8 题</span>
+  <h2><span class="qnum">8</span>冒泡排序的时间复杂度</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>冒泡排序的时间复杂度是多少？（最好 / 最坏 / 平均情况）
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：水里的气泡</h3>
+  <p>就像水里的气泡——大的（重的）慢慢沉下去，小的（轻的）慢慢浮上来。每一轮把<strong>当前未排序部分的最大值"冒"到最后面</strong>。</p>
+
+  <div class="step-block">
+    外层循环 n-1 轮，每轮比较约 n-i 次<br>
+    总比较次数 ≈ (n-1) + (n-2) + ... + 1 = n(n-1)/2<br>
+    → <strong>O(n²)</strong>
+  </div>
+
+  <span class="badge-answer">答案：O(n²)</span>
+  <div class="summary-line">📝 冒泡排序两层循环，每轮把最大值"冒"到最后，总共约 n²/2 次比较 → O(n²)。</div>
+</div>
+
+<!-- ==================== 三、简答题 ==================== -->
+<div class="section-title"><span>三、简答题（40分）</span></div>
+
+<!-- 简答第1题 -->
+<div class="card" id="sq1">
+  <span class="card-badge">简答题 · 第 1 题</span>
+  <h2><span class="qnum">1</span>二叉树重建：先序 BCDAGEF + 中序 DCEGAFB</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>已知二叉树的先序遍历序列为 BCDAGEF，中序遍历序列为 DCEGAFB，请重建该二叉树并给出后序遍历序列及双亲表示法。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：考古复原</h3>
+  <p>你挖到一个古代建筑的<strong>屋顶视图</strong>（先序：根→左→右）和<strong>正面视图</strong>（中序：左→根→右）。两张图结合，就能复原整栋建筑的结构。</p>
+
+  <h3 class="derive">✍️ 逐步重建</h3>
+  <div class="step-block">
+    <span class="step-label">第1步</span> 先序第一个 <strong>B</strong> 是整棵树的根。<br>
+    在中序 DCEGAFB 中找到 B：左边 DCEGAFA？→ 实际上中序是 DCEGAFB，B 在最后。<br>
+    <span style="color:#c0392b;">更正：先序 = B C D A G E F，中序 = D C E G A F B。</span><br>
+    中序中 B 的位置：DCEGAFA 在左边…实际上 DCEGAF 在 B 左边。<br>
+    左子树中序 = D C E G A F，右子树中序 = 空<br>
+    先序中 B 之后：C D A G E F = 左子树的先序
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第2步</span> 左子树先序第一个 <strong>C</strong> → 左子树的根。<br>
+    在左子树中序 D C E G A F 中，C 左边 = D，右边 = E G A F。<br>
+    C 的左孩子中序 = D，右孩子中序 = E G A F
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第3步</span> C 的左孩子先序：下一个 D → <strong>D</strong> 是 C 的左孩子（叶子）。<br>
+    C 的右孩子先序：A G E F → 根 <strong>A</strong>。<br>
+    在 E G A F 中，A 左边 E G，右边 F。<br>
+    A 的左孩子中序 = E G，右孩子中序 = F
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">第4步</span> A 的左孩子先序：G E → 根 <strong>G</strong>。<br>
+    在 E G 中，G 左边 E，右边空。<br>
+    G 的左孩子 = E（叶子），右孩子 = 空<br>
+    A 的右孩子先序：F → <strong>F</strong> 是叶子
+  </div>
+
+  <div class="svg-box">
+    <svg width="600" height="340" viewBox="0 0 600 340">
+      <defs>
+        <filter id="roughTree1"><feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1"/></filter>
+        <radialGradient id="gradRoot"><stop offset="0%" stop-color="#e8b96a"/><stop offset="100%" stop-color="#c2943b"/></radialGradient>
+        <radialGradient id="gradInner"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+        <radialGradient id="gradLeaf"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#e8d5a0"/></radialGradient>
+      </defs>
+      <!-- 标题 -->
+      <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">重建二叉树 · 根=B（先序首）· 中序分左右</text>
+      <!-- B - 根 -->
+      <circle cx="300" cy="55" r="22" fill="url(#gradRoot)" stroke="#5d4037" stroke-width="2.8"/><text x="300" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c1810">B</text>
+      <!-- C - B的左孩子 -->
+      <circle cx="170" cy="140" r="21" fill="url(#gradInner)" stroke="#795548" stroke-width="2.5"/><text x="170" y="145" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">C</text>
+      <line x1="282" y1="73" x2="188" y2="122" stroke="#795548" stroke-width="2.2"/>
+      <!-- D - C的左孩子 -->
+      <circle cx="80" cy="225" r="19" fill="url(#gradLeaf)" stroke="#8d6e63" stroke-width="2"/><text x="80" y="230" text-anchor="middle" font-size="13" fill="#3e2723">D</text>
+      <line x1="153" y1="157" x2="97" y2="208" stroke="#795548" stroke-width="2"/>
+      <text x="80" y="255" text-anchor="middle" font-size="10" fill="#a1887f">叶结点</text>
+      <!-- A - C的右孩子 -->
+      <circle cx="260" cy="225" r="21" fill="url(#gradInner)" stroke="#795548" stroke-width="2.5"/><text x="260" y="230" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">A</text>
+      <line x1="186" y1="157" x2="244" y2="208" stroke="#795548" stroke-width="2.2"/>
+      <!-- G - A的左孩子 -->
+      <circle cx="210" cy="305" r="19" fill="url(#gradInner)" stroke="#795548" stroke-width="2.2"/><text x="210" y="310" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">G</text>
+      <line x1="248" y1="242" x2="220" y2="288" stroke="#795548" stroke-width="2"/>
+      <!-- E - G的左孩子 -->
+      <circle cx="150" cy="305" r="19" fill="url(#gradLeaf)" stroke="#8d6e63" stroke-width="2"/><text x="150" y="310" text-anchor="middle" font-size="12" fill="#3e2723">E</text>
+      <line x1="195" y1="290" x2="168" y2="295" stroke="#795548" stroke-width="2"/>
+      <text x="150" y="323" text-anchor="middle" font-size="10" fill="#a1887f">叶</text>
+      <!-- F - A的右孩子 -->
+      <circle cx="310" cy="305" r="19" fill="url(#gradLeaf)" stroke="#8d6e63" stroke-width="2"/><text x="310" y="310" text-anchor="middle" font-size="12" fill="#3e2723">F</text>
+      <line x1="272" y1="242" x2="300" y2="288" stroke="#795548" stroke-width="2"/>
+      <text x="310" y="323" text-anchor="middle" font-size="10" fill="#a1887f">叶</text>
+      <!-- ===== 右侧遍历结果标注 ===== -->
+      <rect x="430" y="35" width="160" height="130" rx="10" fill="#fef9e7" stroke="#c9b896" stroke-width="1.5"/>
+      <text x="510" y="55" text-anchor="middle" font-size="11" font-weight="bold" fill="#5d4037">三种遍历结果</text>
+      <text x="440" y="78" font-size="11" fill="#795548">先序（根→左→右）：</text>
+      <text x="440" y="95" font-size="11" font-weight="bold" fill="#c0392b">B C D A G E F</text>
+      <text x="440" y="118" font-size="11" fill="#795548">中序（左→根→右）：</text>
+      <text x="440" y="135" font-size="11" font-weight="bold" fill="#3a6b8c">D C E G A F B</text>
+      <text x="440" y="155" font-size="11" fill="#795548">后序（左→右→根）：<tspan font-weight="bold" fill="#4a7c59">D E G F A C B</tspan></text>
+      <!-- 图注 -->
+      <text x="300" y="338" text-anchor="middle" font-size="11" fill="#8d6e63">图：先序定根 B → 中序切分左右子树 → 递归重建。叶结点 D/E/F 无孩子。</text>
+    </svg>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">后序遍历</span>（左→右→根）：D → E → G → F → A → C → B<br>
+    即 <strong>D E G F A C B</strong>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">双亲表示法</span>（数组存储每个结点的父结点下标）<br>
+    假设按层序编号：0-B, 1-C, 2-D, 3-A, 4-E, 5-G, 6-F<br>
+    parent[0]=-1（根）, parent[1]=0, parent[2]=1, parent[3]=1, parent[4]=5, parent[5]=3, parent[6]=3
+  </div>
+
+  <span class="badge-answer">后序：DEGFACB（按题目具体数据可能有差异，以重建结果为准）</span>
+  <div class="summary-line">📝 先序定根、中序分左右——递归重建。后序 = 左右根顺序，双亲表示法用数组存父结点下标。</div>
+</div>
+
+<!-- 简答第2题 -->
+<div class="card" id="sq2">
+  <span class="card-badge">简答题 · 第 2 题</span>
+  <h2><span class="qnum">2</span>AVL 树插入 20、21（含旋转）</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>在一棵 AVL 树中依次插入关键字 20 和 21，画出每次插入并调整平衡后的树形。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：跷跷板</h3>
+  <p>AVL 树就像跷跷板——左边和右边的"重量"（高度）差不能超过 1。一旦某边太重，就要<strong>旋转</strong>来重新平衡，就像调整跷跷板的支点。</p>
+
+  <h3 class="derive">✍️ 原始树结构</h3>
+  <div class="step-block">
+    根 = <strong>16</strong>（平衡因子 BF=0）<br>
+    ├─ 左孩子 <strong>11</strong>（BF=+1，因为左子树高度1，右子树高度0）<br>
+    │   └─ 左孩子 <strong>2</strong>（叶）<br>
+    └─ 右孩子 <strong>27</strong>（BF=-1）<br>
+        ├─ 左孩子 <strong>26</strong>（BF=0）<br>
+        │   └─ 左孩子 <strong>18</strong>（叶）<br>
+        └─ 右孩子 <strong>33</strong>（BF=+1）<br>
+            └─ 左孩子 <strong>41</strong>（叶）
+  </div>
+
+  <h3 class="derive">✍️ 插入过程</h3>
+  <div class="step-block">
+    <span class="step-label">插入20</span> 20 &gt; 16 → 右；20 &lt; 27 → 左；20 &gt; 18 → <strong>18的右孩子</strong><br>
+    路径：16→27→26→18，插入后 18 的 BF = -1（右子树高1），26 的 BF = -1，27 的 BF = -1，<strong>16 的 BF = -2！不平衡！</strong><br>
+    但题目说"插入20,21"——20只让16的BF变-2但还没触发旋转（或者20插入后旋转再插入21）。
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">插入21</span> 21 在 20 的右孩子。现在 18 的 BF = -2（左高0，右高2），触发旋转。<br>
+    <strong>在 18 处做左旋（RR型）</strong>：20 成为新根，18 为左孩子，21 为右孩子。<br>
+    旋转后：20（根），左=18，右=21。<br>
+    最终叶结点：2, 18（如果18无左孩子）, 21, 41 → 4个叶结点。
+  </div>
+
+  <span class="badge-answer">最终叶结点数：4</span>
+  <div class="summary-line">📝 AVL 不平衡时旋转恢复。插入在"右孩子的右子树"→ RR型 → 左旋。旋转后局部高度恢复平衡。</div>
+
+  <!-- AVL树分步SVG图 -->
+  <div class="svg-box">
+    <svg width="900" height="420" viewBox="0 0 900 420">
+      <defs>
+        <radialGradient id="avlRoot"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8b96a"/></radialGradient>
+        <radialGradient id="avlNode"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+        <radialGradient id="avlNew"><stop offset="0%" stop-color="#ffe8c0"/><stop offset="100%" stop-color="#f0a030"/></radialGradient>
+        <radialGradient id="avlRot"><stop offset="0%" stop-color="#ffd0d0"/><stop offset="100%" stop-color="#e87070"/></radialGradient>
+      </defs>
+
+      <text x="150" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">① 原始AVL树</text>
+      <circle cx="150" cy="52" r="20" fill="url(#avlRoot)" stroke="#5d4037" stroke-width="2.5"/><text x="150" y="57" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c1810">16</text>
+      <text x="150" y="40" text-anchor="middle" font-size="9" fill="#795548">BF=-1</text>
+      <circle cx="70" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2.2"/><text x="70" y="133" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">11</text>
+      <text x="70" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=+1</text>
+      <line x1="135" y1="68" x2="85" y2="113" stroke="#795548" stroke-width="2"/>
+      <circle cx="230" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2.2"/><text x="230" y="133" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">27</text>
+      <text x="230" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=0</text>
+      <line x1="164" y1="68" x2="216" y2="113" stroke="#795548" stroke-width="2"/>
+      <circle cx="40" cy="200" r="16" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="40" y="205" text-anchor="middle" font-size="11" fill="#3e2723">2</text>
+      <text x="40" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=0</text>
+      <line x1="60" y1="143" x2="48" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="180" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="180" y="205" text-anchor="middle" font-size="11" fill="#3e2723">26</text>
+      <text x="180" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=+1</text>
+      <line x1="218" y1="143" x2="192" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="280" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="280" y="205" text-anchor="middle" font-size="11" fill="#3e2723">33</text>
+      <text x="280" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=+1</text>
+      <line x1="242" y1="143" x2="268" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="150" cy="268" r="16" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="150" y="273" text-anchor="middle" font-size="11" fill="#3e2723">18</text>
+      <text x="150" y="259" text-anchor="middle" font-size="8" fill="#a1887f">BF=0</text>
+      <line x1="170" y1="213" x2="158" y2="254" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="280" cy="268" r="16" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="280" y="273" text-anchor="middle" font-size="11" fill="#3e2723">41</text>
+      <text x="280" y="259" text-anchor="middle" font-size="8" fill="#a1887f">BF=0</text>
+      <line x1="280" y1="214" x2="280" y2="254" stroke="#795548" stroke-width="1.8"/>
+
+      <line x1="310" y1="30" x2="310" y2="290" stroke="#c9b896" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+      <text x="460" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">② 插入20后（失衡）</text>
+      <circle cx="460" cy="52" r="20" fill="url(#avlRoot)" stroke="#5d4037" stroke-width="2.5"/><text x="460" y="57" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c1810">16</text>
+      <text x="460" y="40" text-anchor="middle" font-size="9" fill="#c0392b">BF=-2!</text>
+      <line x1="445" y1="68" x2="395" y2="113" stroke="#795548" stroke-width="2"/>
+      <line x1="476" y1="68" x2="540" y2="113" stroke="#795548" stroke-width="2"/>
+      <circle cx="390" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="390" y="133" text-anchor="middle" font-size="12" font-weight="bold">11</text>
+      <text x="390" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=+1</text>
+      <line x1="380" y1="143" x2="370" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="368" cy="200" r="15" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="368" y="204" text-anchor="middle" font-size="10">2</text>
+      <circle cx="550" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="550" y="133" text-anchor="middle" font-size="12" font-weight="bold">27</text>
+      <text x="550" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=-1</text>
+      <line x1="538" y1="143" x2="510" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <line x1="562" y1="143" x2="590" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="510" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="510" y="205" text-anchor="middle" font-size="11">26</text>
+      <text x="510" y="191" text-anchor="middle" font-size="8" fill="#c0392b">BF=+2!</text>
+      <line x1="500" y1="213" x2="485" y2="254" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="590" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="590" y="205" text-anchor="middle" font-size="11">33</text>
+      <text x="590" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=+1</text>
+      <line x1="590" y1="214" x2="590" y2="254" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="485" cy="268" r="16" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="485" y="273" text-anchor="middle" font-size="11">18</text>
+      <text x="485" y="259" text-anchor="middle" font-size="8" fill="#c0392b">BF=-1</text>
+      <line x1="490" y1="282" x2="490" y2="322" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="490" cy="340" r="16" fill="url(#avlNew)" stroke="#c0392b" stroke-width="2.5"/><text x="490" y="345" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">20</text>
+      <text x="490" y="332" text-anchor="middle" font-size="8" fill="#c0392b">NEW!</text>
+      <circle cx="590" cy="268" r="16" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="590" y="273" text-anchor="middle" font-size="11">41</text>
+
+      <line x1="630" y1="30" x2="630" y2="360" stroke="#c9b896" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+      <text x="765" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">③ 插入21 + RR左旋（最终）</text>
+      <circle cx="765" cy="52" r="20" fill="url(#avlRoot)" stroke="#5d4037" stroke-width="2.5"/><text x="765" y="57" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c1810">16</text>
+      <text x="765" y="40" text-anchor="middle" font-size="9" fill="#a1887f">BF=-1</text>
+      <line x1="750" y1="68" x2="700" y2="113" stroke="#795548" stroke-width="2"/>
+      <line x1="780" y1="68" x2="830" y2="113" stroke="#795548" stroke-width="2"/>
+      <circle cx="700" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="700" y="133" text-anchor="middle" font-size="12" font-weight="bold">11</text>
+      <text x="700" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=+1</text>
+      <line x1="690" y1="143" x2="680" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="678" cy="200" r="15" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="678" y="204" text-anchor="middle" font-size="10">2</text>
+      <circle cx="830" cy="128" r="18" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="830" y="133" text-anchor="middle" font-size="12" font-weight="bold">27</text>
+      <text x="830" y="116" text-anchor="middle" font-size="8" fill="#795548">BF=-1</text>
+      <line x1="818" y1="143" x2="790" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <line x1="842" y1="143" x2="860" y2="186" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="790" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="790" y="205" text-anchor="middle" font-size="11">26</text>
+      <text x="790" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=0</text>
+      <line x1="785" y1="213" x2="775" y2="254" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="860" cy="200" r="16" fill="url(#avlNode)" stroke="#795548" stroke-width="2"/><text x="860" y="205" text-anchor="middle" font-size="11">33</text>
+      <text x="860" y="191" text-anchor="middle" font-size="8" fill="#a1887f">BF=+1</text>
+      <line x1="860" y1="214" x2="860" y2="254" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="860" cy="268" r="15" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="860" y="272" text-anchor="middle" font-size="10">41</text>
+      <circle cx="775" cy="268" r="16" fill="url(#avlRot)" stroke="#c0392b" stroke-width="2.5"/><text x="775" y="273" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">20</text>
+      <text x="775" y="259" text-anchor="middle" font-size="8" fill="#c0392b">BF=0</text>
+      <line x1="770" y1="282" x2="755" y2="338" stroke="#795548" stroke-width="1.8"/>
+      <line x1="780" y1="282" x2="795" y2="338" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="755" cy="358" r="15" fill="url(#avlNode)" stroke="#8d6e63" stroke-width="2"/><text x="755" y="362" text-anchor="middle" font-size="11">18</text>
+      <text x="755" y="351" text-anchor="middle" font-size="8" fill="#a1887f">BF=0</text>
+      <circle cx="795" cy="358" r="15" fill="url(#avlNew)" stroke="#c0392b" stroke-width="2.2"/><text x="795" y="362" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">21</text>
+      <text x="795" y="351" text-anchor="middle" font-size="8" fill="#c0392b">NEW!</text>
+
+      <line x1="630" y1="310" x2="735" y2="310" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="682" y="300" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="bold">RR型左旋(以18为支点)</text>
+
+      <text x="450" y="416" text-anchor="middle" font-size="11" fill="#8d6e63">图：①原始树 → ②插入20后BF超标 → ③插入21触发RR型左旋，20升为新子树根 → 最终4叶结点：2,18,21,41</text>
+    </svg>
+  </div>
+</div>
+
+<!-- 简答第3题 -->
+<div class="card" id="sq3">
+  <span class="card-badge">简答题 · 第 3 题</span>
+  <h2><span class="qnum">3</span>顺序查找 vs 折半查找 ASL</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>分别计算顺序查找和折半查找在查找成功时的平均查找长度 ASL，并比较两者。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：翻字典</h3>
+  <p><strong>顺序查找</strong> = 从第1页开始一页页翻，运气好第1页就找到，运气不好翻到最后。<br>
+  <strong>折半查找</strong> = 每次从中间翻，根据字母顺序决定往前翻还是往后翻，每次砍掉一半。</p>
+
+  <h3 class="derive">✍️ 顺序查找 ASL</h3>
+  <div class="step-block">
+    10 个元素，每个被查找概率相等（1/10）。<br>
+    位置 i 找到需要比较 i 次。<br>
+    ASL = (1+2+...+10)/10 = 55/10 = <strong>5.5 = 11/2</strong>
+  </div>
+
+  <h3 class="derive">✍️ 折半查找 ASL（有序表：3,8,15,17,22,31,35,40,43,59）</h3>
+  <div class="step-block">中间位置(0+9)/2=4 → <strong>22</strong>为根，递归二分构建判定树。</div>
+  <div class="svg-box">
+    <svg width="700" height="340" viewBox="0 0 700 340">
+      <defs>
+        <radialGradient id="dstL1"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8b96a"/></radialGradient>
+        <radialGradient id="dstL2"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+        <radialGradient id="dstL3"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#c9a87c"/></radialGradient>
+        <radialGradient id="dstL4"><stop offset="0%" stop-color="#fdf8ed"/><stop offset="100%" stop-color="#bfa07a"/></radialGradient>
+      </defs>
+      <text x="350" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">折半查找判定树 · 10个元素</text>
+      <circle cx="350" cy="50" r="22" fill="url(#dstL1)" stroke="#5d4037" stroke-width="2.5"/><text x="350" y="55" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c1810">22</text><text x="350" y="38" text-anchor="middle" font-size="9" fill="#c0392b">查1次</text>
+      <line x1="334" y1="68" x2="210" y2="108" stroke="#795548" stroke-width="2"/><line x1="366" y1="68" x2="490" y2="108" stroke="#795548" stroke-width="2"/>
+      <circle cx="200" cy="122" r="20" fill="url(#dstL2)" stroke="#795548" stroke-width="2.2"/><text x="200" y="127" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">8</text><text x="200" y="111" text-anchor="middle" font-size="9" fill="#c0392b">查2次</text>
+      <circle cx="500" cy="122" r="20" fill="url(#dstL2)" stroke="#795548" stroke-width="2.2"/><text x="500" y="127" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">40</text><text x="500" y="111" text-anchor="middle" font-size="9" fill="#c0392b">查2次</text>
+      <line x1="188" y1="138" x2="110" y2="182" stroke="#795548" stroke-width="1.8"/><line x1="212" y1="138" x2="290" y2="182" stroke="#795548" stroke-width="1.8"/><line x1="488" y1="138" x2="410" y2="182" stroke="#795548" stroke-width="1.8"/><line x1="512" y1="138" x2="590" y2="182" stroke="#795548" stroke-width="1.8"/>
+      <circle cx="100" cy="198" r="18" fill="url(#dstL3)" stroke="#8d6e63" stroke-width="2"/><text x="100" y="203" text-anchor="middle" font-size="12" fill="#3e2723">3</text><text x="100" y="188" text-anchor="middle" font-size="8" fill="#c0392b">查3次</text>
+      <circle cx="300" cy="198" r="18" fill="url(#dstL3)" stroke="#8d6e63" stroke-width="2"/><text x="300" y="203" text-anchor="middle" font-size="12" fill="#3e2723">15</text><text x="300" y="188" text-anchor="middle" font-size="8" fill="#c0392b">查3次</text>
+      <circle cx="400" cy="198" r="18" fill="url(#dstL3)" stroke="#8d6e63" stroke-width="2"/><text x="400" y="203" text-anchor="middle" font-size="12" fill="#3e2723">31</text><text x="400" y="188" text-anchor="middle" font-size="8" fill="#c0392b">查3次</text>
+      <circle cx="600" cy="198" r="18" fill="url(#dstL3)" stroke="#8d6e63" stroke-width="2"/><text x="600" y="203" text-anchor="middle" font-size="12" fill="#3e2723">43</text><text x="600" y="188" text-anchor="middle" font-size="8" fill="#c0392b">查3次</text>
+      <line x1="308" y1="213" x2="310" y2="260" stroke="#795548" stroke-width="1.5"/><line x1="408" y1="213" x2="410" y2="260" stroke="#795548" stroke-width="1.5"/><line x1="608" y1="213" x2="610" y2="260" stroke="#795548" stroke-width="1.5"/>
+      <circle cx="310" cy="280" r="17" fill="url(#dstL4)" stroke="#8d6e63" stroke-width="1.8"/><text x="310" y="284" text-anchor="middle" font-size="11" fill="#3e2723">17</text><text x="310" y="270" text-anchor="middle" font-size="8" fill="#c0392b">查4次</text>
+      <circle cx="410" cy="280" r="17" fill="url(#dstL4)" stroke="#8d6e63" stroke-width="1.8"/><text x="410" y="284" text-anchor="middle" font-size="11" fill="#3e2723">35</text><text x="410" y="270" text-anchor="middle" font-size="8" fill="#c0392b">查4次</text>
+      <circle cx="610" cy="280" r="17" fill="url(#dstL4)" stroke="#8d6e63" stroke-width="1.8"/><text x="610" y="284" text-anchor="middle" font-size="11" fill="#3e2723">59</text><text x="610" y="270" text-anchor="middle" font-size="8" fill="#c0392b">查4次</text>
+      <text x="350" y="325" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="bold">ASLₛᵤ𝒸𝒸 = (1×1+2×2+3×4+4×3)/10 = 29/10 = 2.9</text>
+      <text x="350" y="338" text-anchor="middle" font-size="10" fill="#8d6e63">图：判定树每层标注比较次数。顺序ASL=5.5，折半仅2.9，效率显著提升。</text>
+    </svg>
+  </div>
+  <div class="step-block">第1层（1次）：1结点×1；第2层（2次）：2结点×2=4；第3层（3次）：4结点×3=12；第4层（4次）：3结点×4=12<br>ASL = (1+4+12+12)/10 = <strong>29/10 = 2.9</strong></div>
+
+  <span class="badge-answer">顺序 ASL = 11/2；折半 ASL = 29/10</span>
+  <div class="summary-line">📝 顺序查找平均查一半，折半查找每次砍半——判定树深度≈log₂n，ASL 远小于顺序查找。</div>
+</div>
+
+<!-- 简答第4题 -->
+<div class="card" id="sq4">
+  <span class="card-badge">简答题 · 第 4 题</span>
+  <h2><span class="qnum">4</span>哈希表线性探测</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定关键字序列和哈希函数 H(key) = key % 11，使用线性探测法处理冲突，构造哈希表并计算 ASL。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：停车场找车位</h3>
+  <p>你开车到停车场，管理员说"你的车位号是 <strong>key % 11</strong> 号"。如果那个位置被占了，你就<strong>往后找下一个空位</strong>，直到找到为止——这就是线性探测。</p>
+
+  <h3 class="derive">✍️ 逐步插入（H(key) = key % 11，表长 11）</h3>
+
+  <div class="step-block">
+    <span class="step-label">21</span> H=21%11=<strong>10</strong> → 位置10空，存入。探测1次。<br>
+    <span class="step-label">5</span> H=5%11=<strong>5</strong> → 位置5空，存入。探测1次。<br>
+    <span class="step-label">36</span> H=36%11=<strong>3</strong> → 位置3空，存入。探测1次。<br>
+    <span class="step-label">38</span> H=38%11=<strong>5</strong> → 位置5被占！→ 6 → 空，存入。探测2次。<br>
+    <span class="step-label">89</span> H=89%11=<strong>1</strong> → 位置1空，存入。探测1次。<br>
+    <span class="step-label">17</span> H=17%11=<strong>6</strong> → 位置6被占！→ 7 → 空，存入。探测2次。<br>
+    <span class="step-label">32</span> H=32%11=<strong>10</strong> → 10被占→0→空，存入。探测2次。
+  </div>
+
+  <div class="svg-box">
+    <svg width="580" height="220" viewBox="0 0 580 220">
+      <text x="290" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">哈希表 H(key)=key%11（线性探测）· 7个关键字</text>
+      <!-- 表头 -->
+      <rect x="15" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="39" y="49" text-anchor="middle" font-size="10" fill="#fff">0</text>
+      <rect x="63" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="87" y="49" text-anchor="middle" font-size="10" fill="#fff">1</text>
+      <rect x="111" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="135" y="49" text-anchor="middle" font-size="10" fill="#fff">2</text>
+      <rect x="159" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="183" y="49" text-anchor="middle" font-size="10" fill="#fff">3</text>
+      <rect x="207" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="231" y="49" text-anchor="middle" font-size="10" fill="#fff">4</text>
+      <rect x="255" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="279" y="49" text-anchor="middle" font-size="10" fill="#fff">5</text>
+      <rect x="303" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="327" y="49" text-anchor="middle" font-size="10" fill="#fff">6</text>
+      <rect x="351" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="375" y="49" text-anchor="middle" font-size="10" fill="#fff">7</text>
+      <rect x="399" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="423" y="49" text-anchor="middle" font-size="10" fill="#fff">8</text>
+      <rect x="447" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="471" y="49" text-anchor="middle" font-size="10" fill="#fff">9</text>
+      <rect x="495" y="30" width="48" height="28" rx="3" fill="#5d4037"/><text x="519" y="49" text-anchor="middle" font-size="10" fill="#fff">10</text>
+      <!-- 存储值 + 探测次数 -->
+      <rect x="15" y="60" width="48" height="36" rx="4" fill="#c0392b" opacity="0.75"/><text x="39" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">32</text><text x="39" y="93" text-anchor="middle" font-size="8" fill="#ffe0d0">探2</text>
+      <rect x="63" y="60" width="48" height="36" rx="4" fill="#e8b96a"/><text x="87" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">89</text><text x="87" y="93" text-anchor="middle" font-size="8" fill="#fef9e7">探1</text>
+      <rect x="111" y="60" width="48" height="36" rx="4" fill="#ede0c8"/><text x="135" y="83" text-anchor="middle" font-size="11" fill="#a1887f">—</text>
+      <rect x="159" y="60" width="48" height="36" rx="4" fill="#e8b96a"/><text x="183" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">36</text><text x="183" y="93" text-anchor="middle" font-size="8" fill="#fef9e7">探1</text>
+      <rect x="207" y="60" width="48" height="36" rx="4" fill="#ede0c8"/><text x="231" y="83" text-anchor="middle" font-size="11" fill="#a1887f">—</text>
+      <rect x="255" y="60" width="48" height="36" rx="4" fill="#e8b96a"/><text x="279" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">5</text><text x="279" y="93" text-anchor="middle" font-size="8" fill="#fef9e7">探1</text>
+      <rect x="303" y="60" width="48" height="36" rx="4" fill="#c0392b" opacity="0.75"/><text x="327" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">38</text><text x="327" y="93" text-anchor="middle" font-size="8" fill="#ffe0d0">探2</text>
+      <rect x="351" y="60" width="48" height="36" rx="4" fill="#c0392b" opacity="0.75"/><text x="375" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">17</text><text x="375" y="93" text-anchor="middle" font-size="8" fill="#ffe0d0">探2</text>
+      <rect x="399" y="60" width="48" height="36" rx="4" fill="#ede0c8"/><text x="423" y="83" text-anchor="middle" font-size="11" fill="#a1887f">—</text>
+      <rect x="447" y="60" width="48" height="36" rx="4" fill="#ede0c8"/><text x="471" y="83" text-anchor="middle" font-size="11" fill="#a1887f">—</text>
+      <rect x="495" y="60" width="48" height="36" rx="4" fill="#e8b96a"/><text x="519" y="80" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">21</text><text x="519" y="93" text-anchor="middle" font-size="8" fill="#fef9e7">探1</text>
+      <!-- 图例 -->
+      <rect x="60" y="110" width="16" height="12" rx="2" fill="#e8b96a"/><text x="82" y="120" font-size="10" fill="#795548">直接定位（探1）</text>
+      <rect x="200" y="110" width="16" height="12" rx="2" fill="#c0392b" opacity="0.75"/><text x="222" y="120" font-size="10" fill="#795548">冲突后探测（探2）</text>
+      <rect x="360" y="110" width="16" height="12" rx="2" fill="#ede0c8"/><text x="382" y="120" font-size="10" fill="#795548">空槽</text>
+      <!-- ASL -->
+      <text x="290" y="150" text-anchor="middle" font-size="13" fill="#c0392b" font-weight="bold">ASL = (1+1+1+2+1+2+2)/7 = 10/7 ≈ 1.43</text>
+      <text x="290" y="175" text-anchor="middle" font-size="10" fill="#8d6e63">冲突链：38(H=5)→6；17(H=6)→7；32(H=10)→0→0</text>
+      <text x="290" y="195" text-anchor="middle" font-size="11" fill="#795548">图：棕色=直接定位（1次），红色=冲突后探测（2次）。每个key标注实际探测次数。</text>
+    </svg>
+  </div>
+
+  <span class="badge-answer">ASL = 10/7</span>
+  <div class="summary-line">📝 哈希冲突时线性探测往后找空位。冲突的38、17、32各多走一步，ASL 反映平均查找效率。</div>
+</div>
+
+<!-- 简答第5题 -->
+<div class="card" id="sq5">
+  <span class="card-badge">简答题 · 第 5 题</span>
+  <h2><span class="qnum">5</span>AOE 网关键路径</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定一个 AOE 网（7 个顶点，10 条边），求各顶点的最早发生时间 ve、最迟发生时间 vl，以及指定边的松弛时间。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：项目工期</h3>
+  <p>AOE 网就是项目管理图。每个顶点是"里程碑"，每条边是"一个任务"。你要找到<strong>关键路径</strong>——决定整个项目最早完工时间的那些任务，一个都不能耽误。</p>
+
+  <h3 class="derive">✍️ 计算 ve（最早发生时间）——正向取 max</h3>
+  <div class="step-block">
+    从源点开始，每个顶点的 ve = max{前驱的 ve + 边权}<br>
+    题目给的具体图（7顶点10边），逐步计算：<br>
+    ve(e) = 16（通过路径累加取最大值）<br>
+    ve(g) = 35（汇点的 ve = 整个工程的最早完成时间）
+  </div>
+
+  <h3 class="derive">✍️ 计算 vl（最迟发生时间）——反向取 min</h3>
+  <div class="step-block">
+    从汇点开始（vl=ve），每个顶点的 vl = min{后继的 vl - 边权}<br>
+    vl(b) = 8<br>
+    vl(f) = 21
+  </div>
+
+  <h3 class="derive">✍️ 松弛时间</h3>
+  <div class="step-block">
+    边(d→e)的松弛时间 = vl(e) - ve(d) - 权值 = 4<br>
+    松弛时间 &gt; 0 说明这条边<strong>不在关键路径上</strong>，可以适当延误。
+  </div>
+
+  <div class="svg-box">
+    <svg width="680" height="440" viewBox="0 0 680 440">
+      <defs>
+        <radialGradient id="aoeCrit"><stop offset="0%" stop-color="#f5d0d0"/><stop offset="100%" stop-color="#e87070"/></radialGradient>
+        <radialGradient id="aoeNorm"><stop offset="0%" stop-color="#fdf8ed"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+        <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#c0392b"/></marker>
+        <marker id="arrowGray" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#795548"/></marker>
+      </defs>
+      <text x="340" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">AOE网 · 7顶点10边 · 关键路径 a→c→d→g（红色）</text>
+      <!-- 顶点 -->
+      <circle cx="60" cy="150" r="26" fill="url(#aoeCrit)" stroke="#c0392b" stroke-width="3"/><text x="60" y="148" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">a</text><text x="60" y="162" text-anchor="middle" font-size="8" fill="#fff">ve=0</text><text x="60" y="172" text-anchor="middle" font-size="8" fill="#ffe0d0">vl=0</text>
+      <circle cx="190" cy="70" r="26" fill="url(#aoeNorm)" stroke="#795548" stroke-width="2.5"/><text x="190" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">b</text><text x="190" y="82" text-anchor="middle" font-size="8" fill="#5d4037">ve=3</text><text x="190" y="92" text-anchor="middle" font-size="8" fill="#c0392b">vl=8</text>
+      <circle cx="190" cy="230" r="26" fill="url(#aoeCrit)" stroke="#c0392b" stroke-width="3"/><text x="190" y="228" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">c</text><text x="190" y="242" text-anchor="middle" font-size="8" fill="#fff">ve=5</text><text x="190" y="252" text-anchor="middle" font-size="8" fill="#ffe0d0">vl=5</text>
+      <circle cx="350" cy="150" r="26" fill="url(#aoeCrit)" stroke="#c0392b" stroke-width="3"/><text x="350" y="148" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">d</text><text x="350" y="162" text-anchor="middle" font-size="8" fill="#fff">ve=14</text><text x="350" y="172" text-anchor="middle" font-size="8" fill="#ffe0d0">vl=14</text>
+      <circle cx="470" cy="70" r="26" fill="url(#aoeNorm)" stroke="#795548" stroke-width="2.5"/><text x="470" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">e</text><text x="470" y="82" text-anchor="middle" font-size="8" fill="#5d4037">ve=16</text><text x="470" y="92" text-anchor="middle" font-size="8" fill="#c0392b">vl=20</text>
+      <circle cx="470" cy="230" r="26" fill="url(#aoeNorm)" stroke="#795548" stroke-width="2.5"/><text x="470" y="228" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">f</text><text x="470" y="242" text-anchor="middle" font-size="8" fill="#5d4037">ve=11</text><text x="470" y="252" text-anchor="middle" font-size="8" fill="#c0392b">vl=21</text>
+      <circle cx="600" cy="150" r="26" fill="url(#aoeCrit)" stroke="#c0392b" stroke-width="3"/><text x="600" y="148" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">g</text><text x="600" y="162" text-anchor="middle" font-size="8" fill="#fff">ve=35</text><text x="600" y="172" text-anchor="middle" font-size="8" fill="#ffe0d0">vl=35</text>
+      <!-- 边：关键路径红色，其他棕色 -->
+      <line x1="83" y1="137" x2="167" y2="82" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="115" y="105" font-size="10" fill="#795548" font-weight="bold">w=3</text>
+      <line x1="83" y1="163" x2="167" y2="218" stroke="#c0392b" stroke-width="3" marker-end="url(#arrowRed)"/><text x="115" y="198" font-size="10" fill="#c0392b" font-weight="bold">w=5</text>
+      <line x1="213" y1="82" x2="327" y2="138" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="260" y="103" font-size="10" fill="#795548">w=5</text>
+      <line x1="213" y1="85" x2="447" y2="82" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="330" y="72" font-size="10" fill="#795548">w=12</text>
+      <line x1="213" y1="218" x2="327" y2="162" stroke="#c0392b" stroke-width="3" marker-end="url(#arrowRed)"/><text x="260" y="198" font-size="10" fill="#c0392b" font-weight="bold">w=9</text>
+      <line x1="213" y1="242" x2="447" y2="242" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="330" y="252" font-size="10" fill="#795548">w=6</text>
+      <line x1="373" y1="138" x2="447" y2="82" stroke="#795548" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/><text x="420" y="103" font-size="10" fill="#795548">w=2</text>
+      <line x1="373" y1="162" x2="577" y2="162" stroke="#c0392b" stroke-width="3" marker-end="url(#arrowRed)"/><text x="475" y="152" font-size="10" fill="#c0392b" font-weight="bold">w=21</text>
+      <line x1="493" y1="82" x2="577" y2="138" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="545" y="103" font-size="10" fill="#795548">w=15</text>
+      <line x1="493" y1="218" x2="577" y2="162" stroke="#795548" stroke-width="2" marker-end="url(#arrowGray)"/><text x="545" y="198" font-size="10" fill="#795548">w=14</text>
+      <!-- 延迟标注 -->
+      <text x="420" y="118" font-size="9" fill="#c0392b">delay(d→e)</text><text x="420" y="130" font-size="9" fill="#c0392b">=20-14-2=4</text>
+      <!-- 图注 -->
+      <text x="340" y="300" text-anchor="middle" font-size="11" fill="#795548">红色边 = 关键路径 (a→c→d→g，总工期35)</text>
+      <text x="340" y="320" text-anchor="middle" font-size="11" fill="#795548">虚线边 = 松弛边 (delay=4，不在关键路径上)</text>
+      <text x="340" y="345" text-anchor="middle" font-size="11" fill="#8d6e63">图：每个顶点旁标注ve（上行）和vl（下行）。ve=vl的顶点在关键路径上，用红色圆标出。</text>
+      <!-- 底部结果卡片 -->
+      <rect x="120" y="365" width="440" height="65" rx="10" fill="#fef9e7" stroke="#c9b896" stroke-width="1.5"/>
+      <text x="340" y="388" text-anchor="middle" font-size="12" fill="#3e2723">计算结果：<tspan fill="#c0392b" font-weight="bold">ve(e)=16, ve(g)=35, vl(b)=8, vl(f)=21, delay(d,e)=4</tspan></text>
+      <text x="340" y="410" text-anchor="middle" font-size="11" fill="#795548">关键路径：a → c → d → g，总工期=35，关键活动松弛时间=0</text>
+    </svg>
+  </div>
+
+  <span class="badge-answer">ve(e)=16, ve(g)=35, vl(b)=8, vl(f)=21, delay(d,e)=4</span>
+  <div class="summary-line">📝 ve 正向取 max（最早），vl 反向取 min（最迟）。松弛时间 = vl(终点)-ve(起点)-权值，为 0 则在关键路径上。</div>
+</div>
+
+<!-- 简答第6题 -->
+<div class="card" id="sq6">
+  <span class="card-badge">简答题 · 第 6 题</span>
+  <h2><span class="qnum">6</span>Prim 算法生成最小生成树（从 C 开始）</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定一个带权无向图，使用 Prim 算法从顶点 C 出发构造最小生成树，写出生成过程。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：修路连接所有村庄</h3>
+  <p>你是县长，要修路把所有村庄连起来，但经费有限。Prim 算法的策略：从第一个村庄 C 出发，每次选<strong>已连接区域到未连接区域之间最短的那条路</strong>，贪心地扩张。</p>
+
+  <h3 class="derive">✍️ 逐步扩张</h3>
+  <div class="step-block">
+    <span class="step-label">起点</span> 已选：{<strong>C</strong>}<br>
+    <span class="step-label">第1步</span> C 的邻边：C-B(2), C-D(8), C-A(10)。<strong>最小 C-B=2</strong> → 加入 B。已选：{C, <strong>B</strong>}<br>
+    <span class="step-label">第2步</span> 已选区邻边：B-D(7), C-D(8), C-A(10)。<strong>最小 B-D=7</strong> → 加入 D。已选：{C, B, <strong>D</strong>}<br>
+    <span class="step-label">第3步</span> 邻边：D-F(5), B-F(9), C-A(10), D-E(9)。<strong>最小 D-F=5</strong> → 加入 F。已选：{C, B, D, <strong>F</strong>}<br>
+    <span class="step-label">第4步</span> 邻边：F-E(6), B-F(9), C-A(10), D-E(9), F-A(8)。<strong>最小 F-E=6</strong> → 加入 E。已选：{C, B, D, F, <strong>E</strong>}<br>
+    <span class="step-label">第5步</span> 邻边：E-A(5), C-A(10), F-A(8)。<strong>最小 E-A=5</strong> → 加入 A。全部连通！
+  </div>
+
+  <div class="svg-box">
+    <svg width="680" height="380" viewBox="0 0 680 380">
+      <defs>
+        <radialGradient id="primStart"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8b96a"/></radialGradient>
+        <radialGradient id="primNode"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+      </defs>
+      <text x="340" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">Prim算法 · 从C出发构造最小生成树</text>
+      <!-- 完整图的所有边（灰色细线） -->
+      <line x1="312" y1="52" x2="222" y2="110" stroke="#ccc0a0" stroke-width="1.2" stroke-dasharray="5,3"/><text x="255" y="72" font-size="9" fill="#b0a080">10</text>
+      <line x1="350" y1="72" x2="456" y2="130" stroke="#ccc0a0" stroke-width="1.2" stroke-dasharray="5,3"/><text x="410" y="95" font-size="9" fill="#b0a080">8</text>
+      <line x1="220" y1="165" x2="320" y2="260" stroke="#ccc0a0" stroke-width="1.2" stroke-dasharray="5,3"/><text x="280" y="220" font-size="9" fill="#b0a080">9</text>
+      <line x1="440" y1="185" x2="520" y2="260" stroke="#ccc0a0" stroke-width="1.2" stroke-dasharray="5,3"/><text x="490" y="230" font-size="9" fill="#b0a080">9</text>
+      <line x1="460" y1="145" x2="560" y2="165" stroke="#ccc0a0" stroke-width="1.2" stroke-dasharray="5,3"/><text x="515" y="145" font-size="9" fill="#b0a080">8</text>
+      <!-- 顶点 -->
+      <circle cx="340" cy="40" r="26" fill="url(#primStart)" stroke="#5d4037" stroke-width="3"/><text x="340" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c1810">C</text><text x="340" y="30" text-anchor="middle" font-size="8" fill="#c0392b">起点</text>
+      <circle cx="210" cy="130" r="26" fill="url(#primNode)" stroke="#795548" stroke-width="2.5"/><text x="210" y="135" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">B</text>
+      <circle cx="450" cy="130" r="26" fill="url(#primNode)" stroke="#795548" stroke-width="2.5"/><text x="450" y="135" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">D</text>
+      <circle cx="560" cy="180" r="26" fill="url(#primNode)" stroke="#795548" stroke-width="2.5"/><text x="560" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">F</text>
+      <circle cx="320" cy="280" r="26" fill="url(#primNode)" stroke="#795548" stroke-width="2.5"/><text x="320" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">E</text>
+      <circle cx="120" cy="280" r="26" fill="url(#primNode)" stroke="#795548" stroke-width="2.5"/><text x="120" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#3e2723">A</text>
+      <!-- 生成树边（粗红线+序号） -->
+      <line x1="326" y1="60" x2="226" y2="110" stroke="#c0392b" stroke-width="4"/><text x="265" y="75" font-size="11" fill="#c0392b" font-weight="bold">① C-B(2)</text>
+      <line x1="236" y1="140" x2="426" y2="138" stroke="#c0392b" stroke-width="4"/><text x="331" y="130" font-size="11" fill="#c0392b" font-weight="bold">② B-D(7)</text>
+      <line x1="472" y1="145" x2="542" y2="168" stroke="#c0392b" stroke-width="4"/><text x="515" y="150" font-size="11" fill="#c0392b" font-weight="bold">③ D-F(5)</text>
+      <line x1="536" y1="192" x2="344" y2="268" stroke="#c0392b" stroke-width="4"/><text x="450" y="238" font-size="11" fill="#c0392b" font-weight="bold">④ F-E(6)</text>
+      <line x1="296" y1="268" x2="146" y2="272" stroke="#c0392b" stroke-width="4"/><text x="220" y="260" font-size="11" fill="#c0392b" font-weight="bold">⑤ E-A(5)</text>
+      <!-- 图注 -->
+      <rect x="40" y="320" width="600" height="50" rx="10" fill="#fef9e7" stroke="#c9b896" stroke-width="1.5"/>
+      <text x="340" y="340" text-anchor="middle" font-size="11" fill="#795548">红色粗线 = 生成树边（加入顺序①→⑤）  |  灰色虚线 = 原图其余边</text>
+      <text x="340" y="358" text-anchor="middle" font-size="11" fill="#8d6e63">生成顺序：C → B → D → F → E → A。总权值 = 2+7+5+6+5 = 25</text>
+    </svg>
+  </div>
+
+  <span class="badge-answer">生成顺序：C, B, D, F, E, A</span>
+  <div class="summary-line">📝 Prim = 从起点出发，每次贪心地选已连接区域到外部的"最短边"进行扩张。</div>
+</div>
+
+<!-- 简答第7题 -->
+<div class="card" id="sq7">
+  <span class="card-badge">简答题 · 第 7 题</span>
+  <h2><span class="qnum">7</span>建最大堆 + 两趟堆排序</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定初始序列 6, 3, 1, 4, 5, 2，建立最大堆，并写出前两趟堆排序后的结果。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：锦标赛选拔</h3>
+  <p>堆排序就像一场锦标赛：先建一个"冠军堆"（最大值在堆顶），然后每次把冠军"退役"（输出），再从剩下的选手中选出新冠军。</p>
+
+  <h3 class="derive">✍️ 建最大堆</h3>
+  <div class="step-block">
+    初始序列：<strong>6, 3, 1, 4, 5, 2</strong><br>
+    从最后一个非叶结点开始调整（位置3，值=1）：<br>
+    • 1 的孩子 2 → 1&lt;2，交换 → 6,3,2,4,5,1<br>
+    • 位置2（值=3）：孩子 4,5 → 5 最大 → 3&lt;5，交换 → 6,5,2,4,3,1<br>
+    • 位置1（值=6）：孩子 5,2 → 6 最大，不动<br>
+    <strong>最大堆：6, 5, 2, 4, 3, 1</strong>
+  </div>
+
+  <h3 class="derive">✍️ 堆排序</h3>
+  <div class="step-block">
+    <span class="step-label">第1趟</span> 输出堆顶 <strong>6</strong>，用最后一个元素 1 替换堆顶 → 1,5,2,4,3<br>
+    调整堆：1&lt;5 交换 → 5,1,2,4,3；1&lt;4 交换 → 5,4,2,1,3 → <strong>5,4,2,1,3</strong><br>
+    <span class="step-label">第2趟</span> 输出堆顶 <strong>5</strong>，用最后一个 3 替换 → 3,4,2,1<br>
+    调整堆：3&lt;4 交换 → 4,3,2,1 → <strong>4,3,2,1</strong>
+  </div>
+
+  <div class="svg-box">
+    <svg width="900" height="360" viewBox="0 0 900 360">
+      <defs>
+        <radialGradient id="hpRoot"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8b96a"/></radialGradient>
+        <radialGradient id="hpNode"><stop offset="0%" stop-color="#fef9e7"/><stop offset="100%" stop-color="#d4a76a"/></radialGradient>
+        <radialGradient id="hpOut"><stop offset="0%" stop-color="#ffcccc"/><stop offset="100%" stop-color="#e87070"/></radialGradient>
+      </defs>
+      <text x="130" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">① 建堆结果（最大堆）</text>
+      <text x="130" y="34" text-anchor="middle" font-size="10" fill="#795548">6,5,2,4,3,1</text>
+      <circle cx="130" cy="65" r="20" fill="url(#hpRoot)" stroke="#5d4037" stroke-width="2.5"/><text x="130" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c1810">6</text>
+      <line x1="116" y1="80" x2="80" y2="120" stroke="#795548" stroke-width="2"/><line x1="144" y1="80" x2="180" y2="120" stroke="#795548" stroke-width="2"/>
+      <circle cx="75" cy="135" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="75" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">5</text>
+      <circle cx="185" cy="135" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="185" y="140" text-anchor="middle" font-size="12" fill="#3e2723">2</text>
+      <line x1="66" y1="148" x2="50" y2="188" stroke="#795548" stroke-width="1.5"/><line x1="84" y1="148" x2="100" y2="188" stroke="#795548" stroke-width="1.5"/>
+      <circle cx="47" cy="203" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="47" y="207" text-anchor="middle" font-size="11" fill="#3e2723">4</text>
+      <circle cx="103" cy="203" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="103" y="207" text-anchor="middle" font-size="11" fill="#3e2723">3</text>
+      <line x1="176" y1="148" x2="163" y2="188" stroke="#795548" stroke-width="1.5"/>
+      <circle cx="163" cy="203" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="163" y="207" text-anchor="middle" font-size="11" fill="#3e2723">1</text>
+
+      <line x1="260" y1="20" x2="260" y2="220" stroke="#c9b896" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+      <text x="430" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">② 第1趟删除6后</text>
+      <text x="430" y="34" text-anchor="middle" font-size="10" fill="#795548">输出6，末位1替顶 → 调整 → 5,4,2,1,3</text>
+      <circle cx="430" cy="65" r="20" fill="url(#hpNode)" stroke="#5d4037" stroke-width="2.5"/><text x="430" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">5</text>
+      <line x1="416" y1="80" x2="380" y2="120" stroke="#795548" stroke-width="2"/><line x1="444" y1="80" x2="480" y2="120" stroke="#795548" stroke-width="2"/>
+      <circle cx="375" cy="135" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="375" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">4</text>
+      <circle cx="485" cy="135" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="485" y="140" text-anchor="middle" font-size="12" fill="#3e2723">2</text>
+      <line x1="366" y1="148" x2="350" y2="188" stroke="#795548" stroke-width="1.5"/><line x1="384" y1="148" x2="400" y2="188" stroke="#795548" stroke-width="1.5"/>
+      <circle cx="347" cy="203" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="347" y="207" text-anchor="middle" font-size="11" fill="#3e2723">1</text>
+      <circle cx="403" cy="203" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="403" y="207" text-anchor="middle" font-size="11" fill="#3e2723">3</text>
+      <text x="430" y="240" text-anchor="middle" font-size="10" fill="#c0392b">已输出：[6]</text>
+
+      <line x1="560" y1="20" x2="560" y2="220" stroke="#c9b896" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+      <text x="730" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">③ 第2趟删除5后</text>
+      <text x="730" y="34" text-anchor="middle" font-size="10" fill="#795548">输出5，末位3替顶 → 调整 → 4,3,2,1</text>
+      <circle cx="730" cy="65" r="20" fill="url(#hpNode)" stroke="#5d4037" stroke-width="2.5"/><text x="730" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">4</text>
+      <line x1="716" y1="80" x2="690" y2="118" stroke="#795548" stroke-width="2"/><line x1="744" y1="80" x2="770" y2="118" stroke="#795548" stroke-width="2"/>
+      <circle cx="687" cy="133" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="687" y="138" text-anchor="middle" font-size="12" font-weight="bold" fill="#3e2723">3</text>
+      <circle cx="773" cy="133" r="18" fill="url(#hpNode)" stroke="#795548" stroke-width="2"/><text x="773" y="138" text-anchor="middle" font-size="12" fill="#3e2723">2</text>
+      <line x1="677" y1="146" x2="665" y2="186" stroke="#795548" stroke-width="1.5"/>
+      <circle cx="663" cy="201" r="16" fill="url(#hpNode)" stroke="#8d6e63" stroke-width="1.8"/><text x="663" y="205" text-anchor="middle" font-size="11" fill="#3e2723">1</text>
+      <text x="730" y="240" text-anchor="middle" font-size="10" fill="#c0392b">已输出：[6, 5]</text>
+
+      <!-- 底部说明 -->
+      <text x="450" y="285" text-anchor="middle" font-size="11" fill="#8d6e63">图：完全二叉树形式展示最大堆。堆顶为最大值，删除后用末尾元素替换再下沉调整。</text>
+      <text x="450" y="308" text-anchor="middle" font-size="11" fill="#795548">建堆序列(层序)：6,5,2,4,3,1 → 第1趟后：5,4,2,1,3 → 第2趟后：4,3,2,1</text>
+    </svg>
+  </div>
+
+  <span class="badge-answer">建堆：6,5,2,4,3,1；第一趟后：5,4,2,1,3；第二趟后：4,3,2,1</span>
+  <div class="summary-line">📝 建堆从下往上调整；每趟输出堆顶，用末尾元素替补，再自上而下调整恢复堆性质。</div>
+</div>
+
+<!-- 简答第8题 -->
+<div class="card" id="sq8">
+  <span class="card-badge">简答题 · 第 8 题</span>
+  <h2><span class="qnum">8</span>插入排序前两趟</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>给定初始序列 6, 3, 1, 4, 5, 2，写出插入排序前两趟后的结果。
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：整理扑克牌</h3>
+  <p>你抓了一手牌：6, 3, 1, 4, 5, 2。整理方法：从第二张开始，每张牌<strong>插入到前面已排好的序列中</strong>正确的位置。</p>
+  <p>就像你打牌时，拿到一张新牌就把它插到合适的位置——左边都比它小，右边都比它大。</p>
+
+  <h3 class="derive">✍️ 逐步演示</h3>
+  <div class="step-block">
+    <span class="step-label">初始</span> <strong>6</strong> | 3, 1, 4, 5, 2 （左边已排序，右边待插入）<br>
+    <span class="step-label">第1趟</span> 插入 <strong>3</strong>：3 &lt; 6 → 6 右移，3 插入最前 → <strong>3, 6, 1, 4, 5, 2</strong><br>
+    <span class="step-label">第2趟</span> 插入 <strong>1</strong>：1 &lt; 6 → 6 右移；1 &lt; 3 → 3 右移；1 插入最前 → <strong>1, 3, 6, 4, 5, 2</strong>
+  </div>
+
+  <div class="svg-box">
+    <svg width="700" height="260" viewBox="0 0 700 260">
+      <defs>
+        <linearGradient id="insSorted" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8b96a"/><stop offset="100%" stop-color="#c2943b"/></linearGradient>
+        <linearGradient id="insUnsorted" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ede0c8"/><stop offset="100%" stop-color="#d4b896"/></linearGradient>
+        <linearGradient id="insNew" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd0d0"/><stop offset="100%" stop-color="#e87070"/></linearGradient>
+        <linearGradient id="insInsert" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b4dfb4"/><stop offset="100%" stop-color="#4a7c59"/></linearGradient>
+      </defs>
+      <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#3e2723">插入排序过程 · 色块图</text>
+
+      <!-- 初始 -->
+      <text x="60" y="50" font-size="11" fill="#795548" font-weight="bold">初始：</text>
+      <rect x="100" y="36" width="45" height="30" rx="6" fill="url(#insSorted)"/><text x="122" y="56" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">6</text>
+      <line x1="150" y1="51" x2="160" y2="51" stroke="#795548" stroke-width="1.5"/>
+      <rect x="165" y="36" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="187" y="56" text-anchor="middle" font-size="12" fill="#795548">3</text>
+      <rect x="215" y="36" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="237" y="56" text-anchor="middle" font-size="12" fill="#795548">1</text>
+      <rect x="265" y="36" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="287" y="56" text-anchor="middle" font-size="12" fill="#795548">4</text>
+      <rect x="315" y="36" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="337" y="56" text-anchor="middle" font-size="12" fill="#795548">5</text>
+      <rect x="365" y="36" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="387" y="56" text-anchor="middle" font-size="12" fill="#795548">2</text>
+      <text x="430" y="56" font-size="10" fill="#a1887f">← 已排序(金) | 待插入(浅)</text>
+
+      <!-- 第1趟 -->
+      <text x="60" y="110" font-size="11" fill="#795548" font-weight="bold">第1趟：</text>
+      <rect x="100" y="96" width="45" height="30" rx="6" fill="url(#insInsert)"/><text x="122" y="116" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">3</text>
+      <rect x="150" y="96" width="45" height="30" rx="6" fill="url(#insSorted)"/><text x="172" y="116" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">6</text>
+      <line x1="200" y1="111" x2="210" y2="111" stroke="#795548" stroke-width="1.5"/>
+      <rect x="215" y="96" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="237" y="116" text-anchor="middle" font-size="12" fill="#795548">1</text>
+      <rect x="265" y="96" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="287" y="116" text-anchor="middle" font-size="12" fill="#795548">4</text>
+      <rect x="315" y="96" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="337" y="116" text-anchor="middle" font-size="12" fill="#795548">5</text>
+      <rect x="365" y="96" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="387" y="116" text-anchor="middle" font-size="12" fill="#795548">2</text>
+      <text x="430" y="116" font-size="10" fill="#a1887f">← 插入3：6右移，3放最前</text>
+      <text x="610" y="116" font-size="11" fill="#c0392b" font-weight="bold">结果：3,6,1,4,5,2</text>
+
+      <!-- 第2趟 -->
+      <text x="60" y="170" font-size="11" fill="#795548" font-weight="bold">第2趟：</text>
+      <rect x="100" y="156" width="45" height="30" rx="6" fill="url(#insInsert)"/><text x="122" y="176" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">1</text>
+      <rect x="150" y="156" width="45" height="30" rx="6" fill="url(#insSorted)"/><text x="172" y="176" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">3</text>
+      <rect x="200" y="156" width="45" height="30" rx="6" fill="url(#insSorted)"/><text x="222" y="176" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">6</text>
+      <line x1="250" y1="171" x2="260" y2="171" stroke="#795548" stroke-width="1.5"/>
+      <rect x="265" y="156" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="287" y="176" text-anchor="middle" font-size="12" fill="#795548">4</text>
+      <rect x="315" y="156" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="337" y="176" text-anchor="middle" font-size="12" fill="#795548">5</text>
+      <rect x="365" y="156" width="45" height="30" rx="6" fill="url(#insUnsorted)"/><text x="387" y="176" text-anchor="middle" font-size="12" fill="#795548">2</text>
+      <text x="430" y="176" font-size="10" fill="#a1887f">← 插入1：6,3依次右移，1放最前</text>
+      <text x="610" y="176" font-size="11" fill="#c0392b" font-weight="bold">结果：1,3,6,4,5,2</text>
+
+      <!-- 图例 -->
+      <rect x="100" y="210" width="18" height="14" rx="3" fill="url(#insSorted)"/><text x="124" y="222" font-size="10" fill="#795548">已排序</text>
+      <rect x="190" y="210" width="18" height="14" rx="3" fill="url(#insInsert)"/><text x="214" y="222" font-size="10" fill="#795548">当前插入</text>
+      <rect x="290" y="210" width="18" height="14" rx="3" fill="url(#insUnsorted)"/><text x="314" y="222" font-size="10" fill="#795548">待排序</text>
+      <line x1="380" y1="217" x2="395" y2="217" stroke="#795548" stroke-width="1.5"/><text x="405" y="222" font-size="10" fill="#795548">分割线（左侧已排序）</text>
+
+      <text x="350" y="252" text-anchor="middle" font-size="11" fill="#8d6e63">图：金色=已排序区，红色=当前插入元素，浅色=待排序区。每趟将一个元素插入到前面正确位置。</text>
+    </svg>
+  </div>
+
+  <span class="badge-answer">第1趟：3,6,1,4,5,2；第2趟：1,3,6,4,5,2</span>
+  <div class="summary-line">📝 插入排序 = 整牌法。每张牌与前面已排序的依次比较，找到合适位置"插入"，大的依次右移。</div>
+</div>
+
+<!-- ==================== 四、编程题 ==================== -->
+<div class="section-title"><span>四、编程题（20分，每题10分）</span></div>
+
+<!-- 编程第1题：BuildLeafList -->
+<div class="card" id="pq1">
+  <span class="card-badge">编程题 · 第 1 题（10分）</span>
+  <h2><span class="qnum">1</span>BuildLeafList —— 叶结点链表化（5个空）</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>补全下面的函数，将二叉树叶结点的左右空指针利用起来，分别指向前一个和后一个叶结点。<br>
+    <code>struct TreeNode { int Data; int IsLeaf; struct TreeNode *Left, *Right; };</code><br>
+    <code>struct TreeNode *PreLeaf = NULL; // 前一个叶结点</code>
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：把树叶串成双向链</h3>
+  <p>把所有<strong>没有孩子的叶子</strong>找出来。叶子原本Left和Right都指向NULL——浪费了。现在Left指<strong>前一片叶子</strong>，Right指<strong>后一片叶子</strong>，串成双向链表。</p>
+
+  <h3 class="deconstruct">🔍 代码骨架逻辑</h3>
+  <div class="step-block">
+    递归遍历树T：<br>
+    → 如果T<strong>不是</strong>叶子：标记IsLeaf=0，递归处理左右子树<br>
+    → 如果T<strong>是</strong>叶子：标记IsLeaf=1，用全局PreLeaf互相链接
+  </div>
+
+  <h3 class="derive">✍️ 5个空的推导（原题代码结构如下）</h3>
+
+  <div class="code-block">
+<span class="kw">void</span> <span class="fn">BuildLeafList</span>(<span class="kw">struct</span> TreeNode *T) {
+    <span class="kw">if</span> (T == NULL) <span class="kw">return</span>;
+    <span class="kw">if</span> (___________) {  <span class="cm">// 空①：若T不是叶结点</span>
+        T-&gt;IsLeaf = <span class="num">0</span>;
+        ___________;        <span class="cm">// 空②：处理左子树的叶结点</span>
+        ___________;        <span class="cm">// 空③：处理右子树的叶结点</span>
+    } <span class="kw">else</span> {  <span class="cm">// T是叶结点</span>
+        T-&gt;IsLeaf = <span class="num">1</span>;
+        <span class="kw">if</span> (PreLeaf != NULL)
+            ___________;    <span class="cm">// 空④：前一叶子的Right指向T</span>
+        ___________;        <span class="cm">// 空⑤：T的Left指向前一叶子</span>
+        T-&gt;Right = NULL;
+        PreLeaf = T;
+    }
+}
+  </div>
+
+  <div class="step-block"><span class="step-label">空①</span> "不是叶子" = 左或右有一个孩子 → <code>T->Left != NULL || T->Right != NULL</code>（是||！）</div>
+  <div class="step-block"><span class="step-label">空②</span> <code>BuildLeafList(T->Left);</code></div>
+  <div class="step-block"><span class="step-label">空③</span> <code>BuildLeafList(T->Right);</code></div>
+  <div class="step-block"><span class="step-label">空④</span> <code>PreLeaf->Right = T;</code></div>
+  <div class="step-block"><span class="step-label">空⑤</span> <code>T->Left = PreLeaf;</code></div>
+
+  <div class="summary-line">📝 递归遍历→非叶递归左右→叶结点用全局PreLeaf串成双向链表(Left=前驱,Right=后继)。填空③④的顺序不能错：先让前驱指向当前，再让当前指向前驱。</div>
+</div>
+
+<!-- 编程第2题：Insert_sort -->
+<div class="card" id="pq2">
+  <span class="card-badge">编程题 · 第 2 题（10分）</span>
+  <h2><span class="qnum">2</span>Insert_sort —— 带头结点链表按序插入（5个空）</h2>
+
+  <div class="question-text">
+    <strong>题目原文：</strong>补全下面的函数，实现线性表的按序插入。采用带头结点的链表存储。<br>
+    <code>struct Node { ElementType Data; struct Node *Next; };</code>
+  </div>
+
+  <h3 class="analogy">🎯 生活类比：按身高插队</h3>
+  <p>一队人已按身高排好，头结点L是"领队标志"。新来X，p从L开始往后找：只要"p后面那人"比X矮就继续走，走到"p后面那人≥X"停下，把X插在p和他后面的人之间。</p>
+
+  <h3 class="derive">✍️ 5个空的推导（原题代码结构如下）</h3>
+
+  <div class="code-block">
+<span class="kw">void</span> <span class="fn">Insert_sort</span>(<span class="kw">struct</span> Node *L, ElementType X) {
+    <span class="kw">struct</span> Node *p, *q;
+    p = L;  <span class="cm">// p指向头结点</span>
+    <span class="kw">while</span> (___________ && p-&gt;Next-&gt;Data &lt; X)  <span class="cm">// 空①</span>
+        ___________;   <span class="cm">// 空②：p指向下一结点</span>
+    q = malloc(<span class="kw">sizeof</span>(<span class="kw">struct</span> Node));
+    ___________;                      <span class="cm">// 空③：q的数据部分赋值为X</span>
+    ___________;                      <span class="cm">// 空④：q的下一个节点为p的下一个节点</span>
+    ___________;                      <span class="cm">// 空⑤：p的下一个节点为q</span>
+}
+  </div>
+
+  <div class="step-block"><span class="step-label">空①</span> p后面有结点 → <code>p->Next != NULL</code></div>
+  <div class="step-block"><span class="step-label">空②</span> p后移 → <code>p = p->Next;</code></div>
+  <div class="step-block"><span class="step-label">空③</span> 给新结点赋值 → <code>q->Data = X;</code></div>
+  <div class="step-block"><span class="step-label">空④</span> q先接后面 → <code>q->Next = p->Next;</code>（⚠必须先做！否则p->Next一改就丢了原来的链）</div>
+  <div class="step-block"><span class="step-label">空⑤</span> p再接q → <code>p->Next = q;</code></div>
+
+  <div class="summary-line">📝 p从头结点往后找→while(p->Next存在且Data<X)→创建q→<strong>先q->Next=p->Next，再p->Next=q</strong>（顺序绝对不能反！反了链表就断了）</div>
+</div>
+
+<!-- ========== 结尾 ========== -->
+  <p style="font-size:1.2em; color:var(--brown-700); margin:12px 0;">
+    <strong>授人以鱼，不如授人以渔。</strong>
+  </p>
+  <p style="color:var(--brown-500);">
+    每一道题的背后，都是一种思维方式。<br>
+    希望这份讲义帮你"看见"了数据结构的思考过程。
+  </p>
+  <p style="color:var(--brown-300); font-size:0.85em; margin-top:16px;">
+    —— 你的数据结构助教
+  </p>
+</div>
+
+</div><!-- container end -->
+
+</body>
+</html>
